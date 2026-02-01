@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>טיול כביש 1 - גרסה סופית</title>
+    <title>Road Trip Pro - California 1</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,28 +19,28 @@
             font-family: 'Rubik', sans-serif;
             -webkit-tap-highlight-color: transparent;
             overscroll-behavior-y: none;
+            background-color: #f8fafc;
         }
         
         html { scroll-behavior: smooth; }
 
-        /* אנימציית רכב עדינה */
+        /* Smooth Car Animation */
         @keyframes carEngine {
             0%, 100% { transform: translateY(0px) scale(1); }
             50% { transform: translateY(-1px) scale(1.02); }
         }
         
-        /* המכונית עצמה */
         .car-marker {
             position: absolute;
-            right: 12px; /* מיקום על הקו */
+            right: 12px; 
             z-index: 30;
-            transition: top 1s linear, opacity 0.3s ease; /* תנועה חלקה מאוד */
+            transition: top 1s linear, opacity 0.3s ease; 
             pointer-events: none;
-            opacity: 0; /* מוסתר כברירת מחדל */
+            opacity: 0; 
         }
         
         .car-inner {
-            background-color: #2563eb; /* Blue-600 */
+            background-color: #2563eb; 
             padding: 6px;
             border-radius: 9999px;
             border: 3px solid white;
@@ -48,17 +48,17 @@
             animation: carEngine 2s infinite ease-in-out;
         }
 
-        /* הסתרת סרגל גלילה */
+        /* Scrollbar Hiding */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .btn-press { transition: transform 0.1s; }
-        .btn-press:active { transform: scale(0.95); }
+        .btn-press:active { transform: scale(0.96); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 pb-24">
+<body class="text-slate-800 pb-32">
 
-    <!-- Header Sticky -->
+    <!-- Header -->
     <div class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-gray-200 px-5 py-4 z-40 shadow-sm transition-all">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div>
@@ -100,8 +100,8 @@
     <!-- Main Modal (Details) -->
     <div id="mainModal" class="fixed inset-0 z-50 hidden flex items-end justify-center">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
-        <div class="bg-white w-full max-w-md rounded-t-3xl shadow-2xl animate-[slideIn_0.3s_ease-out] relative z-10 max-h-[90vh] flex flex-col overflow-hidden">
-            <div id="modalContent" class="flex flex-col h-full overflow-y-auto no-scrollbar"></div>
+        <div class="bg-white w-full max-w-md rounded-t-3xl shadow-2xl animate-[slideIn_0.3s_ease-out] relative z-10 max-h-[92vh] flex flex-col overflow-hidden">
+            <div id="modalContent" class="flex flex-col h-full overflow-y-auto no-scrollbar pb-6"></div>
         </div>
     </div>
 
@@ -125,48 +125,16 @@
     <script>
         // --- DATA ---
         
-        // יום 1 + יום 2 תחנות דלק
         const GAS_STATIONS = {
-            'start': [ 
-                { name: "ARCO Oxnard", address: "1935 N Oxnard Blvd", price: "$4.39", note: "זול! מזומן/Debit בלבד" },
-                { name: "United Oil", address: "2888 E Thousand Oaks Blvd", price: "$4.45", note: "על הדרך" },
-                { name: "Valero", address: "500 S Ventura Rd", price: "$4.49", note: "מחיר הוגן" }
-            ],
-            'sb': [ 
-                { name: "Fuel Depot", address: "5767 Calle Real, Goleta", price: "$4.55", note: "הכי זול ביציאה מסנטה ברברה" },
-                { name: "ARCO Buellton", address: "175 E Hwy 246", price: "$4.35", note: "ממש בכניסה לסולבנג" }
-            ],
-            'solvang': [ 
-                { name: "ARCO Pismo", address: "898 Oak Park Blvd", price: "$4.29", note: "מומלץ לפני שנכנסים ל-Big Sur" },
-                { name: "Speedway Express", address: "1350 Grand Ave", price: "$4.35", note: "" }
-            ],
-            'gas': [ 
-                { name: "Morro Bay Fuel", address: "1590 Main St", price: "$4.45", note: "בתוך העיר" },
-                { name: "Sinclair", address: "940 Morro Bay Blvd", price: "$4.49", note: "דינוזאור ירוק" }
-            ],
-            'morro': [ 
-                { name: "Chevron Cambria", address: "2194 Main St", price: "$5.89", note: "יקר! רק אם חייבים" },
-                { name: "אזהרה", address: "תמלאו לפני שמגיעים לכאן!", price: "---", note: "אין דלק זול עד מונטריי" }
-            ],
-            'seals': [ 
-                { name: "Ragged Point", address: "19019 CA-1", price: "$7.99", note: "חירום בלבד (יקר בטירוף)" },
-                { name: "Gorda Gas", address: "HC 67, Big Sur", price: "$7.50", note: "חירום בלבד" }
-            ],
-            'monterey': [ // יום 2 בבוקר
-                { name: "Safeway Fuel", address: "104 Canyon Del Rey", price: "$4.25", note: "הכי זול באזור (ליד המלון)" },
-                { name: "Valero", address: "2200 N Fremont St", price: "$4.39", note: "מחיר טוב" }
-            ],
-            'aquarium': [
-                { name: "Chevron Carmel", address: "3545 Rio Rd, Carmel", price: "$4.89", note: "יקר יחסית, אבל נוח" },
-                { name: "Shell", address: "3745 Via Nona Marie", price: "$4.79", note: "בכניסה לכרמל" }
-            ],
-            'carmel': [
-                 { name: "אזהרה", address: "אין דלק ב-Big Sur", price: "---", note: "מלאו לפני הנסיעה לגשר ביקסבי" }
-            ],
-            'bixby': [ // נסיעה לסן פרנסיסקו
-                { name: "Costco Gas (Half Moon Bay)", address: "Hwy 1", price: "$4.15", note: "לחברי מועדון בלבד" },
-                { name: "Chevron Pacifica", address: "500 Linda Mar Blvd", price: "$4.65", note: "לפני הכניסה ל-SF" }
-            ]
+            'start': [ { name: "ARCO Oxnard", address: "1935 N Oxnard Blvd", price: "$4.39", note: "זול! מזומן/Debit" }, { name: "United Oil", address: "2888 E Thousand Oaks Blvd", price: "$4.45", note: "על הדרך" }, { name: "Valero", address: "500 S Ventura Rd", price: "$4.49", note: "מחיר הוגן" } ],
+            'sb': [ { name: "Fuel Depot", address: "5767 Calle Real", price: "$4.55", note: "ביציאה מסנטה ברברה" }, { name: "ARCO Buellton", address: "175 E Hwy 246", price: "$4.35", note: "בכניסה לסולבנג" } ],
+            'solvang': [ { name: "ARCO Pismo", address: "898 Oak Park Blvd", price: "$4.29", note: "מומלץ מאוד!" }, { name: "Speedway", address: "1350 Grand Ave", price: "$4.35", note: "" } ],
+            'gas': [ { name: "Morro Bay Fuel", address: "1590 Main St", price: "$4.45", note: "בתוך העיר" }, { name: "Sinclair", address: "940 Morro Bay Blvd", price: "$4.49", note: "דינוזאור ירוק" } ],
+            'morro': [ { name: "Chevron Cambria", address: "2194 Main St", price: "$5.89", note: "יקר מאוד" }, { name: "אזהרה", address: "אין דלק זול מכאן!", price: "---", note: "תדלקו במורו ביי" } ],
+            'seals': [ { name: "Ragged Point", address: "19019 CA-1", price: "$7.99", note: "חירום בלבד" }, { name: "Gorda Gas", address: "Big Sur", price: "$7.50", note: "חירום בלבד" } ],
+            'monterey': [ { name: "Safeway Fuel", address: "104 Canyon Del Rey", price: "$4.25", note: "הכי זול באזור" }, { name: "Valero", address: "2200 N Fremont St", price: "$4.39", note: "מחיר טוב" } ],
+            'aquarium': [ { name: "Shell", address: "3745 Via Nona Marie", price: "$4.79", note: "בכניסה לכרמל" } ],
+            'bixby': [ { name: "Costco Gas", address: "Half Moon Bay", price: "$4.15", note: "חברים בלבד" }, { name: "Chevron Pacifica", address: "500 Linda Mar Blvd", price: "$4.65", note: "לפני SF" } ]
         };
 
         const ITINERARY = [
@@ -175,12 +143,20 @@
                 title: 'יציאה: לוס אנג\'לס',
                 originalTime: '09:00',
                 displayTime: '09:00',
-                description: 'יציאה ממלון Westin Bonaventure. לוודא: מים, כבלים ונשנושים.',
+                subTitle: 'מתחילים את המסע',
                 type: 'start',
                 icon: 'car',
                 coords: { lat: 34.0528, lng: -118.2556 },
                 parking: { name: 'לובי המלון', coords: { lat: 34.0528, lng: -118.2556 }, cost: '---' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3p6yTIcIs92AnFZfplUcSVPCaXzjjpc_hdRUxa4vbcA&s=10"
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3p6yTIcIs92AnFZfplUcSVPCaXzjjpc_hdRUxa4vbcA&s=10",
+                longDesc: `
+                    <p class="mb-2">יוצאים לדרך! וודאו שארזתם הכל ושהרכב מוכן.</p>
+                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
+                        <li>יציאה דרך כביש 101 מערבה.</li>
+                        <li>בדקו שיש לכם מים וכבל טעינה.</li>
+                        <li>הגדרת הניווט לתחנה הראשונה: סנטה ברברה.</li>
+                    </ul>`,
+                walkingRoute: null
             },
             {
                 id: 'sb',
@@ -188,12 +164,22 @@
                 subTitle: 'Stearns Wharf',
                 originalTime: '11:00',
                 displayTime: '11:00',
-                description: 'עצירה במזח העתיק. אווירה של ריביירה ספרדית.',
                 type: 'stop',
                 icon: 'anchor',
                 coords: { lat: 34.4123, lng: -119.6876 }, 
-                parking: { name: 'City Lot #1', address: '23 E Cabrillo Blvd', coords: { lat: 34.4137, lng: -119.6905 }, cost: 'חינם 75 דק׳, אח״כ $2.5/שעה' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSB1m_VYizll6MT567ggSruv9ImG91t4HKdwqXT1wxLWA&s=10"
+                parking: { name: 'City Lot #1', address: '23 E Cabrillo Blvd', coords: { lat: 34.4137, lng: -119.6905 }, cost: 'חינם 75 דק׳ ראשונות' },
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSB1m_VYizll6MT567ggSruv9ImG91t4HKdwqXT1wxLWA&s=10",
+                longDesc: `
+                    <p class="mb-2"><strong>הריביירה האמריקאית.</strong> עיר חוף יפהפייה עם ארכיטקטורה ספרדית, גגות רעפים אדומים ודקלים.</p>
+                    <div class="bg-blue-50 p-3 rounded-lg mb-3 border border-blue-100">
+                        <h4 class="font-bold text-blue-700 text-xs mb-1">מה עושים כאן?</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
+                            <li>הליכה על המזח ההיסטורי (Stearns Wharf).</li>
+                            <li>ביקור בבית המשפט (תצפית חינם מהמגדל).</li>
+                            <li>סיבוב קצר ברחוב המדינה (State Street).</li>
+                        </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Stearns+Wharf,+217+Stearns+Wharf,+Santa+Barbara,+CA+93101/State+St,+Santa+Barbara,+CA/@34.416668,-119.6967757,16z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x80e914878a176885:0x87a71f010c7336f7!2m2!1d-119.6853609!2d34.4103135!1m5!1m1!1s0x80e91480c44f8087:0x629c42405a415664!2m2!1d-119.7028919!2d34.4231885!3e2?entry=ttu"
             },
             {
                 id: 'solvang',
@@ -201,12 +187,22 @@
                 subTitle: 'העיירה הדנית',
                 originalTime: '12:30',
                 displayTime: '12:30',
-                description: 'הפסקת צהריים בדנמרק הקטנה. חובה לטעום מאפה דני.',
                 type: 'stop',
                 icon: 'coffee',
                 coords: { lat: 34.5958, lng: -120.1376 },
                 parking: { name: 'Public Parking', address: '1616 Oak St', coords: { lat: 34.5945, lng: -120.1408 }, cost: 'חינם' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2NgP8pvIZShu5F_1XhFvbqpMI-fDt3sSXwxNpXw4IHg&s=10"
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2NgP8pvIZShu5F_1XhFvbqpMI-fDt3sSXwxNpXw4IHg&s=10",
+                longDesc: `
+                    <p class="mb-2"><strong>דנמרק הקטנה.</strong> עיירה שנבנתה על ידי מהגרים דנים. הכל נראה כמו באגדות - טחנות רוח, מאפיות וגגות משופעים.</p>
+                    <div class="bg-orange-50 p-3 rounded-lg mb-3 border border-orange-100">
+                        <h4 class="font-bold text-orange-700 text-xs mb-1">המלצות לביקור:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
+                            <li>חובה לטעום Aebleskiver (סופגניות דניות) עם ריבה.</li>
+                            <li>צילום ליד טחנות הרוח.</li>
+                            <li>ביקור בחנות חג המולד (פתוחה כל השנה).</li>
+                        </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Solvang+Visitor+Center,+1639+Copenhagen+Dr,+Solvang,+CA+93463/The+Little+Mermaid+Fountain,+1693+Mission+Dr,+Solvang,+CA+93463/@34.5950837,-120.1403248,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x80e94a37c02b377b:0x52445c7b3724c084!2m2!1d-120.1384049!2d34.5946399!1m5!1m1!1s0x80e94a36f88d2285:0x8544d673199f57f6!2m2!1d-120.139611!2d34.5956041!3e2?entry=ttu"
             },
             {
                 id: 'gas',
@@ -214,12 +210,16 @@
                 subTitle: 'סן לואיס אוביספו',
                 originalTime: '14:30',
                 displayTime: '14:30',
-                description: 'נקודה קריטית! מכאן אין דלק נורמלי לשעות הקרובות.',
                 type: 'gas',
                 icon: 'fuel',
                 coords: { lat: 35.2675, lng: -120.6481 },
-                parking: { name: 'Conserv Fuel', address: '2211 Broad St', coords: { lat: 35.2675, lng: -120.6481 }, cost: 'ללקוחות בלבד' },
-                isEmoji: true, emoji: "⛽", bgGradient: "from-orange-400 to-red-500"
+                parking: { name: 'Conserv Fuel', address: '2211 Broad St', coords: { lat: 35.2675, lng: -120.6481 }, cost: 'מחיר הוגן' },
+                isEmoji: true, emoji: "⛽", bgGradient: "from-orange-400 to-red-500",
+                longDesc: `
+                    <p class="mb-2 font-bold text-red-600">עצירה קריטית!</p>
+                    <p class="text-sm text-gray-700">זה המקום האחרון לתדלק במחיר שפוי לפני שנכנסים לכביש החוף הפראי ולביג סר (Big Sur).</p>
+                    <p class="text-sm mt-2">בהמשך המחירים קופצים לפי 2, או שאין תחנות בכלל. מלאו מיכל מלא גם אם נשאר לכם חצי.</p>`,
+                walkingRoute: null
             },
             {
                 id: 'morro',
@@ -227,12 +227,22 @@
                 subTitle: 'Morro Rock',
                 originalTime: '15:00',
                 displayTime: '15:00',
-                description: 'תמונה זריזה עם הסלע הגעשי שבוקע מהים.',
                 type: 'stop',
                 icon: 'camera',
                 coords: { lat: 35.3712, lng: -120.8667 },
                 parking: { name: 'Coleman Park', address: 'Coleman Dr', coords: { lat: 35.3705, lng: -120.8650 }, cost: 'חינם' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNR-4naNKMPmIiq99YbgSSK0VvTVhUrTG-W_7YMbSYOg&s=10"
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNR-4naNKMPmIiq99YbgSSK0VvTVhUrTG-W_7YMbSYOg&s=10",
+                longDesc: `
+                    <p class="mb-2"><strong>הגיברלטר של האוקיינוס השקט.</strong> סלע געשי עצום שבוקע מהים בגובה 176 מטר.</p>
+                    <div class="bg-teal-50 p-3 rounded-lg mb-3 border border-teal-100">
+                        <h4 class="font-bold text-teal-700 text-xs mb-1">שימו לב:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
+                            <li>חפשו לוטרות ים (Sea Otters) צפות על הגב במפרץ.</li>
+                            <li>אסור לטפס על הסלע (שמורת טבע לקינון בזים).</li>
+                            <li>מקום מעולה לתמונות פנורמיות.</li>
+                        </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Coleman+Park,+Morro+Bay,+CA/Morro+Rock,+Morro+Bay,+CA/@35.3707765,-120.8677649,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x80ececf65e305739:0x80327f311663f749!2m2!1d-120.8637777!2d35.3709033!1m5!1m1!1s0x80ececf163352723:0x415b026615b1406!2m2!1d-120.8662973!2d35.371485!3e2?entry=ttu"
             },
             {
                 id: 'seals',
@@ -240,12 +250,22 @@
                 subTitle: 'San Simeon',
                 originalTime: '16:15',
                 displayTime: '16:15',
-                description: 'השיא של הנסיעה! אלפי פילי ים על החוף.',
                 type: 'stop',
                 icon: 'fish',
                 coords: { lat: 35.6630, lng: -121.2575 },
                 parking: { name: 'Vista Point', address: 'Hwy 1', coords: { lat: 35.6630, lng: -121.2575 }, cost: 'חינם' },
-                isEmoji: true, emoji: "🦭", bgGradient: "from-blue-400 to-cyan-600"
+                isEmoji: true, emoji: "🦭", bgGradient: "from-blue-400 to-cyan-600",
+                longDesc: `
+                    <p class="mb-2"><strong>תופעת טבע מדהימה.</strong> מושבה ענקית של פילי ים (Elephant Seals).</p>
+                    <div class="bg-indigo-50 p-3 rounded-lg mb-3 border border-indigo-100">
+                        <h4 class="font-bold text-indigo-700 text-xs mb-1">מה רואים?</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
+                            <li>אלפי כלבי ים שוכבים על החוף, רבים, ישנים ומשמיעים קולות מוזרים.</li>
+                            <li>יש מסלול הליכה מסודר מעץ (Boardwalk) שלא מפריע לחיות.</li>
+                            <li>הריח... חלק מהחוויה!</li>
+                        </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Elephant+Seal+Vista+Point,+San+Simeon,+CA/Elephant+Seal+Viewing+Walkway,+San+Simeon,+CA+93452/@35.662862,-121.2588421,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x8092dca6666324b3:0x6f31d04469076597!2m2!1d-121.2576356!2d35.6630095!1m5!1m1!1s0x8092dcbfa0388e33:0x1b439e7638706240!2m2!1d-121.2562479!2d35.6622378!3e2?entry=ttu"
             },
             {
                 id: 'monterey',
@@ -253,12 +273,19 @@
                 subTitle: 'Victorian Inn',
                 originalTime: '18:30',
                 displayTime: '18:30',
-                description: 'סיום יום 1. מרחק הליכה מ-Cannery Row.',
                 type: 'hotel',
                 icon: 'bed',
                 coords: { lat: 36.6128, lng: -121.9001 },
-                parking: { name: 'חניון המלון', address: '487 Foam St', coords: { lat: 36.6128, lng: -121.9001 }, cost: '$20 ללילה (בערך)' },
-                isEmoji: true, emoji: "🏨", bgGradient: "from-indigo-500 to-purple-600"
+                parking: { name: 'חניון המלון', address: '487 Foam St', coords: { lat: 36.6128, lng: -121.9001 }, cost: 'לאורחים' },
+                isEmoji: true, emoji: "🏨", bgGradient: "from-indigo-500 to-purple-600",
+                longDesc: `
+                    <p class="mb-2">הגעתם! מלון בסגנון ויקטוריאני במיקום מושלם.</p>
+                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
+                        <li>המלון נמצא במרחק הליכה קצר מ-Cannery Row.</li>
+                        <li>יש קבלת פנים עם יין וגבינות (לבדוק שעות).</li>
+                        <li>ארוחת בוקר כלולה.</li>
+                    </ul>`,
+                walkingRoute: "https://www.google.com/maps/dir/Victorian+Inn,+487+Foam+St,+Monterey,+CA+93940/Cannery+Row,+Monterey,+CA/@36.6146051,-121.9022635,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x808de4446b5a34ad:0x1b704c7c8c322b28!2m2!1d-121.9001206!2d36.6127568!1m5!1m1!1s0x808de443a6773321:0x2289c037593c7857!2m2!1d-121.8993202!2d36.616335!3e2?entry=ttu"
             },
             { id: 'day2', title: 'יום שני (02/02)', type: 'divider' },
             {
@@ -267,12 +294,22 @@
                 subTitle: 'Cannery Row',
                 originalTime: '09:00',
                 displayTime: '09:00',
-                description: 'מהטובים בעולם. להזמין כרטיסים מראש.',
                 type: 'stop',
                 icon: 'fish',
                 coords: { lat: 36.6183, lng: -121.9015 },
-                parking: { name: 'Cannery Row Garage', address: '601 Foam St', coords: { lat: 36.6145, lng: -121.8988 }, cost: '$20-$30 ליום' },
-                image: "https://media-cdn.tripadvisor.com/media/photo-s/12/e8/d0/6c/back-decks-and-great.jpg"
+                parking: { name: 'Cannery Row Garage', address: '601 Foam St', coords: { lat: 36.6145, lng: -121.8988 }, cost: '$20 ליום' },
+                image: "https://media-cdn.tripadvisor.com/media/photo-s/12/e8/d0/6c/back-decks-and-great.jpg",
+                longDesc: `
+                    <p class="mb-2"><strong>אחד האקווריומים הטובים בעולם.</strong></p>
+                    <div class="bg-cyan-50 p-3 rounded-lg mb-3 border border-cyan-100">
+                        <h4 class="font-bold text-cyan-700 text-xs mb-1">אל תפספסו:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
+                            <li>יער הקלפ (Kelp Forest) - מיכל ענק בגובה 3 קומות.</li>
+                            <li>לוטרות הים (Sea Otters) - האכלה בשעה 10:30 (לוודא).</li>
+                            <li>מיכל האוקיינוס הפתוח (Open Sea) עם המדוזות הזוהרות.</li>
+                        </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Cannery+Row+Parking+Garage,+601+Foam+St,+Monterey,+CA+93940/Monterey+Bay+Aquarium,+886+Cannery+Row,+Monterey,+CA+93940/@36.6167882,-121.903006,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x808de44415840617:0x520a061405a76e97!2m2!1d-121.898797!2d36.6144884!1m5!1m1!1s0x808de4439121a221:0x4d216f272a4b8e55!2m2!1d-121.9017772!2d36.6182586!3e2?entry=ttu"
             },
             {
                 id: 'carmel',
@@ -280,12 +317,22 @@
                 subTitle: 'Carmel-by-the-Sea',
                 originalTime: '11:30',
                 displayTime: '11:30',
-                description: 'עיירה ציורית וחוף לבן מהמם.',
                 type: 'stop',
                 icon: 'coffee',
                 coords: { lat: 36.5552, lng: -121.9233 },
                 parking: { name: 'Vista Lobos', address: '3rd Ave & Torres St', coords: { lat: 36.5560, lng: -121.9215 }, cost: 'חינם' },
-                image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0a/66/e2/75/20160221-091502-1-largejpg.jpg?w=600&h=-1&s=1"
+                image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0a/66/e2/75/20160221-091502-1-largejpg.jpg?w=600&h=-1&s=1",
+                longDesc: `
+                    <p class="mb-2"><strong>עיירת האגדות.</strong> בתים שנראים כמו מסיפורי ילדים, גלריות וחוף לבן.</p>
+                    <div class="bg-gray-50 p-3 rounded-lg mb-3 border border-gray-200">
+                        <h4 class="font-bold text-gray-700 text-xs mb-1">המלצת מסלול:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-600">
+                            <li>חנו את הרכב ורדו ברגל את Ocean Avenue.</li>
+                            <li>בסוף הרחוב מחכה לכם חוף כרמל עם חול לבן ונקי.</li>
+                            <li>שימו לב: אין מספרי בתים בכרמל, ולנשים אסור ללכת עם עקבים גבוהים (חוק ישן!).</li>
+                        </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Ocean+Ave,+Carmel-By-The-Sea,+CA/Carmel+Beach,+Carmel-By-The-Sea,+CA/@36.5545229,-121.9271616,16z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x808de615b71c0861:0xa7d825c56209581!2m2!1d-121.9208039!2d36.5551986!1m5!1m1!1s0x808de63e14732165:0x8797b5398d928230!2m2!1d-121.9287399!2d36.5539308!3e2?entry=ttu"
             },
             {
                 id: 'bixby',
@@ -293,12 +340,19 @@
                 subTitle: 'Big Sur Bridge',
                 originalTime: '13:20',
                 displayTime: '13:20',
-                description: 'התמונה המפורסמת ביותר. זהירות בחצייה.',
                 type: 'stop',
                 icon: 'camera',
                 coords: { lat: 36.3714, lng: -121.9017 },
                 parking: { name: 'מפרץ צפוני', address: 'Hwy 1', coords: { lat: 36.3725, lng: -121.9030 }, cost: 'חינם' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2zJIDl1fe1ZGo7UfUrx2iHn1dYXzNNPtTfggtnUme6A&s=10"
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2zJIDl1fe1ZGo7UfUrx2iHn1dYXzNNPtTfggtnUme6A&s=10",
+                longDesc: `
+                    <p class="mb-2"><strong>האייקון של כביש 1.</strong> גשר בטון עצום שנבנה ב-1932 ומחבר את שני צידי הקניון מעל הים.</p>
+                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
+                        <li>החניה היא במפרץ עפר בצד הצפוני (לפני הגשר אם באים מצפון, אחרי הגשר אם באים מדרום).</li>
+                        <li>זהירות! הכביש סואן והמצוק תלול.</li>
+                        <li>המקום הכי מצולם בקליפורניה.</li>
+                    </ul>`,
+                walkingRoute: null
             },
             {
                 id: 'sf',
@@ -306,12 +360,22 @@
                 subTitle: 'Fisherman\'s Wharf',
                 originalTime: '17:00',
                 displayTime: '17:00',
-                description: 'הגעה לעיר הגדולה והחזרת הרכב.',
                 type: 'stop',
                 icon: 'anchor',
                 coords: { lat: 37.8080, lng: -122.4177 },
                 parking: { name: 'חניון המלון', coords: { lat: 37.8080, lng: -122.4177 }, cost: '$50-$70 ללילה' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThRZsv_ufgRrqGw4E1tFyxdTSwAQoAxAfQGk5jrZAlaTvcZzTjQ3fM_-J5&s=10"
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThRZsv_ufgRrqGw4E1tFyxdTSwAQoAxAfQGk5jrZAlaTvcZzTjQ3fM_-J5&s=10",
+                longDesc: `
+                    <p class="mb-2"><strong>הגעתם ליעד!</strong> רציף הדייגים (Fisherman's Wharf).</p>
+                    <div class="bg-blue-50 p-3 rounded-lg mb-3 border border-blue-100">
+                        <h4 class="font-bold text-blue-700 text-xs mb-1">סיום מתוק:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
+                            <li>לראות את אריות הים ב-Pier 39.</li>
+                            <li>לאכול מרק צדפות (Clam Chowder) בלחם חמוץ ב-Boudin.</li>
+                            <li>תצפית על כלא אלקטרז.</li>
+                        </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Fisherman's+Wharf,+San+Francisco,+CA/Pier+39,+The+Embarcadero,+San+Francisco,+CA/@37.808871,-122.4146036,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x808580e839d7e541:0xf89b6220c55337a7!2m2!1d-122.4177426!2d37.8080005!1m5!1m1!1s0x808580f18d783d63:0x153e77dfd2361b20!2m2!1d-122.409821!2d37.808673!3e2?entry=ttu"
             }
         ];
 
@@ -331,13 +395,11 @@
 
         // --- CORE LOGIC ---
 
-        // בניה חד פעמית של ה-HTML למניעת הבהוב
         function initItinerary() {
             const container = document.getElementById('itinerary-container');
             container.innerHTML = '';
 
             ITINERARY.forEach((stop, index) => {
-                // Divider
                 if (stop.type === 'divider') {
                     container.innerHTML += `
                         <div class="relative z-10 my-8 flex items-center justify-center">
@@ -350,29 +412,21 @@
 
                 const showGas = index < ITINERARY.length - 1 && ITINERARY[index+1].type !== 'divider' && GAS_STATIONS[stop.id];
 
-                // Image/Emoji
                 let mediaHtml = stop.isEmoji 
                     ? `<div class="w-full h-full bg-gradient-to-br ${stop.bgGradient} flex items-center justify-center text-6xl drop-shadow-md select-none">${stop.emoji}</div>`
                     : `<img src="${stop.image}" class="w-full h-full object-cover select-none">`;
 
-                // Main Item HTML
                 container.innerHTML += `
                     <div id="stop-item-${index}" class="relative mb-8">
-                        
-                        <!-- THE CAR ELEMENT (Hidden by default, opacity 0) -->
                         <div id="car-${index}" class="car-marker" style="top: 0%;">
-                            <div class="car-inner">
-                                <i data-lucide="car" class="w-4 h-4 text-white"></i>
-                            </div>
+                            <div class="car-inner"><i data-lucide="car" class="w-4 h-4 text-white"></i></div>
                         </div>
 
                         <div class="flex items-start gap-4">
-                            <!-- Timeline Dot -->
                             <div id="dot-${index}" class="relative shrink-0 w-8 h-8 rounded-full border-[3px] z-10 flex items-center justify-center bg-white shadow-sm mt-8 transition-colors duration-500 border-slate-300">
                                 <div id="inner-dot-${index}" class="w-2.5 h-2.5 rounded-full transition-colors duration-500 bg-slate-300"></div>
                             </div>
 
-                            <!-- Card -->
                             <div id="card-${index}" onclick="openModal(${index})" class="relative grow bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer btn-press transition-all duration-300">
                                 <div class="h-32 w-full relative bg-gray-100">
                                     ${mediaHtml}
@@ -391,8 +445,6 @@
                                         <i data-lucide="clock" class="w-3 h-3 text-slate-500"></i>
                                         <span id="time-${index}" class="text-xs font-bold text-slate-700 font-mono">${stop.displayTime}</span>
                                     </div>
-
-                                    <!-- ETA Badge (Dynamic) -->
                                     <div id="eta-${index}" class="hidden flex items-center gap-1 text-[10px] font-bold text-green-700 bg-green-50 px-2 py-1 rounded-full border border-green-100 animate-pulse">
                                         <i data-lucide="timer" class="w-3 h-3"></i> <span id="eta-text-${index}"></span>
                                     </div>
@@ -400,7 +452,6 @@
                             </div>
                         </div>
 
-                        <!-- Gas Button -->
                         ${showGas ? `
                         <div class="ml-4 mr-[30px] my-4 relative">
                             <div class="absolute right-[21px] -top-6 -bottom-6 w-0 border-r-2 border-dashed border-slate-200"></div>
@@ -418,7 +469,6 @@
             lucide.createIcons();
         }
 
-        // כפתור ראשי
         function handleMainButton() {
             const btn = document.getElementById('actionBtn');
             const btnText = document.getElementById('btnText');
@@ -432,11 +482,10 @@
                     navigator.geolocation.watchPosition(
                         (position) => {
                             isTracking = true;
-                            // Fake location for testing (uncomment to simulate being near Santa Barbara):
+                            // Uncomment to test fake location:
                             // userLocation = { lat: 34.3, lng: -119.5 };
                             userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
                             
-                            // Visual Updates
                             btn.classList.remove('bg-green-600', 'shadow-green-200');
                             btn.classList.add('bg-blue-600', 'shadow-blue-200');
                             btnText.innerText = "איפה אני?";
@@ -458,7 +507,6 @@
             }
         }
 
-        // לוגיקה שרצה בכל עדכון GPS
         function updateLiveLogic() {
             if (!userLocation) return;
             const { lat, lng } = userLocation;
@@ -468,15 +516,12 @@
 
             const stops = ITINERARY.filter(s => s.type !== 'divider');
 
-            // 1. Find Location & Calculate ETA
             ITINERARY.forEach((stop, idx) => {
                 if (stop.type === 'divider') return;
 
-                // Update Time Logic
                 const dist = getDistance(lat, lng, stop.coords.lat, stop.coords.lng);
                 const minutes = Math.round((dist * 1.4 / 70) * 60); 
                 
-                // DOM Elements
                 const timeEl = document.getElementById(`time-${idx}`);
                 const etaEl = document.getElementById(`eta-${idx}`);
                 const etaTextEl = document.getElementById(`eta-text-${idx}`);
@@ -484,20 +529,14 @@
                 const innerDot = document.getElementById(`inner-dot-${idx}`);
                 const card = document.getElementById(`card-${idx}`);
 
-                // Past or Future?
-                // Simple logic: if we are significantly North of the stop
                 if (lat > stop.coords.lat + 0.02) { 
-                    // Past
                     timeEl.innerText = stop.originalTime;
                     etaEl.classList.add('hidden');
-                    
-                    // Style Updates (Past)
                     dot.classList.remove('border-slate-300'); dot.classList.add('border-blue-500');
                     innerDot.classList.remove('bg-slate-300'); innerDot.classList.add('bg-blue-500');
                     card.classList.remove('ring-2', 'ring-blue-400');
                 } else {
-                    // Future
-                    if (minutes > 0 && minutes < 600) { // Limit crazy values
+                    if (minutes > 0 && minutes < 600) {
                         const arrival = new Date(now.getTime() + minutes * 60000);
                         timeEl.innerText = `${String(arrival.getHours()).padStart(2,'0')}:${String(arrival.getMinutes()).padStart(2,'0')}`;
                         etaEl.classList.remove('hidden');
@@ -506,43 +545,30 @@
                 }
             });
 
-            // 2. Determine Active Segment (Where is the car?)
             for (let i = 0; i < stops.length - 1; i++) {
                 const current = stops[i];
                 const next = stops[i+1];
-                
-                // If we are strictly between these two latitudes
                 if (lat >= current.coords.lat && lat <= next.coords.lat) {
-                    // Find original index in full ITINERARY
                     activeSegmentIndex = ITINERARY.findIndex(s => s.id === current.id);
-                    
                     const totalDist = next.coords.lat - current.coords.lat;
                     const covered = lat - current.coords.lat;
-                    segmentProgress = covered / totalDist; // 0.0 to 1.0
+                    segmentProgress = covered / totalDist;
                     break;
                 }
             }
 
-            // 3. Move the Car (Visual Only - No re-render)
-            // Reset all cars first
             document.querySelectorAll('.car-marker').forEach(el => el.style.opacity = '0');
             
             if (activeSegmentIndex !== -1) {
                 const activeCar = document.getElementById(`car-${activeSegmentIndex}`);
                 const activeCard = document.getElementById(`card-${activeSegmentIndex}`);
-                
                 if (activeCar) {
                     activeCar.style.opacity = '1';
-                    // Move it! (CSS transition handles smooth slide)
-                    // We add a slight offset (20px) to not overlap the dot immediately
                     activeCar.style.top = `${segmentProgress * 100}%`;
                 }
-                
                 if (activeCard) {
                      activeCard.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
                 }
-                
-                // Save global active for scroll button
                 window.currentActiveIndex = activeSegmentIndex;
             }
         }
@@ -553,8 +579,6 @@
             }
         }
 
-        // --- MODALS ---
-
         function openModal(idx) {
             const stop = ITINERARY[idx];
             const content = document.getElementById('modalContent');
@@ -563,6 +587,30 @@
             let mediaHtml = stop.isEmoji 
                 ? `<div class="w-full h-full bg-gradient-to-br ${stop.bgGradient} flex items-center justify-center text-8xl">${stop.emoji}</div>`
                 : `<img src="${stop.image}" class="w-full h-full object-cover">`;
+
+            // HTML for Navigation Buttons
+            const navButtons = `
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div class="col-span-2 text-[10px] text-gray-400 uppercase tracking-widest font-bold text-center">ניווט ליעד</div>
+                    <button onclick="nav('${stop.coords.lat},${stop.coords.lng}', 'waze')" class="bg-blue-600 text-white py-3 rounded-xl text-sm font-bold shadow-md btn-press flex justify-center items-center gap-2">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/Waze_2020.svg" class="w-4 h-4 brightness-0 invert"> Waze יעד
+                    </button>
+                    <button onclick="nav('${stop.coords.lat},${stop.coords.lng}', 'google')" class="bg-white text-gray-700 border border-gray-200 py-3 rounded-xl text-sm font-bold shadow-sm btn-press flex justify-center items-center gap-2">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg" class="w-4 h-4"> Google
+                    </button>
+                </div>
+
+                ${stop.parking ? `
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="col-span-2 text-[10px] text-gray-400 uppercase tracking-widest font-bold text-center mt-2">ניווט לחניה</div>
+                    <button onclick="nav('${stop.parking.coords.lat},${stop.parking.coords.lng}', 'waze')" class="bg-slate-800 text-white py-3 rounded-xl text-sm font-bold shadow-md btn-press flex justify-center items-center gap-2">
+                        <span class="bg-white/20 px-1.5 rounded text-[10px]">P</span> Waze
+                    </button>
+                    <button onclick="nav('${stop.parking.coords.lat},${stop.parking.coords.lng}', 'google')" class="bg-slate-100 text-slate-700 border border-slate-200 py-3 rounded-xl text-sm font-bold shadow-sm btn-press flex justify-center items-center gap-2">
+                        <span class="bg-slate-300 px-1.5 rounded text-[10px] text-slate-700">P</span> Google
+                    </button>
+                </div>` : ''}
+            `;
 
             content.innerHTML = `
                 <div class="relative h-56 shrink-0">
@@ -576,9 +624,15 @@
                         </div>
                     </div>
                 </div>
+                
                 <div class="p-5 bg-white grow flex flex-col">
-                    <p class="text-sm text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-xl border border-gray-100 mb-4">${stop.description}</p>
                     
+                    <!-- Long Description -->
+                    <div class="text-sm text-gray-700 leading-relaxed mb-4">
+                        ${stop.longDesc}
+                    </div>
+                    
+                    <!-- Parking Info Box -->
                     ${stop.parking ? `
                     <div class="bg-white border border-gray-100 p-3 rounded-xl shadow-sm flex gap-3 mb-6">
                         <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg shrink-0">P</div>
@@ -589,13 +643,15 @@
                         </div>
                     </div>` : ''}
 
-                    <div class="grid grid-cols-2 gap-3 mt-auto mb-4">
-                        <button onclick="nav('${stop.coords.lat},${stop.coords.lng}', 'waze')" class="bg-blue-600 text-white py-3.5 rounded-xl text-sm font-bold shadow-lg shadow-blue-200 btn-press flex justify-center items-center gap-2">
-                            <i data-lucide="navigation" class="w-4 h-4"></i> סע ליעד
-                        </button>
-                        <button onclick="nav('${stop.parking ? stop.parking.address : stop.coords.lat + ',' + stop.coords.lng}', 'google')" class="bg-gray-100 text-gray-800 py-3.5 rounded-xl text-sm font-bold border border-gray-200 btn-press flex justify-center items-center gap-2">
-                            <i data-lucide="map" class="w-4 h-4"></i> גוגל מפס
-                        </button>
+                    <!-- Walking Route Button -->
+                    ${stop.walkingRoute ? `
+                    <button onclick="window.open('${stop.walkingRoute}', '_blank')" class="w-full mb-6 bg-teal-50 text-teal-700 border border-teal-200 py-3 rounded-xl text-sm font-bold flex justify-center items-center gap-2 btn-press shadow-sm">
+                        <i data-lucide="footprints" class="w-4 h-4"></i> מסלול הליכה מומלץ (Google)
+                    </button>` : ''}
+
+                    <!-- Navigation Grid -->
+                    <div class="mt-auto">
+                        ${navButtons}
                     </div>
                 </div>
             `;
@@ -645,7 +701,6 @@
             window.open(url, '_blank');
         }
 
-        // Initialize App
         initItinerary();
 
     </script>
