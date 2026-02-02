@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Road Trip Pro - California 1</title>
+    <title>Road Trip Pro - Final</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,7 +24,7 @@
         
         html { scroll-behavior: smooth; }
 
-        /* Smooth Car Animation */
+        /* אנימציית רכב */
         @keyframes carEngine {
             0%, 100% { transform: translateY(0px) scale(1); }
             50% { transform: translateY(-1px) scale(1.02); }
@@ -48,7 +48,6 @@
             animation: carEngine 2s infinite ease-in-out;
         }
 
-        /* Scrollbar Hiding */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -92,7 +91,7 @@
         <!-- Timeline Line -->
         <div class="absolute top-0 bottom-0 right-[29px] w-[3px] bg-gradient-to-b from-blue-500 via-slate-300 to-slate-200 z-0 rounded-full opacity-50"></div>
 
-        <!-- Itinerary Items (Rendered Once) -->
+        <!-- Itinerary Items -->
         <div id="itinerary-container"></div>
 
     </div>
@@ -133,11 +132,13 @@
             'morro': [ { name: "Chevron Cambria", address: "2194 Main St", price: "$5.89", note: "יקר מאוד" }, { name: "אזהרה", address: "אין דלק זול מכאן!", price: "---", note: "תדלקו במורו ביי" } ],
             'seals': [ { name: "Ragged Point", address: "19019 CA-1", price: "$7.99", note: "חירום בלבד" }, { name: "Gorda Gas", address: "Big Sur", price: "$7.50", note: "חירום בלבד" } ],
             'monterey': [ { name: "Safeway Fuel", address: "104 Canyon Del Rey", price: "$4.25", note: "הכי זול באזור" }, { name: "Valero", address: "2200 N Fremont St", price: "$4.39", note: "מחיר טוב" } ],
-            'aquarium': [ { name: "Shell", address: "3745 Via Nona Marie", price: "$4.79", note: "בכניסה לכרמל" } ],
-            'bixby': [ { name: "Costco Gas", address: "Half Moon Bay", price: "$4.15", note: "חברים בלבד" }, { name: "Chevron Pacifica", address: "500 Linda Mar Blvd", price: "$4.65", note: "לפני SF" } ]
+            'mcway': [ { name: "אזהרה", address: "אין דלק בביג סר", price: "---", note: "מלאו במונטריי לפני היציאה!" } ],
+            'bixby': [ { name: "Shell Carmel", address: "3745 Via Nona Marie", price: "$4.79", note: "בכניסה לכרמל" } ],
+            'carmel': [ { name: "Costco Gas", address: "Half Moon Bay", price: "$4.15", note: "חברים בלבד" }, { name: "Chevron Pacifica", address: "500 Linda Mar Blvd", price: "$4.65", note: "לפני SF" } ]
         };
 
         const ITINERARY = [
+            // --- DAY 1 ---
             {
                 id: 'start',
                 title: 'יציאה: לוס אנג\'לס',
@@ -154,7 +155,6 @@
                     <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
                         <li>יציאה דרך כביש 101 מערבה.</li>
                         <li>בדקו שיש לכם מים וכבל טעינה.</li>
-                        <li>הגדרת הניווט לתחנה הראשונה: סנטה ברברה.</li>
                     </ul>`,
                 walkingRoute: null
             },
@@ -170,16 +170,16 @@
                 parking: { name: 'City Lot #1', address: '23 E Cabrillo Blvd', coords: { lat: 34.4137, lng: -119.6905 }, cost: 'חינם 75 דק׳ ראשונות' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSB1m_VYizll6MT567ggSruv9ImG91t4HKdwqXT1wxLWA&s=10",
                 longDesc: `
-                    <p class="mb-2"><strong>הריביירה האמריקאית.</strong> עיר חוף יפהפייה עם ארכיטקטורה ספרדית, גגות רעפים אדומים ודקלים.</p>
+                    <p class="mb-2"><strong>הריביירה האמריקאית.</strong> עיר חוף יפהפייה עם ארכיטקטורה ספרדית.</p>
                     <div class="bg-blue-50 p-3 rounded-lg mb-3 border border-blue-100">
                         <h4 class="font-bold text-blue-700 text-xs mb-1">מה עושים כאן?</h4>
                         <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
                             <li>הליכה על המזח ההיסטורי (Stearns Wharf).</li>
-                            <li>ביקור בבית המשפט (תצפית חינם מהמגדל).</li>
+                            <li>ביקור בבית המשפט (תצפית חינם).</li>
                             <li>סיבוב קצר ברחוב המדינה (State Street).</li>
                         </ul>
                     </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Stearns+Wharf,+217+Stearns+Wharf,+Santa+Barbara,+CA+93101/State+St,+Santa+Barbara,+CA/@34.416668,-119.6967757,16z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x80e914878a176885:0x87a71f010c7336f7!2m2!1d-119.6853609!2d34.4103135!1m5!1m1!1s0x80e91480c44f8087:0x629c42405a415664!2m2!1d-119.7028919!2d34.4231885!3e2?entry=ttu"
+                walkingRoute: "https://www.google.com/maps/dir/Stearns+Wharf,+217+Stearns+Wharf,+Santa+Barbara,+CA+93101/State+St,+Santa+Barbara,+CA/@34.416668,-119.6967757,16z"
             },
             {
                 id: 'solvang',
@@ -193,16 +193,15 @@
                 parking: { name: 'Public Parking', address: '1616 Oak St', coords: { lat: 34.5945, lng: -120.1408 }, cost: 'חינם' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2NgP8pvIZShu5F_1XhFvbqpMI-fDt3sSXwxNpXw4IHg&s=10",
                 longDesc: `
-                    <p class="mb-2"><strong>דנמרק הקטנה.</strong> עיירה שנבנתה על ידי מהגרים דנים. הכל נראה כמו באגדות - טחנות רוח, מאפיות וגגות משופעים.</p>
+                    <p class="mb-2"><strong>דנמרק הקטנה.</strong> הכל נראה כמו באגדות - טחנות רוח ומאפיות.</p>
                     <div class="bg-orange-50 p-3 rounded-lg mb-3 border border-orange-100">
                         <h4 class="font-bold text-orange-700 text-xs mb-1">המלצות לביקור:</h4>
                         <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
-                            <li>חובה לטעום Aebleskiver (סופגניות דניות) עם ריבה.</li>
+                            <li>חובה לטעום Aebleskiver (סופגניות דניות).</li>
                             <li>צילום ליד טחנות הרוח.</li>
-                            <li>ביקור בחנות חג המולד (פתוחה כל השנה).</li>
                         </ul>
                     </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Solvang+Visitor+Center,+1639+Copenhagen+Dr,+Solvang,+CA+93463/The+Little+Mermaid+Fountain,+1693+Mission+Dr,+Solvang,+CA+93463/@34.5950837,-120.1403248,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x80e94a37c02b377b:0x52445c7b3724c084!2m2!1d-120.1384049!2d34.5946399!1m5!1m1!1s0x80e94a36f88d2285:0x8544d673199f57f6!2m2!1d-120.139611!2d34.5956041!3e2?entry=ttu"
+                walkingRoute: "https://www.google.com/maps/dir/Solvang+Visitor+Center/The+Little+Mermaid+Fountain"
             },
             {
                 id: 'gas',
@@ -217,8 +216,7 @@
                 isEmoji: true, emoji: "⛽", bgGradient: "from-orange-400 to-red-500",
                 longDesc: `
                     <p class="mb-2 font-bold text-red-600">עצירה קריטית!</p>
-                    <p class="text-sm text-gray-700">זה המקום האחרון לתדלק במחיר שפוי לפני שנכנסים לכביש החוף הפראי ולביג סר (Big Sur).</p>
-                    <p class="text-sm mt-2">בהמשך המחירים קופצים לפי 2, או שאין תחנות בכלל. מלאו מיכל מלא גם אם נשאר לכם חצי.</p>`,
+                    <p class="text-sm text-gray-700">זה המקום האחרון לתדלק במחיר שפוי לפני Big Sur.</p>`,
                 walkingRoute: null
             },
             {
@@ -233,16 +231,12 @@
                 parking: { name: 'Coleman Park', address: 'Coleman Dr', coords: { lat: 35.3705, lng: -120.8650 }, cost: 'חינם' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNR-4naNKMPmIiq99YbgSSK0VvTVhUrTG-W_7YMbSYOg&s=10",
                 longDesc: `
-                    <p class="mb-2"><strong>הגיברלטר של האוקיינוס השקט.</strong> סלע געשי עצום שבוקע מהים בגובה 176 מטר.</p>
-                    <div class="bg-teal-50 p-3 rounded-lg mb-3 border border-teal-100">
-                        <h4 class="font-bold text-teal-700 text-xs mb-1">שימו לב:</h4>
-                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
-                            <li>חפשו לוטרות ים (Sea Otters) צפות על הגב במפרץ.</li>
-                            <li>אסור לטפס על הסלע (שמורת טבע לקינון בזים).</li>
-                            <li>מקום מעולה לתמונות פנורמיות.</li>
-                        </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Coleman+Park,+Morro+Bay,+CA/Morro+Rock,+Morro+Bay,+CA/@35.3707765,-120.8677649,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x80ececf65e305739:0x80327f311663f749!2m2!1d-120.8637777!2d35.3709033!1m5!1m1!1s0x80ececf163352723:0x415b026615b1406!2m2!1d-120.8662973!2d35.371485!3e2?entry=ttu"
+                    <p class="mb-2">סלע געשי עצום שבוקע מהים.</p>
+                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
+                        <li>חפשו לוטרות ים במפרץ.</li>
+                        <li>אסור לטפס על הסלע.</li>
+                    </ul>`,
+                walkingRoute: "https://www.google.com/maps/dir/Coleman+Park,+Morro+Bay,+CA/Morro+Rock"
             },
             {
                 id: 'seals',
@@ -256,20 +250,13 @@
                 parking: { name: 'Vista Point', address: 'Hwy 1', coords: { lat: 35.6630, lng: -121.2575 }, cost: 'חינם' },
                 isEmoji: true, emoji: "🦭", bgGradient: "from-blue-400 to-cyan-600",
                 longDesc: `
-                    <p class="mb-2"><strong>תופעת טבע מדהימה.</strong> מושבה ענקית של פילי ים (Elephant Seals).</p>
-                    <div class="bg-indigo-50 p-3 rounded-lg mb-3 border border-indigo-100">
-                        <h4 class="font-bold text-indigo-700 text-xs mb-1">מה רואים?</h4>
-                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
-                            <li>אלפי כלבי ים שוכבים על החוף, רבים, ישנים ומשמיעים קולות מוזרים.</li>
-                            <li>יש מסלול הליכה מסודר מעץ (Boardwalk) שלא מפריע לחיות.</li>
-                            <li>הריח... חלק מהחוויה!</li>
-                        </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Elephant+Seal+Vista+Point,+San+Simeon,+CA/Elephant+Seal+Viewing+Walkway,+San+Simeon,+CA+93452/@35.662862,-121.2588421,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x8092dca6666324b3:0x6f31d04469076597!2m2!1d-121.2576356!2d35.6630095!1m5!1m1!1s0x8092dcbfa0388e33:0x1b439e7638706240!2m2!1d-121.2562479!2d35.6622378!3e2?entry=ttu"
+                    <p class="mb-2"><strong>תופעת טבע.</strong> אלפי פילי ים שוכבים על החוף.</p>
+                    <p class="text-sm">יש מסלול הליכה מעץ לתצפית בטוחה.</p>`,
+                walkingRoute: "https://www.google.com/maps/dir/Elephant+Seal+Vista+Point/Elephant+Seal+Viewing+Walkway"
             },
             {
                 id: 'monterey',
-                title: 'הגעה למלון',
+                title: 'לינה במונטריי',
                 subTitle: 'Victorian Inn',
                 originalTime: '18:30',
                 displayTime: '18:30',
@@ -279,80 +266,80 @@
                 parking: { name: 'חניון המלון', address: '487 Foam St', coords: { lat: 36.6128, lng: -121.9001 }, cost: 'לאורחים' },
                 isEmoji: true, emoji: "🏨", bgGradient: "from-indigo-500 to-purple-600",
                 longDesc: `
-                    <p class="mb-2">הגעתם! מלון בסגנון ויקטוריאני במיקום מושלם.</p>
-                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
-                        <li>המלון נמצא במרחק הליכה קצר מ-Cannery Row.</li>
-                        <li>יש קבלת פנים עם יין וגבינות (לבדוק שעות).</li>
+                    <p class="mb-2">הגעתם! מלון בסגנון ויקטוריאני ליד Cannery Row.</p>
+                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600">
+                        <li>יציאה לסיבוב ערב ב-Cannery Row.</li>
                         <li>ארוחת בוקר כלולה.</li>
                     </ul>`,
-                walkingRoute: "https://www.google.com/maps/dir/Victorian+Inn,+487+Foam+St,+Monterey,+CA+93940/Cannery+Row,+Monterey,+CA/@36.6146051,-121.9022635,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x808de4446b5a34ad:0x1b704c7c8c322b28!2m2!1d-121.9001206!2d36.6127568!1m5!1m1!1s0x808de443a6773321:0x2289c037593c7857!2m2!1d-121.8993202!2d36.616335!3e2?entry=ttu"
+                walkingRoute: "https://www.google.com/maps/dir/Victorian+Inn/Cannery+Row"
             },
-            { id: 'day2', title: 'יום שני (02/02)', type: 'divider' },
+            
+            { id: 'day2', title: 'יום שני - התיקון הגדול', type: 'divider' },
+            
             {
-                id: 'aquarium',
-                title: 'אקווריום מונטריי',
-                subTitle: 'Cannery Row',
-                originalTime: '09:00',
-                displayTime: '09:00',
+                id: 'mcway',
+                title: 'מפלי מקוואי',
+                subTitle: 'Julia Pfeiffer Burns',
+                originalTime: '09:45',
+                displayTime: '09:45',
                 type: 'stop',
-                icon: 'fish',
-                coords: { lat: 36.6183, lng: -121.9015 },
-                parking: { name: 'Cannery Row Garage', address: '601 Foam St', coords: { lat: 36.6145, lng: -121.8988 }, cost: '$20 ליום' },
-                image: "https://media-cdn.tripadvisor.com/media/photo-s/12/e8/d0/6c/back-decks-and-great.jpg",
+                icon: 'camera',
+                coords: { lat: 36.1580, lng: -121.6695 },
+                parking: { name: 'חניון השמורה', address: 'McWay Falls Trailhead', coords: { lat: 36.1585, lng: -121.6698 }, cost: '$10 או חינם בכביש' },
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/McWay_Falls_2023.jpg/800px-McWay_Falls_2023.jpg",
                 longDesc: `
-                    <p class="mb-2"><strong>אחד האקווריומים הטובים בעולם.</strong></p>
-                    <div class="bg-cyan-50 p-3 rounded-lg mb-3 border border-cyan-100">
-                        <h4 class="font-bold text-cyan-700 text-xs mb-1">אל תפספסו:</h4>
+                    <p class="mb-2"><strong>אחד המקומות היפים בעולם.</strong> מפל שנופל מגובה 25 מטר ישירות לחוף טורקיז בתולי.</p>
+                    <div class="bg-teal-50 p-3 rounded-lg mb-3 border border-teal-100">
+                        <h4 class="font-bold text-teal-700 text-xs mb-1">הוראות הגעה:</h4>
                         <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
-                            <li>יער הקלפ (Kelp Forest) - מיכל ענק בגובה 3 קומות.</li>
-                            <li>לוטרות הים (Sea Otters) - האכלה בשעה 10:30 (לוודא).</li>
-                            <li>מיכל האוקיינוס הפתוח (Open Sea) עם המדוזות הזוהרות.</li>
+                            <li>נוסעים ממונטריי כ-שעה דרומה.</li>
+                            <li>חונים בשמורה (בתשלום) או בזהירות בצד הכביש.</li>
+                            <li>הולכים במנהרה מתחת לכביש לתצפית (10 דקות הליכה).</li>
+                            <li><strong>שימו לב:</strong> אי אפשר לרדת לחוף עצמו! רק תצפית.</li>
                         </ul>
                     </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Cannery+Row+Parking+Garage,+601+Foam+St,+Monterey,+CA+93940/Monterey+Bay+Aquarium,+886+Cannery+Row,+Monterey,+CA+93940/@36.6167882,-121.903006,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x808de44415840617:0x520a061405a76e97!2m2!1d-121.898797!2d36.6144884!1m5!1m1!1s0x808de4439121a221:0x4d216f272a4b8e55!2m2!1d-121.9017772!2d36.6182586!3e2?entry=ttu"
-            },
-            {
-                id: 'carmel',
-                title: 'כרמל',
-                subTitle: 'Carmel-by-the-Sea',
-                originalTime: '11:30',
-                displayTime: '11:30',
-                type: 'stop',
-                icon: 'coffee',
-                coords: { lat: 36.5552, lng: -121.9233 },
-                parking: { name: 'Vista Lobos', address: '3rd Ave & Torres St', coords: { lat: 36.5560, lng: -121.9215 }, cost: 'חינם' },
-                image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0a/66/e2/75/20160221-091502-1-largejpg.jpg?w=600&h=-1&s=1",
-                longDesc: `
-                    <p class="mb-2"><strong>עיירת האגדות.</strong> בתים שנראים כמו מסיפורי ילדים, גלריות וחוף לבן.</p>
-                    <div class="bg-gray-50 p-3 rounded-lg mb-3 border border-gray-200">
-                        <h4 class="font-bold text-gray-700 text-xs mb-1">המלצת מסלול:</h4>
-                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-600">
-                            <li>חנו את הרכב ורדו ברגל את Ocean Avenue.</li>
-                            <li>בסוף הרחוב מחכה לכם חוף כרמל עם חול לבן ונקי.</li>
-                            <li>שימו לב: אין מספרי בתים בכרמל, ולנשים אסור ללכת עם עקבים גבוהים (חוק ישן!).</li>
-                        </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Ocean+Ave,+Carmel-By-The-Sea,+CA/Carmel+Beach,+Carmel-By-The-Sea,+CA/@36.5545229,-121.9271616,16z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x808de615b71c0861:0xa7d825c56209581!2m2!1d-121.9208039!2d36.5551986!1m5!1m1!1s0x808de63e14732165:0x8797b5398d928230!2m2!1d-121.9287399!2d36.5539308!3e2?entry=ttu"
+                walkingRoute: "https://www.google.com/maps/dir/McWay+Falls+Parking/McWay+Falls+Viewpoint"
             },
             {
                 id: 'bixby',
                 title: 'גשר ביקסבי',
-                subTitle: 'Big Sur Bridge',
-                originalTime: '13:20',
-                displayTime: '13:20',
+                subTitle: 'בחזרה צפונה',
+                originalTime: '11:30',
+                displayTime: '11:30',
                 type: 'stop',
                 icon: 'camera',
                 coords: { lat: 36.3714, lng: -121.9017 },
                 parking: { name: 'מפרץ צפוני', address: 'Hwy 1', coords: { lat: 36.3725, lng: -121.9030 }, cost: 'חינם' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2zJIDl1fe1ZGo7UfUrx2iHn1dYXzNNPtTfggtnUme6A&s=10",
                 longDesc: `
-                    <p class="mb-2"><strong>האייקון של כביש 1.</strong> גשר בטון עצום שנבנה ב-1932 ומחבר את שני צידי הקניון מעל הים.</p>
+                    <p class="mb-2"><strong>האייקון של כביש 1.</strong> עוצרים כאן בדרך חזרה מהמפל צפונה.</p>
                     <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
-                        <li>החניה היא במפרץ עפר בצד הצפוני (לפני הגשר אם באים מצפון, אחרי הגשר אם באים מדרום).</li>
-                        <li>זהירות! הכביש סואן והמצוק תלול.</li>
-                        <li>המקום הכי מצולם בקליפורניה.</li>
+                        <li>החניה היא במפרץ עפר בצד הצפוני של הגשר (לכיוון מונטריי).</li>
+                        <li>זהירות בחציית הכביש!</li>
                     </ul>`,
                 walkingRoute: null
+            },
+            {
+                id: 'carmel',
+                title: 'כרמל',
+                subTitle: 'ארוחת צהריים',
+                originalTime: '12:15',
+                displayTime: '12:15',
+                type: 'stop',
+                icon: 'coffee',
+                coords: { lat: 36.5552, lng: -121.9233 },
+                parking: { name: 'Vista Lobos', address: '3rd Ave & Torres St', coords: { lat: 36.5560, lng: -121.9215 }, cost: 'חינם' },
+                image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0a/66/e2/75/20160221-091502-1-largejpg.jpg?w=600&h=-1&s=1",
+                longDesc: `
+                    <p class="mb-2"><strong>עיירת האגדות.</strong> זמן מצוין לארוחת צהריים וסיבוב בחוף הלבן.</p>
+                    <div class="bg-gray-50 p-3 rounded-lg mb-3 border border-gray-200">
+                        <h4 class="font-bold text-gray-700 text-xs mb-1">טיפ:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-600">
+                            <li>חנו את הרכב בחינם בחניון Vista Lobos.</li>
+                            <li>רדו ברגל את Ocean Avenue עד לים.</li>
+                        </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Ocean+Ave,+Carmel/Carmel+Beach"
             },
             {
                 id: 'sf',
@@ -366,24 +353,18 @@
                 parking: { name: 'חניון המלון', coords: { lat: 37.8080, lng: -122.4177 }, cost: '$50-$70 ללילה' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThRZsv_ufgRrqGw4E1tFyxdTSwAQoAxAfQGk5jrZAlaTvcZzTjQ3fM_-J5&s=10",
                 longDesc: `
-                    <p class="mb-2"><strong>הגעתם ליעד!</strong> רציף הדייגים (Fisherman's Wharf).</p>
-                    <div class="bg-blue-50 p-3 rounded-lg mb-3 border border-blue-100">
-                        <h4 class="font-bold text-blue-700 text-xs mb-1">סיום מתוק:</h4>
-                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
-                            <li>לראות את אריות הים ב-Pier 39.</li>
-                            <li>לאכול מרק צדפות (Clam Chowder) בלחם חמוץ ב-Boudin.</li>
-                            <li>תצפית על כלא אלקטרז.</li>
-                        </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Fisherman's+Wharf,+San+Francisco,+CA/Pier+39,+The+Embarcadero,+San+Francisco,+CA/@37.808871,-122.4146036,17z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x808580e839d7e541:0xf89b6220c55337a7!2m2!1d-122.4177426!2d37.8080005!1m5!1m1!1s0x808580f18d783d63:0x153e77dfd2361b20!2m2!1d-122.409821!2d37.808673!3e2?entry=ttu"
+                    <p class="mb-2"><strong>הגעתם ליעד הסופי!</strong></p>
+                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
+                        <li>לראות את אריות הים ב-Pier 39.</li>
+                        <li>לאכול מרק צדפות (Clam Chowder).</li>
+                        <li>החזרת הרכב וצ'ק-אין במלון.</li>
+                    </ul>`,
+                walkingRoute: "https://www.google.com/maps/dir/Fisherman's+Wharf,+San+Francisco,+CA/Pier+39"
             }
         ];
 
-        // --- STATE & UTILS ---
-        let isTracking = false;
-        let userLocation = null;
-        let etas = {};
-
+        // --- UTILS ---
+        
         function deg2rad(deg) { return deg * (Math.PI/180); }
         function getDistance(lat1, lon1, lat2, lon2) {
             const R = 6371; 
@@ -393,6 +374,19 @@
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
+        function getDriveTime(distKm) {
+            // Factor 1.3 for traffic/winding roads, Speed 75 km/h avg
+            const minutes = Math.round((distKm * 1.3 / 75) * 60);
+            const hrs = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            if (hrs > 0) return `${hrs} ש׳ ${mins} דק׳`;
+            return `${mins} דק׳ נסיעה`;
+        }
+
+        // --- STATE ---
+        let isTracking = false;
+        let userLocation = null;
+
         // --- CORE LOGIC ---
 
         function initItinerary() {
@@ -400,14 +394,32 @@
             container.innerHTML = '';
 
             ITINERARY.forEach((stop, index) => {
+                
+                // --- RENDER DIVIDER ---
                 if (stop.type === 'divider') {
                     container.innerHTML += `
-                        <div class="relative z-10 my-8 flex items-center justify-center">
-                            <span class="bg-slate-800 text-white px-4 py-1 rounded-full text-xs font-bold shadow-md tracking-wide">
+                        <div class="relative z-10 my-10 flex items-center justify-center">
+                            <span class="bg-slate-800 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-md tracking-wide border-2 border-slate-600">
                                 ${stop.title}
                             </span>
                         </div>`;
                     return;
+                }
+
+                // --- CALCULATE DRIVE TIME FROM PREV STOP ---
+                let driveTimeHtml = '';
+                if (index > 0) {
+                    const prevStop = ITINERARY[index - 1];
+                    if (prevStop.type !== 'divider') {
+                        const dist = getDistance(prevStop.coords.lat, prevStop.coords.lng, stop.coords.lat, stop.coords.lng);
+                        const timeStr = getDriveTime(dist);
+                        driveTimeHtml = `
+                            <div class="absolute -top-6 right-[46px] z-0 flex items-center gap-1">
+                                <div class="h-8 w-0 border-r-2 border-dotted border-slate-300"></div>
+                                <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 rounded whitespace-nowrap">${timeStr}</span>
+                            </div>
+                        `;
+                    }
                 }
 
                 const showGas = index < ITINERARY.length - 1 && ITINERARY[index+1].type !== 'divider' && GAS_STATIONS[stop.id];
@@ -416,8 +428,11 @@
                     ? `<div class="w-full h-full bg-gradient-to-br ${stop.bgGradient} flex items-center justify-center text-6xl drop-shadow-md select-none">${stop.emoji}</div>`
                     : `<img src="${stop.image}" class="w-full h-full object-cover select-none">`;
 
+                // --- RENDER ITEM ---
                 container.innerHTML += `
                     <div id="stop-item-${index}" class="relative mb-8">
+                        ${driveTimeHtml}
+
                         <div id="car-${index}" class="car-marker" style="top: 0%;">
                             <div class="car-inner"><i data-lucide="car" class="w-4 h-4 text-white"></i></div>
                         </div>
@@ -469,6 +484,8 @@
             lucide.createIcons();
         }
 
+        // --- LIVE TRACKING ---
+
         function handleMainButton() {
             const btn = document.getElementById('actionBtn');
             const btnText = document.getElementById('btnText');
@@ -482,8 +499,8 @@
                     navigator.geolocation.watchPosition(
                         (position) => {
                             isTracking = true;
-                            // Uncomment to test fake location:
-                            // userLocation = { lat: 34.3, lng: -119.5 };
+                            // Fake location for testing (Monterey area):
+                            // userLocation = { lat: 36.6, lng: -121.9 };
                             userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
                             
                             btn.classList.remove('bg-green-600', 'shadow-green-200');
@@ -514,8 +531,6 @@
             let activeSegmentIndex = -1;
             let segmentProgress = 0;
 
-            const stops = ITINERARY.filter(s => s.type !== 'divider');
-
             ITINERARY.forEach((stop, idx) => {
                 if (stop.type === 'divider') return;
 
@@ -545,14 +560,17 @@
                 }
             });
 
+            // Find Active Segment
+            const stops = ITINERARY.filter(s => s.type !== 'divider');
             for (let i = 0; i < stops.length - 1; i++) {
                 const current = stops[i];
                 const next = stops[i+1];
-                if (lat >= current.coords.lat && lat <= next.coords.lat) {
+                // Check latitude range (approximate for North/South travel)
+                if ((lat >= current.coords.lat && lat <= next.coords.lat) || (lat <= current.coords.lat && lat >= next.coords.lat)) {
                     activeSegmentIndex = ITINERARY.findIndex(s => s.id === current.id);
-                    const totalDist = next.coords.lat - current.coords.lat;
-                    const covered = lat - current.coords.lat;
-                    segmentProgress = covered / totalDist;
+                    const totalDist = Math.abs(next.coords.lat - current.coords.lat);
+                    const covered = Math.abs(lat - current.coords.lat);
+                    segmentProgress = totalDist > 0 ? covered / totalDist : 0;
                     break;
                 }
             }
@@ -578,6 +596,8 @@
                 document.getElementById(`stop-item-${window.currentActiveIndex}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
+
+        // --- MODALS ---
 
         function openModal(idx) {
             const stop = ITINERARY[idx];
