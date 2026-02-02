@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Road Trip Pro - Final</title>
+    <title>Road Trip Pro - Ultimate</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,76 +12,108 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Rubik', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(to bottom, #f8fafc, #eff6ff); /* רקע גרדיאנט עדין */
+            color: #1e293b;
             overscroll-behavior-y: none;
-            background-color: #f8fafc;
         }
         
         html { scroll-behavior: smooth; }
 
-        /* אנימציית רכב */
-        @keyframes carEngine {
-            0%, 100% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(-1px) scale(1.02); }
+        /* אנימציית רכב חלקה */
+        @keyframes carFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
         }
         
         .car-marker {
             position: absolute;
-            right: 12px; 
-            z-index: 30;
-            transition: top 1s linear, opacity 0.3s ease; 
+            right: 13px; 
+            z-index: 40;
+            transition: top 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
             pointer-events: none;
             opacity: 0; 
+            filter: drop-shadow(0 4px 8px rgba(37, 99, 235, 0.4));
         }
         
         .car-inner {
-            background-color: #2563eb; 
-            padding: 6px;
-            border-radius: 9999px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
             border: 3px solid white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            animation: carEngine 2s infinite ease-in-out;
+            animation: carFloat 2s infinite ease-in-out;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .btn-press { transition: transform 0.1s; }
-        .btn-press:active { transform: scale(0.96); }
+        .btn-active:active { transform: scale(0.96); }
+        
+        /* Glassmorphism Styles */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Time Bubble Arrow */
+        .time-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            right: 50%;
+            transform: translateX(50%);
+            border-width: 4px 4px 0;
+            border-style: solid;
+            border-color: #f1f5f9 transparent transparent transparent;
+        }
     </style>
 </head>
-<body class="text-slate-800 pb-32">
+<body class="pb-32 selection:bg-blue-100 selection:text-blue-900">
 
     <!-- Header -->
-    <div class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-gray-200 px-5 py-4 z-40 shadow-sm transition-all">
+    <div class="fixed top-0 left-0 right-0 glass-nav px-5 py-3 z-50 shadow-sm transition-all duration-300">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div>
-                <h1 class="text-xl font-black tracking-tight text-blue-700 flex items-center gap-2">
-                    <i data-lucide="map" class="text-blue-500 w-5 h-5"></i>
-                    מסע כביש 1
+                <h1 class="text-lg font-black tracking-tight text-slate-800 flex items-center gap-2.5">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-1.5 rounded-lg shadow-sm">
+                        <i data-lucide="map" class="w-4 h-4"></i>
+                    </div>
+                    Road Trip Pro
                 </h1>
-                <div class="flex items-center gap-2">
-                    <p class="text-xs text-gray-500 font-medium">לוס אנג'לס ⬅️ סן פרנסיסקו</p>
-                    <span id="liveIndicator" class="hidden flex h-2 w-2 relative">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                <div class="flex items-center gap-2 mt-0.5 ml-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">LA ➔ SF</p>
+                    <span id="liveIndicator" class="hidden flex h-1.5 w-1.5 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                     </span>
                 </div>
             </div>
             
-            <button id="actionBtn" onclick="handleMainButton()" class="btn-press bg-green-600 text-white px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 shadow-lg shadow-green-200 border border-transparent transition-all">
-                <i id="btnIcon" data-lucide="navigation" class="w-4 h-4"></i>
-                <span id="btnText">הפעל זמן אמת</span>
+            <button id="actionBtn" onclick="handleMainButton()" class="btn-active bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-slate-200 border border-slate-700 transition-all group">
+                <i id="btnIcon" data-lucide="navigation" class="w-3.5 h-3.5 group-hover:text-emerald-400 transition-colors"></i>
+                <span id="btnText">הפעל GPS</span>
             </button>
         </div>
         
-        <div id="statusMsg" class="hidden text-center mt-2 text-[11px] font-bold text-orange-500 bg-orange-50 py-1 rounded-lg border border-orange-100 max-w-md mx-auto">
-            ממתין לקליטת GPS...
+        <div id="statusMsg" class="hidden text-center mt-2 text-[10px] font-bold text-orange-600 bg-orange-50/80 py-1.5 rounded-lg border border-orange-100 max-w-md mx-auto animate-pulse backdrop-blur-sm">
+            <i data-lucide="satellite" class="w-3 h-3 inline mr-1"></i> מאתר מיקום לווייני...
         </div>
     </div>
 
@@ -89,52 +121,53 @@
     <div class="max-w-md mx-auto px-5 pt-24 relative min-h-screen">
         
         <!-- Timeline Line -->
-        <div class="absolute top-0 bottom-0 right-[29px] w-[3px] bg-gradient-to-b from-blue-500 via-slate-300 to-slate-200 z-0 rounded-full opacity-50"></div>
+        <div class="absolute top-0 bottom-0 right-[29px] w-[2px] bg-gradient-to-b from-blue-200 via-slate-300 to-slate-200 z-0 rounded-full"></div>
 
         <!-- Itinerary Items -->
-        <div id="itinerary-container"></div>
+        <div id="itinerary-container" class="space-y-0"></div>
 
     </div>
 
-    <!-- Main Modal (Details) -->
-    <div id="mainModal" class="fixed inset-0 z-50 hidden flex items-end justify-center">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
-        <div class="bg-white w-full max-w-md rounded-t-3xl shadow-2xl animate-[slideIn_0.3s_ease-out] relative z-10 max-h-[92vh] flex flex-col overflow-hidden">
-            <div id="modalContent" class="flex flex-col h-full overflow-y-auto no-scrollbar pb-6"></div>
+    <!-- Main Modal -->
+    <div id="mainModal" class="fixed inset-0 z-50 hidden flex items-end justify-center sm:items-center p-0 sm:p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity duration-300" onclick="closeModal()"></div>
+        <div class="bg-white w-full max-w-md rounded-t-[32px] sm:rounded-[32px] shadow-2xl animate-[slideIn_0.35s_cubic-bezier(0.16,1,0.3,1)] relative z-10 max-h-[92vh] flex flex-col overflow-hidden">
+            <div id="modalContent" class="flex flex-col h-full overflow-y-auto no-scrollbar pb-6 bg-slate-50"></div>
         </div>
     </div>
 
     <!-- Gas Modal -->
-    <div id="gasModal" class="fixed inset-0 z-50 hidden flex items-end justify-center">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeGasModal()"></div>
-        <div class="bg-white w-full max-w-md rounded-t-3xl shadow-2xl relative z-10 max-h-[85vh] flex flex-col">
-            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-orange-50 rounded-t-3xl sticky top-0 z-20">
+    <div id="gasModal" class="fixed inset-0 z-50 hidden flex items-end justify-center sm:items-center p-0 sm:p-4">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeGasModal()"></div>
+        <div class="bg-white w-full max-w-md rounded-t-[28px] sm:rounded-[28px] shadow-2xl relative z-10 max-h-[85vh] flex flex-col transition-transform">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-[28px] sticky top-0 z-20">
                 <div>
-                    <h2 class="text-xl font-black text-orange-600 flex items-center gap-2">
-                        <i data-lucide="fuel" class="w-6 h-6"></i> דלק זול בדרך
+                    <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                        <div class="bg-orange-50 p-2 rounded-xl text-orange-500"><i data-lucide="fuel" class="w-5 h-5"></i></div>
+                        דלק זול בדרך
                     </h2>
-                    <p class="text-xs text-orange-400 font-bold mt-1">התחנות המשתלמות במקטע זה</p>
+                    <p class="text-[11px] text-slate-400 font-bold mt-0.5 mr-1">השוואת מחירים למקטע הנוכחי</p>
                 </div>
-                <button onclick="closeGasModal()" class="bg-white text-orange-400 p-2 rounded-full shadow-sm btn-press"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="closeGasModal()" class="bg-slate-50 text-slate-400 p-2.5 rounded-full hover:bg-slate-100 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <div id="gasModalContent" class="p-5 space-y-4 overflow-y-auto bg-slate-50 no-scrollbar"></div>
+            <div id="gasModalContent" class="p-5 space-y-3 overflow-y-auto bg-slate-50 no-scrollbar"></div>
         </div>
     </div>
 
     <script>
-        // --- DATA ---
+        // --- DATA CONFIG ---
         
         const GAS_STATIONS = {
-            'start': [ { name: "ARCO Oxnard", address: "1935 N Oxnard Blvd", price: "$4.39", note: "זול! מזומן/Debit" }, { name: "United Oil", address: "2888 E Thousand Oaks Blvd", price: "$4.45", note: "על הדרך" }, { name: "Valero", address: "500 S Ventura Rd", price: "$4.49", note: "מחיר הוגן" } ],
+            'start': [ { name: "ARCO Oxnard", address: "1935 N Oxnard Blvd", price: "$4.39", note: "זול! מזומן/Debit" }, { name: "United Oil", address: "2888 E Thousand Oaks Blvd", price: "$4.45", note: "על הדרך" } ],
             'sb': [ { name: "Fuel Depot", address: "5767 Calle Real", price: "$4.55", note: "ביציאה מסנטה ברברה" }, { name: "ARCO Buellton", address: "175 E Hwy 246", price: "$4.35", note: "בכניסה לסולבנג" } ],
-            'solvang': [ { name: "ARCO Pismo", address: "898 Oak Park Blvd", price: "$4.29", note: "מומלץ מאוד!" }, { name: "Speedway", address: "1350 Grand Ave", price: "$4.35", note: "" } ],
+            'solvang': [ { name: "ARCO Pismo", address: "898 Oak Park Blvd", price: "$4.29", note: "הכי מומלץ!" }, { name: "Speedway", address: "1350 Grand Ave", price: "$4.35", note: "" } ],
             'gas': [ { name: "Morro Bay Fuel", address: "1590 Main St", price: "$4.45", note: "בתוך העיר" }, { name: "Sinclair", address: "940 Morro Bay Blvd", price: "$4.49", note: "דינוזאור ירוק" } ],
             'morro': [ { name: "Chevron Cambria", address: "2194 Main St", price: "$5.89", note: "יקר מאוד" }, { name: "אזהרה", address: "אין דלק זול מכאן!", price: "---", note: "תדלקו במורו ביי" } ],
             'seals': [ { name: "Ragged Point", address: "19019 CA-1", price: "$7.99", note: "חירום בלבד" }, { name: "Gorda Gas", address: "Big Sur", price: "$7.50", note: "חירום בלבד" } ],
-            'monterey': [ { name: "Safeway Fuel", address: "104 Canyon Del Rey", price: "$4.25", note: "הכי זול באזור" }, { name: "Valero", address: "2200 N Fremont St", price: "$4.39", note: "מחיר טוב" } ],
-            'mcway': [ { name: "אזהרה", address: "אין דלק בביג סר", price: "---", note: "מלאו במונטריי לפני היציאה!" } ],
+            'monterey': [ { name: "Safeway Fuel", address: "104 Canyon Del Rey", price: "$4.25", note: "הכי זול באזור (Del Rey Oaks)" }, { name: "Valero", address: "2200 N Fremont St", price: "$4.39", note: "מחיר טוב" } ],
+            'mcway': [ { name: "אזהרה", address: "אין תחנות בביג סר", price: "---", note: "מלאו במונטריי!" } ],
             'bixby': [ { name: "Shell Carmel", address: "3745 Via Nona Marie", price: "$4.79", note: "בכניסה לכרמל" } ],
-            'carmel': [ { name: "Costco Gas", address: "Half Moon Bay", price: "$4.15", note: "חברים בלבד" }, { name: "Chevron Pacifica", address: "500 Linda Mar Blvd", price: "$4.65", note: "לפני SF" } ]
+            'carmel': [ { name: "Costco Gas", address: "Half Moon Bay", price: "$4.15", note: "לחברים בלבד" }, { name: "Chevron Pacifica", address: "500 Linda Mar Blvd", price: "$4.65", note: "לפני SF" } ]
         };
 
         const ITINERARY = [
@@ -150,12 +183,7 @@
                 coords: { lat: 34.0528, lng: -118.2556 },
                 parking: { name: 'לובי המלון', coords: { lat: 34.0528, lng: -118.2556 }, cost: '---' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3p6yTIcIs92AnFZfplUcSVPCaXzjjpc_hdRUxa4vbcA&s=10",
-                longDesc: `
-                    <p class="mb-2">יוצאים לדרך! וודאו שארזתם הכל ושהרכב מוכן.</p>
-                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
-                        <li>יציאה דרך כביש 101 מערבה.</li>
-                        <li>בדקו שיש לכם מים וכבל טעינה.</li>
-                    </ul>`,
+                longDesc: `<p class="mb-2">יוצאים לדרך! וודאו שארזתם הכל ושהרכב מוכן.</p>`,
                 walkingRoute: null
             },
             {
@@ -169,17 +197,16 @@
                 coords: { lat: 34.4123, lng: -119.6876 }, 
                 parking: { name: 'City Lot #1', address: '23 E Cabrillo Blvd', coords: { lat: 34.4137, lng: -119.6905 }, cost: 'חינם 75 דק׳ ראשונות' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSB1m_VYizll6MT567ggSruv9ImG91t4HKdwqXT1wxLWA&s=10",
-                longDesc: `
-                    <p class="mb-2"><strong>הריביירה האמריקאית.</strong> עיר חוף יפהפייה עם ארכיטקטורה ספרדית.</p>
-                    <div class="bg-blue-50 p-3 rounded-lg mb-3 border border-blue-100">
-                        <h4 class="font-bold text-blue-700 text-xs mb-1">מה עושים כאן?</h4>
-                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
+                longDesc: `<p class="mb-2"><strong>הריביירה האמריקאית.</strong> עיר חוף יפהפייה עם ארכיטקטורה ספרדית.</p>
+                    <div class="bg-blue-50 p-4 rounded-2xl mb-4 border border-blue-100/50">
+                        <h4 class="font-bold text-blue-700 text-xs mb-2 uppercase tracking-wide">מה עושים כאן?</h4>
+                        <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
                             <li>הליכה על המזח ההיסטורי (Stearns Wharf).</li>
                             <li>ביקור בבית המשפט (תצפית חינם).</li>
                             <li>סיבוב קצר ברחוב המדינה (State Street).</li>
                         </ul>
                     </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Stearns+Wharf,+217+Stearns+Wharf,+Santa+Barbara,+CA+93101/State+St,+Santa+Barbara,+CA/@34.416668,-119.6967757,16z"
+                walkingRoute: "https://www.google.com/maps/dir/Stearns+Wharf/State+St,+Santa+Barbara"
             },
             {
                 id: 'solvang',
@@ -192,14 +219,10 @@
                 coords: { lat: 34.5958, lng: -120.1376 },
                 parking: { name: 'Public Parking', address: '1616 Oak St', coords: { lat: 34.5945, lng: -120.1408 }, cost: 'חינם' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2NgP8pvIZShu5F_1XhFvbqpMI-fDt3sSXwxNpXw4IHg&s=10",
-                longDesc: `
-                    <p class="mb-2"><strong>דנמרק הקטנה.</strong> הכל נראה כמו באגדות - טחנות רוח ומאפיות.</p>
-                    <div class="bg-orange-50 p-3 rounded-lg mb-3 border border-orange-100">
-                        <h4 class="font-bold text-orange-700 text-xs mb-1">המלצות לביקור:</h4>
-                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
-                            <li>חובה לטעום Aebleskiver (סופגניות דניות).</li>
-                            <li>צילום ליד טחנות הרוח.</li>
-                        </ul>
+                longDesc: `<p class="mb-2"><strong>דנמרק הקטנה.</strong> הכל נראה כמו באגדות - טחנות רוח ומאפיות.</p>
+                    <div class="bg-orange-50 p-4 rounded-2xl mb-4 border border-orange-100/50">
+                        <h4 class="font-bold text-orange-700 text-xs mb-1 uppercase tracking-wide">חובה לטעום:</h4>
+                        <p class="text-xs text-slate-600 font-medium">Aebleskiver (סופגניות דניות עגולות) עם ריבה ואבקת סוכר.</p>
                     </div>`,
                 walkingRoute: "https://www.google.com/maps/dir/Solvang+Visitor+Center/The+Little+Mermaid+Fountain"
             },
@@ -214,9 +237,7 @@
                 coords: { lat: 35.2675, lng: -120.6481 },
                 parking: { name: 'Conserv Fuel', address: '2211 Broad St', coords: { lat: 35.2675, lng: -120.6481 }, cost: 'מחיר הוגן' },
                 isEmoji: true, emoji: "⛽", bgGradient: "from-orange-400 to-red-500",
-                longDesc: `
-                    <p class="mb-2 font-bold text-red-600">עצירה קריטית!</p>
-                    <p class="text-sm text-gray-700">זה המקום האחרון לתדלק במחיר שפוי לפני Big Sur.</p>`,
+                longDesc: `<p class="font-bold text-red-600 mb-1">עצירה קריטית!</p><p class="text-sm text-slate-600">זה המקום האחרון לתדלק במחיר שפוי לפני שנכנסים לכביש החוף הפראי.</p>`,
                 walkingRoute: null
             },
             {
@@ -230,13 +251,8 @@
                 coords: { lat: 35.3712, lng: -120.8667 },
                 parking: { name: 'Coleman Park', address: 'Coleman Dr', coords: { lat: 35.3705, lng: -120.8650 }, cost: 'חינם' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNR-4naNKMPmIiq99YbgSSK0VvTVhUrTG-W_7YMbSYOg&s=10",
-                longDesc: `
-                    <p class="mb-2">סלע געשי עצום שבוקע מהים.</p>
-                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
-                        <li>חפשו לוטרות ים במפרץ.</li>
-                        <li>אסור לטפס על הסלע.</li>
-                    </ul>`,
-                walkingRoute: "https://www.google.com/maps/dir/Coleman+Park,+Morro+Bay,+CA/Morro+Rock"
+                longDesc: `<p class="text-sm text-slate-600 leading-relaxed">סלע געשי עצום שבוקע מהים. חפשו לוטרות ים (Sea Otters) צפות על הגב במים השקטים של המפרץ.</p>`,
+                walkingRoute: "https://www.google.com/maps/dir/Coleman+Park/Morro+Rock"
             },
             {
                 id: 'seals',
@@ -249,9 +265,7 @@
                 coords: { lat: 35.6630, lng: -121.2575 },
                 parking: { name: 'Vista Point', address: 'Hwy 1', coords: { lat: 35.6630, lng: -121.2575 }, cost: 'חינם' },
                 isEmoji: true, emoji: "🦭", bgGradient: "from-blue-400 to-cyan-600",
-                longDesc: `
-                    <p class="mb-2"><strong>תופעת טבע.</strong> אלפי פילי ים שוכבים על החוף.</p>
-                    <p class="text-sm">יש מסלול הליכה מעץ לתצפית בטוחה.</p>`,
+                longDesc: `<p class="text-sm text-slate-600 leading-relaxed"><strong>תופעת טבע מדהימה.</strong> אלפי פילי ים שוכבים על החוף. הרעש, הריח והגודל שלהם זו חוויה שלא שוכחים.</p>`,
                 walkingRoute: "https://www.google.com/maps/dir/Elephant+Seal+Vista+Point/Elephant+Seal+Viewing+Walkway"
             },
             {
@@ -265,15 +279,11 @@
                 coords: { lat: 36.6128, lng: -121.9001 },
                 parking: { name: 'חניון המלון', address: '487 Foam St', coords: { lat: 36.6128, lng: -121.9001 }, cost: 'לאורחים' },
                 isEmoji: true, emoji: "🏨", bgGradient: "from-indigo-500 to-purple-600",
-                longDesc: `
-                    <p class="mb-2">הגעתם! מלון בסגנון ויקטוריאני ליד Cannery Row.</p>
-                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600">
-                        <li>יציאה לסיבוב ערב ב-Cannery Row.</li>
-                        <li>ארוחת בוקר כלולה.</li>
-                    </ul>`,
+                longDesc: `<p class="text-sm text-slate-600 leading-relaxed">מלון בסגנון ויקטוריאני במיקום מושלם ליד Cannery Row. צאו לסיבוב ערב ברחוב המפעלים המשוחזר.</p>`,
                 walkingRoute: "https://www.google.com/maps/dir/Victorian+Inn/Cannery+Row"
             },
             
+            // --- DAY 2 ---
             { id: 'day2', title: 'יום שני - התיקון הגדול', type: 'divider' },
             
             {
@@ -285,17 +295,17 @@
                 type: 'stop',
                 icon: 'camera',
                 coords: { lat: 36.1580, lng: -121.6695 },
-                parking: { name: 'חניון השמורה', address: 'McWay Falls Trailhead', coords: { lat: 36.1585, lng: -121.6698 }, cost: '$10 או חינם בכביש' },
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/McWay_Falls_2023.jpg/800px-McWay_Falls_2023.jpg",
+                parking: { name: 'McWay Falls Trailhead', address: 'Hwy 1', coords: { lat: 36.1585, lng: -121.6698 }, cost: '$10 או חינם בכביש' },
+                image: "https://offloadmedia.feverup.com/secretlosangeles.com/wp-content/uploads/2025/06/13073447/McWay-Falls.jpg",
                 longDesc: `
-                    <p class="mb-2"><strong>אחד המקומות היפים בעולם.</strong> מפל שנופל מגובה 25 מטר ישירות לחוף טורקיז בתולי.</p>
-                    <div class="bg-teal-50 p-3 rounded-lg mb-3 border border-teal-100">
-                        <h4 class="font-bold text-teal-700 text-xs mb-1">הוראות הגעה:</h4>
-                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-700">
-                            <li>נוסעים ממונטריי כ-שעה דרומה.</li>
-                            <li>חונים בשמורה (בתשלום) או בזהירות בצד הכביש.</li>
-                            <li>הולכים במנהרה מתחת לכביש לתצפית (10 דקות הליכה).</li>
-                            <li><strong>שימו לב:</strong> אי אפשר לרדת לחוף עצמו! רק תצפית.</li>
+                    <p class="mb-4 text-xs font-bold text-white bg-teal-600 px-3 py-1.5 rounded-full inline-block shadow-sm">🌲 נסיעה דרומה מהמלון</p>
+                    <p class="mb-3 text-sm text-slate-700"><strong>אחד המקומות היפים בעולם.</strong> מפל שנופל מגובה 25 מטר ישירות לחוף טורקיז בתולי.</p>
+                    <div class="bg-teal-50 p-4 rounded-2xl mb-3 border border-teal-100/60">
+                        <h4 class="font-bold text-teal-800 text-xs mb-2 uppercase tracking-wide">הוראות הגעה:</h4>
+                        <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
+                            <li>חונים בזהירות בצד הכביש או בחניון.</li>
+                            <li>הולכים במנהרה מתחת לכביש לתצפית (10 דקות).</li>
+                            <li><strong>שימו לב:</strong> אי אפשר לרדת לחוף! רק תצפית.</li>
                         </ul>
                     </div>`,
                 walkingRoute: "https://www.google.com/maps/dir/McWay+Falls+Parking/McWay+Falls+Viewpoint"
@@ -311,12 +321,7 @@
                 coords: { lat: 36.3714, lng: -121.9017 },
                 parking: { name: 'מפרץ צפוני', address: 'Hwy 1', coords: { lat: 36.3725, lng: -121.9030 }, cost: 'חינם' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2zJIDl1fe1ZGo7UfUrx2iHn1dYXzNNPtTfggtnUme6A&s=10",
-                longDesc: `
-                    <p class="mb-2"><strong>האייקון של כביש 1.</strong> עוצרים כאן בדרך חזרה מהמפל צפונה.</p>
-                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
-                        <li>החניה היא במפרץ עפר בצד הצפוני של הגשר (לכיוון מונטריי).</li>
-                        <li>זהירות בחציית הכביש!</li>
-                    </ul>`,
+                longDesc: `<p class="text-sm text-slate-600 leading-relaxed"><strong>האייקון של כביש 1.</strong> הגשר המפורסם ביותר. עצרו במפרץ העפר בצד הצפוני של הגשר (לכיוון מונטריי) לתמונה המושלמת.</p>`,
                 walkingRoute: null
             },
             {
@@ -331,13 +336,10 @@
                 parking: { name: 'Vista Lobos', address: '3rd Ave & Torres St', coords: { lat: 36.5560, lng: -121.9215 }, cost: 'חינם' },
                 image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0a/66/e2/75/20160221-091502-1-largejpg.jpg?w=600&h=-1&s=1",
                 longDesc: `
-                    <p class="mb-2"><strong>עיירת האגדות.</strong> זמן מצוין לארוחת צהריים וסיבוב בחוף הלבן.</p>
-                    <div class="bg-gray-50 p-3 rounded-lg mb-3 border border-gray-200">
-                        <h4 class="font-bold text-gray-700 text-xs mb-1">טיפ:</h4>
-                        <ul class="list-disc list-inside space-y-1 text-xs text-gray-600">
-                            <li>חנו את הרכב בחינם בחניון Vista Lobos.</li>
-                            <li>רדו ברגל את Ocean Avenue עד לים.</li>
-                        </ul>
+                    <p class="mb-2 text-sm text-slate-600"><strong>עיירת האגדות.</strong> זמן מצוין לארוחת צהריים וסיבוב בחוף הלבן.</p>
+                    <div class="bg-indigo-50 p-4 rounded-2xl mb-3 border border-indigo-100/50">
+                        <h4 class="font-bold text-indigo-700 text-xs mb-1 uppercase tracking-wide">טיפ של מקומיים:</h4>
+                        <p class="text-xs text-slate-600 font-medium">חנו את הרכב בחינם בחניון Vista Lobos ורדו ברגל את Ocean Avenue עד לים.</p>
                     </div>`,
                 walkingRoute: "https://www.google.com/maps/dir/Ocean+Ave,+Carmel/Carmel+Beach"
             },
@@ -352,14 +354,8 @@
                 coords: { lat: 37.8080, lng: -122.4177 },
                 parking: { name: 'חניון המלון', coords: { lat: 37.8080, lng: -122.4177 }, cost: '$50-$70 ללילה' },
                 image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThRZsv_ufgRrqGw4E1tFyxdTSwAQoAxAfQGk5jrZAlaTvcZzTjQ3fM_-J5&s=10",
-                longDesc: `
-                    <p class="mb-2"><strong>הגעתם ליעד הסופי!</strong></p>
-                    <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 mb-3">
-                        <li>לראות את אריות הים ב-Pier 39.</li>
-                        <li>לאכול מרק צדפות (Clam Chowder).</li>
-                        <li>החזרת הרכב וצ'ק-אין במלון.</li>
-                    </ul>`,
-                walkingRoute: "https://www.google.com/maps/dir/Fisherman's+Wharf,+San+Francisco,+CA/Pier+39"
+                longDesc: `<p class="text-sm text-slate-600 leading-relaxed"><strong>הגעתם ליעד!</strong> רציף הדייגים. לכו לראות את אריות הים ב-Pier 39 ולאכול מרק צדפות בלחם חמוץ ב-Boudin.</p>`,
+                walkingRoute: "https://www.google.com/maps/dir/Fisherman's+Wharf/Pier+39"
             }
         ];
 
@@ -374,108 +370,123 @@
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
-        function getDriveTime(distKm) {
-            // Factor 1.3 for traffic/winding roads, Speed 75 km/h avg
-            const minutes = Math.round((distKm * 1.3 / 75) * 60);
+        function getDriveTime(distKm, speedKmh = 75) {
+            const minutes = Math.round((distKm * 1.3 / speedKmh) * 60);
             const hrs = Math.floor(minutes / 60);
             const mins = minutes % 60;
             if (hrs > 0) return `${hrs} ש׳ ${mins} דק׳`;
-            return `${mins} דק׳ נסיעה`;
+            return `${mins} דק׳`;
         }
 
         // --- STATE ---
         let isTracking = false;
         let userLocation = null;
+        let lastCoords = null; 
 
         // --- CORE LOGIC ---
 
         function initItinerary() {
             const container = document.getElementById('itinerary-container');
             container.innerHTML = '';
+            
+            lastCoords = ITINERARY[0].coords;
 
             ITINERARY.forEach((stop, index) => {
                 
-                // --- RENDER DIVIDER ---
                 if (stop.type === 'divider') {
+                    // Start Day 2 Logic: Reset lastCoords to Monterey Hotel
+                    const monterey = ITINERARY.find(s => s.id === 'monterey');
+                    if (monterey) lastCoords = monterey.coords;
+                    
                     container.innerHTML += `
-                        <div class="relative z-10 my-10 flex items-center justify-center">
-                            <span class="bg-slate-800 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-md tracking-wide border-2 border-slate-600">
-                                ${stop.title}
-                            </span>
+                        <div class="relative z-10 my-12 flex items-center justify-center">
+                            <div class="bg-slate-800 text-white px-5 py-1.5 rounded-full text-xs font-bold shadow-lg tracking-wide border-2 border-slate-600 flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-3 h-3"></i> ${stop.title}
+                            </div>
                         </div>`;
                     return;
                 }
 
-                // --- CALCULATE DRIVE TIME FROM PREV STOP ---
+                // Drive Time Calculation
                 let driveTimeHtml = '';
                 if (index > 0) {
-                    const prevStop = ITINERARY[index - 1];
-                    if (prevStop.type !== 'divider') {
-                        const dist = getDistance(prevStop.coords.lat, prevStop.coords.lng, stop.coords.lat, stop.coords.lng);
-                        const timeStr = getDriveTime(dist);
-                        driveTimeHtml = `
-                            <div class="absolute -top-6 right-[46px] z-0 flex items-center gap-1">
-                                <div class="h-8 w-0 border-r-2 border-dotted border-slate-300"></div>
-                                <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 rounded whitespace-nowrap">${timeStr}</span>
+                    const dist = getDistance(lastCoords.lat, lastCoords.lng, stop.coords.lat, stop.coords.lng);
+                    const speed = (stop.id === 'mcway' || stop.id === 'bixby') ? 50 : 75; // Slower on Big Sur
+                    const timeStr = getDriveTime(dist, speed);
+                    
+                    // Special label for McWay Falls (Start of Day 2)
+                    const label = (stop.id === 'mcway') ? 'מהמלון:' : 'נסיעה:';
+                    
+                    driveTimeHtml = `
+                        <div class="absolute -top-[34px] right-[48px] z-0 flex flex-col items-center group/time">
+                            <div class="h-10 w-0 border-r-2 border-dotted border-slate-300 group-hover/time:border-blue-300 transition-colors"></div>
+                            <div class="glass-card text-[10px] text-slate-500 px-2.5 py-1 rounded-full shadow-sm font-bold whitespace-nowrap -mt-1 border border-slate-200 group-hover/time:text-blue-600 group-hover/time:border-blue-200 transition-all">
+                                <span class="opacity-70 font-normal mr-0.5">${label}</span> ${timeStr}
                             </div>
-                        `;
-                    }
+                        </div>
+                    `;
                 }
+                
+                lastCoords = stop.coords;
 
                 const showGas = index < ITINERARY.length - 1 && ITINERARY[index+1].type !== 'divider' && GAS_STATIONS[stop.id];
 
                 let mediaHtml = stop.isEmoji 
-                    ? `<div class="w-full h-full bg-gradient-to-br ${stop.bgGradient} flex items-center justify-center text-6xl drop-shadow-md select-none">${stop.emoji}</div>`
-                    : `<img src="${stop.image}" class="w-full h-full object-cover select-none">`;
+                    ? `<div class="w-full h-full bg-gradient-to-br ${stop.bgGradient} flex items-center justify-center text-7xl drop-shadow-md select-none transform transition hover:scale-110 duration-500">${stop.emoji}</div>`
+                    : `<img src="${stop.image}" class="w-full h-full object-cover select-none transition duration-700 hover:scale-105">`;
 
-                // --- RENDER ITEM ---
                 container.innerHTML += `
-                    <div id="stop-item-${index}" class="relative mb-8">
+                    <div id="stop-item-${index}" class="relative mb-12">
                         ${driveTimeHtml}
 
                         <div id="car-${index}" class="car-marker" style="top: 0%;">
                             <div class="car-inner"><i data-lucide="car" class="w-4 h-4 text-white"></i></div>
                         </div>
 
-                        <div class="flex items-start gap-4">
-                            <div id="dot-${index}" class="relative shrink-0 w-8 h-8 rounded-full border-[3px] z-10 flex items-center justify-center bg-white shadow-sm mt-8 transition-colors duration-500 border-slate-300">
+                        <div class="flex items-start gap-5">
+                            <!-- Dot -->
+                            <div id="dot-${index}" class="relative shrink-0 w-8 h-8 rounded-full border-[3px] z-10 flex items-center justify-center bg-white shadow-md mt-8 transition-all duration-500 border-slate-300">
                                 <div id="inner-dot-${index}" class="w-2.5 h-2.5 rounded-full transition-colors duration-500 bg-slate-300"></div>
                             </div>
 
-                            <div id="card-${index}" onclick="openModal(${index})" class="relative grow bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden cursor-pointer btn-press transition-all duration-300">
-                                <div class="h-32 w-full relative bg-gray-100">
+                            <!-- Card -->
+                            <div id="card-${index}" onclick="openModal(${index})" class="relative grow bg-white rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-white/50 overflow-hidden cursor-pointer btn-active transition-all duration-300 hover:shadow-lg group">
+                                
+                                <div class="h-36 w-full relative bg-slate-100 overflow-hidden">
                                     ${mediaHtml}
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                                    <div class="absolute top-2 left-2 bg-white/90 p-1.5 rounded-full shadow-sm text-gray-800">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                                    <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-sm text-slate-800">
                                         <i data-lucide="${stop.icon}" class="w-4 h-4"></i>
                                     </div>
-                                    <div class="absolute bottom-3 right-3 text-white">
-                                        <div class="text-lg font-black leading-none shadow-black drop-shadow-md">${stop.title}</div>
-                                        <div class="text-xs opacity-90 font-medium mt-1">${stop.subTitle}</div>
+                                    <div class="absolute bottom-3 right-4 text-white">
+                                        <div class="text-xl font-black leading-none drop-shadow-md tracking-tight">${stop.title}</div>
+                                        <div class="text-sm opacity-90 font-medium mt-1 tracking-wide">${stop.subTitle}</div>
                                     </div>
                                 </div>
 
-                                <div class="p-3.5 flex justify-between items-center">
-                                    <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-md border border-slate-200">
-                                        <i data-lucide="clock" class="w-3 h-3 text-slate-500"></i>
-                                        <span id="time-${index}" class="text-xs font-bold text-slate-700 font-mono">${stop.displayTime}</span>
+                                <div class="p-4 flex justify-between items-center bg-white/80 backdrop-blur-sm">
+                                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <span id="time-${index}" class="text-sm font-bold text-slate-700 font-mono tracking-tight">${stop.displayTime}</span>
                                     </div>
-                                    <div id="eta-${index}" class="hidden flex items-center gap-1 text-[10px] font-bold text-green-700 bg-green-50 px-2 py-1 rounded-full border border-green-100 animate-pulse">
-                                        <i data-lucide="timer" class="w-3 h-3"></i> <span id="eta-text-${index}"></span>
+                                    
+                                    <div id="eta-${index}" class="hidden flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 animate-pulse shadow-sm">
+                                        <i data-lucide="timer" class="w-3.5 h-3.5"></i> <span id="eta-text-${index}"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         ${showGas ? `
-                        <div class="ml-4 mr-[30px] my-4 relative">
-                            <div class="absolute right-[21px] -top-6 -bottom-6 w-0 border-r-2 border-dashed border-slate-200"></div>
-                            <button onclick="openGasModal('${stop.id}')" class="relative w-full bg-white border border-orange-200 rounded-xl p-2 flex items-center gap-3 shadow-sm btn-press transition hover:bg-orange-50">
-                                <div class="bg-orange-100 text-orange-600 p-1.5 rounded-lg"><i data-lucide="fuel" class="w-4 h-4"></i></div>
+                        <div class="ml-4 mr-[30px] my-6 relative">
+                            <div class="absolute right-[22px] -top-9 -bottom-9 w-0 border-r-2 border-dashed border-slate-200"></div>
+                            <button onclick="openGasModal('${stop.id}')" class="relative w-full bg-white border border-orange-100 rounded-xl p-3 flex items-center gap-3 shadow-sm btn-active transition hover:bg-orange-50/50 hover:border-orange-200 group">
+                                <div class="bg-orange-100 text-orange-600 p-2 rounded-lg group-hover:scale-110 transition shadow-sm"><i data-lucide="fuel" class="w-4 h-4"></i></div>
                                 <div class="text-right">
-                                    <div class="text-xs font-bold text-gray-700">דלק זול בדרך?</div>
-                                    <div class="text-[10px] text-gray-400">לחץ להמלצות</div>
+                                    <div class="text-xs font-bold text-slate-700">דלק זול בדרך?</div>
+                                    <div class="text-[10px] text-slate-400">לחץ להמלצות</div>
                                 </div>
+                                <div class="mr-auto text-orange-300"><i data-lucide="chevron-left" class="w-4 h-4"></i></div>
                             </button>
                         </div>` : ''}
                     </div>
@@ -484,7 +495,7 @@
             lucide.createIcons();
         }
 
-        // --- LIVE TRACKING ---
+        // --- TRACKING & MODALS (Optimized) ---
 
         function handleMainButton() {
             const btn = document.getElementById('actionBtn');
@@ -499,12 +510,10 @@
                     navigator.geolocation.watchPosition(
                         (position) => {
                             isTracking = true;
-                            // Fake location for testing (Monterey area):
-                            // userLocation = { lat: 36.6, lng: -121.9 };
                             userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
                             
-                            btn.classList.remove('bg-green-600', 'shadow-green-200');
-                            btn.classList.add('bg-blue-600', 'shadow-blue-200');
+                            btn.classList.remove('bg-slate-800');
+                            btn.classList.add('bg-blue-600', 'shadow-blue-200', 'border-blue-500');
                             btnText.innerText = "איפה אני?";
                             statusMsg.classList.add('hidden');
                             document.getElementById('liveIndicator').classList.remove('hidden');
@@ -512,8 +521,8 @@
                             updateLiveLogic();
                         },
                         (err) => {
-                            alert("לא ניתן לקבל מיקום. וודא שה-GPS דלוק בדפדפן.");
-                            btnText.innerText = "הפעל זמן אמת";
+                            alert("ודא שה-GPS דלוק ונסה שוב.");
+                            btnText.innerText = "הפעל GPS";
                             statusMsg.classList.add('hidden');
                         },
                         { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
@@ -535,7 +544,8 @@
                 if (stop.type === 'divider') return;
 
                 const dist = getDistance(lat, lng, stop.coords.lat, stop.coords.lng);
-                const minutes = Math.round((dist * 1.4 / 70) * 60); 
+                const speed = (stop.id === 'mcway' || stop.id === 'bixby') ? 50 : 75;
+                const minutes = Math.round((dist * 1.3 / speed) * 60); 
                 
                 const timeEl = document.getElementById(`time-${idx}`);
                 const etaEl = document.getElementById(`eta-${idx}`);
@@ -547,10 +557,10 @@
                 if (lat > stop.coords.lat + 0.02) { 
                     timeEl.innerText = stop.originalTime;
                     etaEl.classList.add('hidden');
-                    dot.classList.remove('border-slate-300'); dot.classList.add('border-blue-500');
-                    innerDot.classList.remove('bg-slate-300'); innerDot.classList.add('bg-blue-500');
+                    dot.classList.replace('border-slate-300', 'border-blue-500');
+                    innerDot.classList.replace('bg-slate-300', 'bg-blue-500');
                     card.classList.remove('ring-2', 'ring-blue-400');
-                } else {
+                } else { 
                     if (minutes > 0 && minutes < 600) {
                         const arrival = new Date(now.getTime() + minutes * 60000);
                         timeEl.innerText = `${String(arrival.getHours()).padStart(2,'0')}:${String(arrival.getMinutes()).padStart(2,'0')}`;
@@ -560,13 +570,11 @@
                 }
             });
 
-            // Find Active Segment
             const stops = ITINERARY.filter(s => s.type !== 'divider');
             for (let i = 0; i < stops.length - 1; i++) {
                 const current = stops[i];
                 const next = stops[i+1];
-                // Check latitude range (approximate for North/South travel)
-                if ((lat >= current.coords.lat && lat <= next.coords.lat) || (lat <= current.coords.lat && lat >= next.coords.lat)) {
+                if (lat >= Math.min(current.coords.lat, next.coords.lat) && lat <= Math.max(current.coords.lat, next.coords.lat)) {
                     activeSegmentIndex = ITINERARY.findIndex(s => s.id === current.id);
                     const totalDist = Math.abs(next.coords.lat - current.coords.lat);
                     const covered = Math.abs(lat - current.coords.lat);
@@ -597,8 +605,6 @@
             }
         }
 
-        // --- MODALS ---
-
         function openModal(idx) {
             const stop = ITINERARY[idx];
             const content = document.getElementById('modalContent');
@@ -608,69 +614,63 @@
                 ? `<div class="w-full h-full bg-gradient-to-br ${stop.bgGradient} flex items-center justify-center text-8xl">${stop.emoji}</div>`
                 : `<img src="${stop.image}" class="w-full h-full object-cover">`;
 
-            // HTML for Navigation Buttons
             const navButtons = `
                 <div class="grid grid-cols-2 gap-3 mb-3">
-                    <div class="col-span-2 text-[10px] text-gray-400 uppercase tracking-widest font-bold text-center">ניווט ליעד</div>
-                    <button onclick="nav('${stop.coords.lat},${stop.coords.lng}', 'waze')" class="bg-blue-600 text-white py-3 rounded-xl text-sm font-bold shadow-md btn-press flex justify-center items-center gap-2">
+                    <div class="col-span-2 text-[10px] text-slate-400 uppercase tracking-widest font-bold text-center">ניווט ליעד</div>
+                    <button onclick="nav('${stop.coords.lat},${stop.coords.lng}', 'waze')" class="bg-blue-600 text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg shadow-blue-200 btn-active flex justify-center items-center gap-2 transition hover:bg-blue-700">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/Waze_2020.svg" class="w-4 h-4 brightness-0 invert"> Waze יעד
                     </button>
-                    <button onclick="nav('${stop.coords.lat},${stop.coords.lng}', 'google')" class="bg-white text-gray-700 border border-gray-200 py-3 rounded-xl text-sm font-bold shadow-sm btn-press flex justify-center items-center gap-2">
+                    <button onclick="nav('${stop.coords.lat},${stop.coords.lng}', 'google')" class="bg-white text-slate-700 border border-slate-200 py-3.5 rounded-2xl text-sm font-bold shadow-sm btn-active flex justify-center items-center gap-2 transition hover:bg-slate-50">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg" class="w-4 h-4"> Google
                     </button>
                 </div>
 
                 ${stop.parking ? `
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="col-span-2 text-[10px] text-gray-400 uppercase tracking-widest font-bold text-center mt-2">ניווט לחניה</div>
-                    <button onclick="nav('${stop.parking.coords.lat},${stop.parking.coords.lng}', 'waze')" class="bg-slate-800 text-white py-3 rounded-xl text-sm font-bold shadow-md btn-press flex justify-center items-center gap-2">
+                    <div class="col-span-2 text-[10px] text-slate-400 uppercase tracking-widest font-bold text-center mt-2">ניווט לחניה</div>
+                    <button onclick="nav('${stop.parking.coords.lat},${stop.parking.coords.lng}', 'waze')" class="bg-slate-800 text-white py-3 rounded-2xl text-sm font-bold shadow-md btn-active flex justify-center items-center gap-2 transition hover:bg-slate-900">
                         <span class="bg-white/20 px-1.5 rounded text-[10px]">P</span> Waze
                     </button>
-                    <button onclick="nav('${stop.parking.coords.lat},${stop.parking.coords.lng}', 'google')" class="bg-slate-100 text-slate-700 border border-slate-200 py-3 rounded-xl text-sm font-bold shadow-sm btn-press flex justify-center items-center gap-2">
+                    <button onclick="nav('${stop.parking.coords.lat},${stop.parking.coords.lng}', 'google')" class="bg-slate-100 text-slate-700 border border-slate-200 py-3 rounded-2xl text-sm font-bold shadow-sm btn-active flex justify-center items-center gap-2 transition hover:bg-slate-200">
                         <span class="bg-slate-300 px-1.5 rounded text-[10px] text-slate-700">P</span> Google
                     </button>
                 </div>` : ''}
             `;
 
             content.innerHTML = `
-                <div class="relative h-56 shrink-0">
+                <div class="relative h-64 shrink-0">
                     ${mediaHtml}
-                    <button onclick="closeModal()" class="absolute top-4 left-4 bg-black/30 text-white p-2 rounded-full backdrop-blur btn-press"><i data-lucide="x" class="w-5 h-5"></i></button>
-                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5 pt-12">
-                        <h2 class="text-white text-2xl font-black leading-tight">${stop.title}</h2>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="bg-white/20 text-white px-2 py-0.5 rounded text-[10px] backdrop-blur font-bold">${stop.displayTime}</span>
-                            <span class="text-white/90 text-sm font-medium">${stop.subTitle}</span>
+                    <button onclick="closeModal()" class="absolute top-4 left-4 bg-black/20 backdrop-blur-md text-white p-2.5 rounded-full border border-white/20 btn-active hover:bg-black/30 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-transparent p-6 pt-24">
+                        <h2 class="text-white text-3xl font-black leading-tight tracking-tight">${stop.title}</h2>
+                        <div class="flex items-center gap-3 mt-2.5">
+                            <span class="bg-white/20 text-white px-2.5 py-0.5 rounded-lg text-xs backdrop-blur font-bold font-mono border border-white/10">${stop.displayTime}</span>
+                            <span class="text-white/90 text-sm font-medium border-r border-white/30 pr-3 mr-1">${stop.subTitle}</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="p-5 bg-white grow flex flex-col">
-                    
-                    <!-- Long Description -->
-                    <div class="text-sm text-gray-700 leading-relaxed mb-4">
+                <div class="p-6 grow flex flex-col bg-white">
+                    <div class="text-sm text-slate-600 leading-relaxed mb-6">
                         ${stop.longDesc}
                     </div>
                     
-                    <!-- Parking Info Box -->
                     ${stop.parking ? `
-                    <div class="bg-white border border-gray-100 p-3 rounded-xl shadow-sm flex gap-3 mb-6">
-                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg shrink-0">P</div>
+                    <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl shadow-sm flex gap-4 mb-6">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center font-bold text-xl shrink-0"><i data-lucide="square-parking" class="w-6 h-6"></i></div>
                         <div>
-                            <div class="font-bold text-sm text-gray-800">${stop.parking.name}</div>
-                            <div class="text-xs text-gray-400">${stop.parking.address}</div>
-                            <div class="text-[10px] font-bold text-green-600 bg-green-50 inline-block px-1.5 py-0.5 rounded mt-1 border border-green-100">${stop.parking.cost}</div>
+                            <div class="font-bold text-sm text-slate-800">${stop.parking.name}</div>
+                            <div class="text-xs text-slate-500 mt-0.5">${stop.parking.address}</div>
+                            <div class="text-[10px] font-bold text-emerald-600 bg-emerald-50 inline-block px-2 py-0.5 rounded-md mt-1.5 border border-emerald-100">${stop.parking.cost}</div>
                         </div>
                     </div>` : ''}
 
-                    <!-- Walking Route Button -->
                     ${stop.walkingRoute ? `
-                    <button onclick="window.open('${stop.walkingRoute}', '_blank')" class="w-full mb-6 bg-teal-50 text-teal-700 border border-teal-200 py-3 rounded-xl text-sm font-bold flex justify-center items-center gap-2 btn-press shadow-sm">
+                    <button onclick="window.open('${stop.walkingRoute}', '_blank')" class="w-full mb-6 bg-teal-50 text-teal-700 border border-teal-200 py-3.5 rounded-2xl text-sm font-bold flex justify-center items-center gap-2 btn-active shadow-sm transition hover:bg-teal-100">
                         <i data-lucide="footprints" class="w-4 h-4"></i> מסלול הליכה מומלץ (Google)
                     </button>` : ''}
 
-                    <!-- Navigation Grid -->
-                    <div class="mt-auto">
+                    <div class="mt-auto pt-4 border-t border-slate-100">
                         ${navButtons}
                     </div>
                 </div>
@@ -688,23 +688,23 @@
             if (data) {
                 data.forEach(st => {
                     list.innerHTML += `
-                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                            <div class="flex justify-between items-start mb-2">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-3">
+                            <div class="flex justify-between items-start">
                                 <div>
-                                    <div class="font-black text-gray-800 text-lg">${st.name}</div>
-                                    <div class="text-xs text-gray-400">${st.address}</div>
+                                    <div class="font-black text-slate-800 text-lg">${st.name}</div>
+                                    <div class="text-xs text-slate-400 mt-0.5">${st.address}</div>
                                 </div>
-                                <div class="font-black px-2 py-1 rounded ${st.price.includes('$7') || st.price.includes('---') ?'bg-red-100 text-red-600':'bg-green-100 text-green-700'}">${st.price}</div>
+                                <div class="font-black px-2.5 py-1 rounded-lg ${st.price.includes('$7') || st.price.includes('---') ?'bg-red-50 text-red-600':'bg-emerald-50 text-emerald-600'}">${st.price}</div>
                             </div>
-                            ${st.note ? `<div class="text-[10px] bg-orange-50 text-orange-600 px-2 py-1 rounded inline-block border border-orange-100 mb-2 font-bold">${st.note}</div>` : ''}
+                            ${st.note ? `<div class="text-[11px] bg-orange-50 text-orange-700 px-2 py-1 rounded-md border border-orange-100 font-bold self-start flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i> ${st.note}</div>` : ''}
                             ${st.price !== '---' ? `
-                            <button onclick="nav('${st.address}', 'waze')" class="w-full bg-slate-800 text-white py-2.5 rounded-lg text-xs font-bold flex justify-center items-center gap-2 btn-press shadow-md shadow-slate-200">
+                            <button onclick="nav('${st.address}', 'waze')" class="w-full bg-slate-800 text-white py-2.5 rounded-xl text-xs font-bold flex justify-center items-center gap-2 btn-active shadow-md shadow-slate-200 mt-1 hover:bg-slate-900 transition">
                                 <i data-lucide="navigation" class="w-3 h-3"></i> נווט לתחנה
                             </button>` : ''}
                         </div>`;
                 });
             } else {
-                list.innerHTML = `<div class="text-center text-gray-400 py-10">אין מידע למקטע זה</div>`;
+                list.innerHTML = `<div class="text-center text-slate-400 py-10">אין מידע למקטע זה</div>`;
             }
             document.getElementById('gasModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
