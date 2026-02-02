@@ -199,9 +199,10 @@
             'morro': [ { name: "Chevron Cambria", address: "2194 Main St", price: "$5.89", note: "יקר מאוד" }, { name: "אזהרה", address: "אין דלק זול מכאן!", price: "---", note: "תדלקו במורו ביי" } ],
             'seals': [ { name: "Ragged Point", address: "19019 CA-1", price: "$7.99", note: "חירום בלבד" }, { name: "Gorda Gas", address: "Big Sur", price: "$7.50", note: "חירום בלבד" } ],
             'monterey': [ { name: "Safeway Fuel", address: "104 Canyon Del Rey", price: "$4.25", note: "הכי זול באזור (Del Rey Oaks)" }, { name: "Valero", address: "2200 N Fremont St", price: "$4.39", note: "מחיר טוב" } ],
-            'mcway': [ { name: "אזהרה", address: "אין תחנות בביג סר", price: "---", note: "מלאו במונטריי!" } ],
-            'bixby': [ { name: "Shell Carmel", address: "3745 Via Nona Marie", price: "$4.79", note: "בכניסה לכרמל" } ],
-            'carmel': [ { name: "Costco Gas", address: "Half Moon Bay", price: "$4.15", note: "לחברים בלבד" }, { name: "Chevron Pacifica", address: "500 Linda Mar Blvd", price: "$4.65", note: "לפני SF" } ]
+            'santacruz': [ { name: "Costco Gas", address: "220 Sylvania Ave", price: "$4.15", note: "הכי זול! (לחברים בלבד)" }, { name: "Safeway Fuel", address: "2111 Mission St", price: "$4.29", note: "מחיר הוגן מאוד" } ],
+            'sharkfin': [ { name: "אזהרה", address: "אין תחנות בדבנפורט", price: "---", note: "מלאו בסנטה קרוז" } ],
+            'hmb': [ { name: "Safeway Fuel", address: "70 N Cabrillo Hwy", price: "$4.55", note: "הכי זול באזור" }, { name: "Chevron", address: "Half Moon Bay", price: "$5.15", note: "יקר יחסית" } ],
+            'pacifica': [ { name: "Valero", address: "Pacific Coast Hwy", price: "$4.65", note: "תחנה אחרונה לפני SF" } ]
         };
 
         const ITINERARY = [
@@ -318,7 +319,7 @@
             },
             
             // --- DAY 2 ---
-            { id: 'day2', title: 'יום שני - התיקון הגדול', type: 'divider' },
+            { id: 'day2', title: 'יום 2 - ביג סר וכרמל', type: 'divider' },
             
             {
                 id: 'mcway',
@@ -377,12 +378,155 @@
                     </div>`,
                 walkingRoute: "https://www.google.com/maps/dir/Ocean+Ave,+Carmel/Carmel+Beach"
             },
+
+            // --- DAY 3: NORTH TO SF (NEW) ---
+            { id: 'day3', title: 'המשך צפונה: סנטה קרוז ל-SF', type: 'divider' },
+
+            {
+                id: 'moss',
+                title: 'מוס לנדינג',
+                subTitle: 'לוטרות ים!',
+                originalTime: '13:45',
+                displayTime: '13:45',
+                type: 'stop',
+                icon: 'fish',
+                coords: { lat: 36.8044, lng: -121.7863 },
+                parking: { name: 'Moss Landing Harbor', address: 'Hwy 1', coords: { lat: 36.8044, lng: -121.7863 }, cost: 'חינם באזור הנמל' },
+                isEmoji: true, emoji: "🦦", bgGradient: "from-amber-500 to-orange-400",
+                longDesc: `
+                    <p class="mb-3 text-sm text-slate-700"><strong>בירת הלוטרות של קליפורניה.</strong> המקום הכי טוב בחוף המערבי לראות לוטרות ים (Sea Otters) שוחות בטבע.</p>
+                    <div class="bg-amber-50 p-4 rounded-2xl mb-3 border border-amber-100">
+                         <h4 class="font-bold text-amber-800 text-xs mb-2 uppercase tracking-wide">מה עושים כאן?</h4>
+                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
+                            <li>תצפית על לוטרות מנמל הדייגים (צד ימין).</li>
+                            <li>קיאקים ב-Elkhorn Slough (מומלץ להזמין מראש).</li>
+                            <li>מסעדות דגים מצוינות על המים.</li>
+                         </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Moss+Landing+Harbor+District/Elkhorn+Slough"
+            },
+            {
+                id: 'santacruz',
+                title: 'סנטה קרוז',
+                subTitle: 'הטיילת המפורסמת',
+                originalTime: '14:30',
+                displayTime: '14:30',
+                type: 'stop',
+                icon: 'palmtree',
+                coords: { lat: 36.9642, lng: -122.0181 },
+                parking: { name: 'חנייה ברחוב', address: '3rd St (מדחנים)', coords: { lat: 36.9660, lng: -122.0200 }, cost: 'זול יותר מהחניון הראשי ($25)' },
+                isEmoji: true, emoji: "🎡", bgGradient: "from-pink-500 to-rose-400",
+                longDesc: `
+                    <p class="mb-3 text-sm text-slate-700"><strong>הווייב של קליפורניה.</strong> עיירת גולשים קלאסית עם טיילת צבעונית ולונה פארק על החוף.</p>
+                    <div class="bg-rose-50 p-4 rounded-2xl mb-3 border border-rose-100">
+                         <h4 class="font-bold text-rose-800 text-xs mb-2 uppercase tracking-wide">אטרקציות חובה:</h4>
+                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
+                            <li>הליכה על ה-Broadwalk (כניסה חינם).</li>
+                            <li>צפייה באריות ים מתחת למזח (Wharf).</li>
+                            <li>נסיעה ב-West Cliff Drive לצפייה בגולשים.</li>
+                         </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Santa+Cruz+Beach+Boardwalk/Santa+Cruz+Wharf"
+            },
+            {
+                id: 'sharkfin',
+                title: 'מפרץ סנפיר הכריש',
+                subTitle: 'Davenport',
+                originalTime: '15:30',
+                displayTime: '15:30',
+                type: 'stop',
+                icon: 'camera',
+                coords: { lat: 37.0034, lng: -122.1852 },
+                parking: { name: 'מפרץ עפר (צד ימין)', address: 'Hwy 1', coords: { lat: 37.0038, lng: -122.1848 }, cost: 'חינם (זהירות בחצייה!)' },
+                isEmoji: true, emoji: "🦈", bgGradient: "from-cyan-500 to-blue-500",
+                longDesc: `
+                    <p class="mb-3 text-sm text-slate-700"><strong>תופעת טבע פוטוגנית.</strong> סלע עצום בצורת סנפיר כריש בולט מתוך המים במפרץ מבודד.</p>
+                    <div class="bg-cyan-50 p-4 rounded-2xl mb-3 border border-cyan-100">
+                         <h4 class="font-bold text-cyan-800 text-xs mb-2 uppercase tracking-wide">טיפים לביקור:</h4>
+                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
+                            <li>הליכה קצרה (5 דק') משביל העפר לתצפית.</li>
+                            <li>המקום הכי יפה לתמונות באזור.</li>
+                            <li>אפשר לרדת לחוף (זהירות, ירידה תלולה).</li>
+                         </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Shark+Fin+Cove+Parking/Shark+Fin+Cove+Overlook"
+            },
+            {
+                id: 'pigeon',
+                title: 'המגדלור',
+                subTitle: 'Pigeon Point',
+                originalTime: '16:15',
+                displayTime: '16:15',
+                type: 'stop',
+                icon: 'anchor',
+                coords: { lat: 37.1843, lng: -122.3946 },
+                parking: { name: 'חניון המגדלור', address: 'Pigeon Point Rd', coords: { lat: 37.1843, lng: -122.3940 }, cost: 'חינם' },
+                isEmoji: true, emoji: "🗼", bgGradient: "from-slate-500 to-gray-600",
+                longDesc: `
+                    <p class="mb-3 text-sm text-slate-700">אחד המגדלורים הגבוהים והיפים בארה"ב (35 מטר). נבנה ב-1871 ועדיין פעיל.</p>
+                    <div class="bg-slate-100 p-4 rounded-2xl mb-3 border border-slate-200">
+                         <h4 class="font-bold text-slate-700 text-xs mb-2 uppercase tracking-wide">מה רואים?</h4>
+                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
+                            <li>סיבוב קצר סביב המגדלור.</li>
+                            <li>תצפית על לווייתנים (בעונה - דצמבר עד אפריל).</li>
+                            <li>תמונות דרמטיות של הצוקים.</li>
+                         </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Pigeon+Point+Light+Station/Whaler's+Cove"
+            },
+            {
+                id: 'hmb',
+                title: 'האף מוּן ביי',
+                subTitle: 'עיירה יוקרתית',
+                originalTime: '17:00',
+                displayTime: '17:00',
+                type: 'stop',
+                icon: 'coffee',
+                coords: { lat: 37.4636, lng: -122.4286 },
+                parking: { name: 'Poplar Beach', address: 'Poplar St', coords: { lat: 37.4593, lng: -122.4418 }, cost: '$10 במכונה (חובה!)' },
+                isEmoji: true, emoji: "🌊", bgGradient: "from-teal-400 to-emerald-500",
+                longDesc: `
+                    <p class="mb-3 text-sm text-slate-700">עיירת חוף עשירה ומהממת עם אווירה כפרית. ידועה בפסטיבל הדלעות ובגלישת גלי ענק.</p>
+                    <div class="bg-teal-50 p-4 rounded-2xl mb-3 border border-teal-100">
+                         <h4 class="font-bold text-teal-800 text-xs mb-2 uppercase tracking-wide">המלצות:</h4>
+                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
+                            <li>הליכה ב-Main Street ההיסטורי.</li>
+                            <li>קפה ומאפה ב-San Benito House.</li>
+                            <li>צפייה במלון ריץ-קרלטון שיושב על הצוק.</li>
+                         </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Poplar+Beach+Parking/Half+Moon+Bay+Coastal+Trail"
+            },
+            {
+                id: 'pacifica',
+                title: 'מגלשת השטן',
+                subTitle: 'Devil\'s Slide Trail',
+                originalTime: '17:45',
+                displayTime: '17:45',
+                type: 'stop',
+                icon: 'footprints',
+                coords: { lat: 37.5843, lng: -122.5020 },
+                parking: { name: 'South Parking Lot', address: 'Hwy 1', coords: { lat: 37.5843, lng: -122.5020 }, cost: 'חינם (קטן מאוד)' },
+                isEmoji: true, emoji: "🥾", bgGradient: "from-green-500 to-lime-600",
+                longDesc: `
+                    <p class="mb-3 text-sm text-slate-700"><strong>ה-הליכה של הטיול.</strong> קטע כביש ישן שהפך למסלול הליכה תלוי מעל התהום. נופים עוצרי נשימה ללא מכוניות.</p>
+                    <div class="bg-green-50 p-4 rounded-2xl mb-3 border border-green-100">
+                         <h4 class="font-bold text-green-800 text-xs mb-2 uppercase tracking-wide">פרטים:</h4>
+                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
+                            <li>אורך המסלול: כ-2 ק"מ (סלול וקל).</li>
+                            <li>לא לפספס: התצפית מהבונקר הישן.</li>
+                            <li>בונוס: עצירה ב-Taco Bell היפה בעולם (על החוף).</li>
+                         </ul>
+                    </div>`,
+                walkingRoute: "https://www.google.com/maps/dir/Devil's+Slide+Trail+South+Parking/Devil's+Slide+Bunker"
+            },
+
             {
                 id: 'sf',
                 title: 'סיום: סן פרנסיסקו',
                 subTitle: 'Fisherman\'s Wharf',
-                originalTime: '17:00',
-                displayTime: '17:00',
+                originalTime: '19:00',
+                displayTime: '19:00',
                 type: 'stop',
                 icon: 'anchor',
                 coords: { lat: 37.8080, lng: -122.4177 },
@@ -455,7 +599,8 @@
                         isMorningDrive = true;
                     }
 
-                    const speed = (stop.id === 'mcway' || stop.id === 'bixby') ? 50 : 75; // Slower on Big Sur
+                    // Adjust speed for curvy roads
+                    const speed = (stop.id === 'mcway' || stop.id === 'bixby' || stop.id === 'sharkfin' || stop.id === 'pacifica') ? 50 : 75; 
                     const timeStr = getDriveTime(distance, speed);
                     
                     // Style for the "Pill" connector
@@ -480,6 +625,7 @@
                 lastCoords = stop.coords;
                 
                 // --- MEDIA & CONTENT PREP ---
+                // Only show gas button if there is data AND it's not the very last item
                 const showGas = index < ITINERARY.length - 1 && ITINERARY[index+1].type !== 'divider' && GAS_STATIONS[stop.id];
 
                 let mediaHtml = stop.isEmoji 
@@ -606,7 +752,8 @@
                 if (stop.type === 'divider') return;
 
                 const dist = getDistance(lat, lng, stop.coords.lat, stop.coords.lng);
-                const speed = (stop.id === 'mcway' || stop.id === 'bixby') ? 50 : 75;
+                // Adjust logic speed for calculations
+                const speed = 75; 
                 const minutes = Math.round((dist * 1.3 / speed) * 60); 
                 
                 const timeEl = document.getElementById(`time-${idx}`);
@@ -616,7 +763,7 @@
                 const card = document.getElementById(`card-${idx}`);
 
                 if (lat > stop.coords.lat + 0.02) { 
-                    // Passed this point
+                    // Passed this point (Driving North -> Lat increases, so checking if User Lat > Stop Lat)
                     timeEl.innerText = stop.originalTime;
                     etaEl.classList.add('hidden');
                     dot.classList.add('active');
@@ -639,10 +786,18 @@
                 const current = stops[i];
                 const next = stops[i+1];
                 
-                // Simple latitude check (works for North to South routes generally)
-                if (lat <= current.coords.lat && lat >= next.coords.lat) {
+                // Logic for Northbound (Lat increases)
+                if (lat >= current.coords.lat && lat <= next.coords.lat) {
                     activeSegmentIndex = ITINERARY.findIndex(s => s.id === current.id);
                     
+                    const totalDist = Math.abs(next.coords.lat - current.coords.lat);
+                    const covered = Math.abs(lat - current.coords.lat);
+                    segmentProgress = totalDist > 0 ? covered / totalDist : 0;
+                    break;
+                }
+                // Logic for Southbound (Lat decreases - kept for compatibility)
+                else if (lat <= current.coords.lat && lat >= next.coords.lat) {
+                    activeSegmentIndex = ITINERARY.findIndex(s => s.id === current.id);
                     const totalDist = Math.abs(current.coords.lat - next.coords.lat);
                     const covered = Math.abs(current.coords.lat - lat);
                     segmentProgress = totalDist > 0 ? covered / totalDist : 0;
@@ -656,11 +811,8 @@
                 const activeCar = document.getElementById(`car-${activeSegmentIndex}`);
                 const activeCard = document.getElementById(`card-${activeSegmentIndex}`);
                 
-                // Only show car if next item isn't a divider (complex logic simplified)
                 if (activeCar) {
                     activeCar.style.opacity = '1';
-                    // We map progress 0-1 to top 0% to 100% of the segment height (roughly)
-                    // Since height varies, this is a visual approximation that looks good
                     const pixelOffset = segmentProgress * 120; // Approx px height between stops
                     activeCar.style.top = `${Math.min(pixelOffset, 100)}%`; 
                 }
