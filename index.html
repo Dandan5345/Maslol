@@ -1,829 +1,723 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Check, X, RotateCcw, Activity, BookOpen, Brain, RefreshCw, AlertCircle, 
-  Info, Home, Settings, Play, Target, CheckSquare, List, ChevronLeft, ChevronRight
-} from 'lucide-react';
-
-// === נתונים משודרגים: שאלות, תשובות, הסברים ואופציות למבחן ===
-// type: 'single' (תשובה אחת) | 'multiple' (כמה תשובות)
-const initialCards = [
-  { 
-    id: 1, question: 'כיצד יש לטפל בחסימת נתיב אוויר חלקית אצל מבוגר או ילד?', answer: 'עידוד לשיעול בלבד.', explanation: 'השיעול הוא המנגנון הטבעי והיעיל ביותר להוצאת גוף זר.', status: 'unseen',
-    type: 'single', options: ['עידוד לשיעול בלבד', '5 טפיחות בין השכמות', 'תמרון היימליך מיידי', 'החדרת מנתב אוויר (A.W)'], correctAnswers: ['עידוד לשיעול בלבד']
-  },
-  { 
-    id: 2, question: 'מהו הטיפול בחסימה מלאה במבוגר וילד (תמרון היימליך)?', answer: 'עיסויים באמצעות שתי הידיים ברום הבטן והטיית הגוף לפנים.', explanation: 'הלחיצה ברום הבטן מעלה בפתאומיות את הלחץ בחזה, ויוצרת מעין "שיעול מלאכותי".', status: 'unseen',
-    type: 'single', options: ['עיסויים שתי ידיים ברום הבטן והטיה לפנים', 'מכות חזקות בין השכמות בלבד', 'לחיצות במרכז בית החזה בקצב מהיר', 'פתיחת פה והוצאה ידנית עם אצבע'], correctAnswers: ['עיסויים שתי ידיים ברום הבטן והטיה לפנים']
-  },
-  { 
-    id: 3, question: 'כיצד נטפל בחסימה מלאה אצל נשים בהיריון או מטופלים שמנים?', answer: 'לחיצות חזה (לנשים בהריון - מעל העובר), או דחיקה מול הקיר.', explanation: 'המטרה היא לייצר לחץ בבית החזה מבלי לפגוע בעובר או כאשר לא ניתן להקיף את הבטן.', status: 'unseen',
-    type: 'multiple', options: ['לחיצות חזה בסטרנום', 'דחיקה מול הקיר למרותקים/שמנים', 'לחיצות ברום הבטן (היימליך רגיל)', '5 טפיחות שכמות והנשמה'], correctAnswers: ['לחיצות חזה בסטרנום', 'דחיקה מול הקיר למרותקים/שמנים']
-  },
-  { 
-    id: 4, question: 'כיצד נטפל בחסימה חלקית אצל תינוק?', answer: 'נחזיק את התינוק במנח שנוח לו להוציא החוצה את הגוף הזר.', explanation: 'אנו נמנעים מהתערבות אגרסיבית שעלולה להחמיר את החסימה, ונותנים לרפלקסים לעבוד.', status: 'unseen',
-    type: 'single', options: ['נחזיק במנח שנוח לתינוק להוציא את הגו"ז', 'נבצע מכות גב קלות', 'נכניס אצבע לפה לחפש את החפץ', 'ננשים עם אמבו בייבי'], correctAnswers: ['נחזיק במנח שנוח לתינוק להוציא את הגו"ז']
-  },
-  { 
-    id: 5, question: 'מהו סדר הפעולות לטיפול בחסימה מלאה אצל תינוק?', answer: '5 טפיחות בין שכמות -> 5 עיסויי חזה -> פתיחת פה והתרשמות מנ"א.', explanation: 'לתינוק אי אפשר לבצע היימליך, לכן משלבים מכות גב ולחיצות חזה עד יציאת הגוף או אובדן הכרה.', status: 'unseen',
-    type: 'single', options: ['5 טפיחות בין שכמות, 5 עיסויי חזה, פתיחת פה', 'עיסויי בטן (היימליך תינוקות)', '15 עיסויי חזה ו-2 מכות גב', 'סקשן ולאחר מכן הנשמה'], correctAnswers: ['5 טפיחות בין שכמות, 5 עיסויי חזה, פתיחת פה']
-  },
-  { 
-    id: 6, question: 'מהם הדגשים בהידרדרות מחסימה מלאה להחייאה? (בחר 3 נכונים)', answer: 'לא בודקים דופק, לא מחדירים מנתב אוויר, לפני הנשמה מחפשים ומוציאים גו"ז.', explanation: 'הלב עצר מחנק ולכן אין טעם לבדוק דופק. המנתב ידחוף את הגוף הזר פנימה.', status: 'unseen',
-    type: 'multiple', options: ['אין צורך לבדוק דופק לפני ההחייאה', 'חובה להחדיר מנתב אוויר (A.W) כדי לאבטח נתיב', 'יש לחפש גוף זר לפני כל ניסיון הנשמה', 'החייאה רציפה ללא בדיקת דופק עד הגעת נט"ן', 'בודקים דופק כל שתי דקות'], correctAnswers: ['אין צורך לבדוק דופק לפני ההחייאה', 'יש לחפש גוף זר לפני כל ניסיון הנשמה', 'החייאה רציפה ללא בדיקת דופק עד הגעת נט"ן']
-  },
-  { 
-    id: 7, question: 'כיצד מוגדר "מוות קליני"?', answer: 'היעדר פעילות לבבית ונשימתית, מצב הפיך.', explanation: 'המוח טרם מת מחוסר חמצן, והתחלת החייאה מידית יכולה להציל חיים.', status: 'unseen',
-    type: 'single', options: ['היעדר דופק ונשימה, מצב הפיך', 'היעדר דופק ונשימה, מצב בלתי הפיך', 'חוסר הכרה עמוק עם נשימות אגונאליות', 'פגיעת ראש קשה שאינה מאפשרת חזרה להכרה'], correctAnswers: ['היעדר דופק ונשימה, מצב הפיך']
-  },
-  { 
-    id: 8, question: 'כיצד מוגדר "מוות מוחי"?', answer: 'היעדר פעילות לבבית ונשימתית, מצב בלתי הפיך.', explanation: 'תאי המוח עברו תהליך נקרוזיס עקב חוסר חמצן ממושך. החייאה לא תועיל.', status: 'unseen',
-    type: 'single', options: ['היעדר דופק ונשימה, מצב בלתי הפיך', 'היעדר דופק ונשימה, מצב הפיך', 'מצב בו הלב עובד אך הפצוע לא נושם עקב פגיעה מוחית', 'הרס של גזע המוח המלווה בנשימות אגונאליות'], correctAnswers: ['היעדר דופק ונשימה, מצב בלתי הפיך']
-  },
-  { 
-    id: 9, question: 'מהי ההגדרה המדויקת של "החייאה"?', answer: 'אוסף פעולות מלאכותיות הנעשות על מנת לחקות את פעולת הלב והריאות למטופל חסר דופק ונשימה.', explanation: 'מטרת ההחייאה היא לספק זרימת דם מחומצן למוח עד להגעת שוק/תרופות.', status: 'unseen',
-    type: 'single', options: ['פעולות לחקות את הלב והריאות למטופל ללא דופק ונשימה', 'החזרת המטופל להכרה מלאה לאחר דום לב', 'שימוש בדפיברילטור ואמבו במטרה לאפס את קצב הלב', 'טיפול במטופל מחוסר הכרה שאינו מגיב לכאב'], correctAnswers: ['פעולות לחקות את הלב והריאות למטופל ללא דופק ונשימה']
-  },
-  { 
-    id: 10, question: 'באילו מקרי טראומה *כן* נבצע החייאה?', answer: 'תלייה, טביעה, התחשמלות ומכת ברק.', explanation: 'במקרים אלו הדם לא יצא מכליו אלא הייתה פגיעה מערכתית/נשימתית ולכן לעיסויים יש סיכוי רב.', status: 'unseen',
-    type: 'multiple', options: ['תלייה', 'קטיעת גפיים משמעותית', 'טביעה והתחשמלות', 'פגיעת ראש פתוחה'], correctAnswers: ['תלייה', 'טביעה והתחשמלות']
-  },
-  { 
-    id: 11, question: 'כיצד מוגדרת "החייאה מוצלחת"?', answer: 'מטופל אשר יצא מבית החולים ללא נזק נוירולוגי משמעותי.', explanation: 'המדד האמיתי הוא שמירת תפקוד המוח והחזרה לשגרה, לא רק חזרת דופק בשטח.', status: 'unseen',
-    type: 'single', options: ['יציאה מבית החולים ללא נזק נוירולוגי משמעותי', 'חזרת דופק ונשימה ספונטניים בשטח (ROSC)', 'הגעה לחדר הלם בבית החולים עם דופק יציב', 'קבלת שוק בהצלחה מהדפיברילטור'], correctAnswers: ['יציאה מבית החולים ללא נזק נוירולוגי משמעותי']
-  },
-  { 
-    id: 12, question: 'מהי הגדרת "מבוגר" לצורך החייאה?', answer: 'גברים - משלב הופעת שיער בבית השחי. נשים - משלב הופעת שדיים.', explanation: 'האנטומיה קובעת את עומק העיסויים ונפח ההנשמה שיש לספק.', status: 'unseen',
-    type: 'single', options: ['גברים: שיער בבית שחי, נשים: שדיים', 'מעל גיל 8 לשני המינים', 'מעל גיל 12 או משקל של 40 ק"ג', 'גברים: הופעת זקן, נשים: גיל ההתבגרות'], correctAnswers: ['גברים: שיער בבית שחי, נשים: שדיים']
-  },
-  { 
-    id: 13, question: 'מה כולל שלב S (Safety - בטיחות) בסכמת ההחייאה? (בחר את כולם)', answer: '1. שמירה על ביטחוננו האישי 2. הרחקת המטופל 3. קריאה לכוחות נוספים.', explanation: 'מטפל פצוע לא יכול לטפל באחרים. בטיחות קודמת לכל.', status: 'unseen',
-    type: 'multiple', options: ['שמירה על ביטחוננו האישי', 'הרחקת המטופל מאזור הסכנה', 'קריאה לכוחות נוספים', 'בדיקת הכרה מהירה'], correctAnswers: ['שמירה על ביטחוננו האישי', 'הרחקת המטופל מאזור הסכנה', 'קריאה לכוחות נוספים']
-  },
-  { 
-    id: 14, question: 'באיזה שלב בסרגל AVPU מצוי מטופל הדורש החייאה?', answer: 'U - Unresponsive (לא מגיב כלל).', explanation: 'אם הוא מגיב לכאב, יש לו פריפוזיה מוחית (כלומר, יש דופק ולחץ דם). אנו נבצע החייאה רק ל-U.', status: 'unseen',
-    type: 'single', options: ['U (Unresponsive - מחוסר הכרה)', 'P (Pain - מגיב לכאב)', 'V (Voice - מגיב לקול)', 'A (Alert - ערני)'], correctAnswers: ['U (Unresponsive - מחוסר הכרה)']
-  },
-  { 
-    id: 15, question: 'כיצד נבדוק נשימה, ומה המשמעות של נשימות "אגונאליות"?', answer: 'שיטת ל.ל.ל ל-10 שניות. נשימות אגונאליות נחשבות למצב של "לא נושם" (מעבר ישיר לעיסויים).', explanation: 'נשימות אגונאליות אינן מכניסות חמצן (זהו רפלקס גוסס).', status: 'unseen',
-    type: 'single', options: ['ל.ל.ל ל-10 שניות, אגונאליות מחייבות מעבר לעיסויים ישירות', 'ל.ל.ל ל-5 שניות, אגונאליות דורשות הנשמה באמבו', 'הסתכלות על בית החזה, אגונאליות נחשבות לנשימה תקינה', 'ל.ל.ל ל-10 שניות, אגונאליות מחייבות סקשן מיידי'], correctAnswers: ['ל.ל.ל ל-10 שניות, אגונאליות מחייבות מעבר לעיסויים ישירות']
-  },
-  { 
-    id: 16, question: 'כיצד בודקים דופק במבוגר מחוסר הכרה?', answer: 'בעורק הקרוטידי למשך 10 שניות.', explanation: 'עורק מרכזי גדול שיורגש בו דופק גם כשלחץ הדם נמוך מאוד.', status: 'unseen',
-    type: 'single', options: ['בעורק הקרוטידי בצוואר למשך כ-10 שניות', 'בעורק הרדיאלי ביד למשך כ-10 שניות', 'בעורק הברכיאלי בזרוע למשך 5 שניות', 'שמים אוזן על לב המטופל למשך 10 שניות'], correctAnswers: ['בעורק הקרוטידי בצוואר למשך כ-10 שניות']
-  },
-  { 
-    id: 17, question: 'מהם הדגשים הקריטיים לביצוע עיסויים איכותיים? (בחר 3)', answer: 'מרכז הסטרנום, עומק לפחות 5 ס"מ, חזרה מלאה של החזה (קצב 100-120).', explanation: 'ביצוע מדויק לוחץ את הלב ומייצר תפוקת לב (Cardic Output) שתספק דם למוח.', status: 'unseen',
-    type: 'multiple', options: ['מרכז הסטרנום ועל מצע קשיח', 'עומק של לפחות 5 ס"מ', 'קצב של 100-120 בדקה תוך חזרה מלאה של החזה', 'עיסויים עד שבירת צלעות מבוקרת', 'עצירת עיסויים כל דקה כדי להעריך מצב'], correctAnswers: ['מרכז הסטרנום ועל מצע קשיח', 'עומק של לפחות 5 ס"מ', 'קצב של 100-120 בדקה תוך חזרה מלאה של החזה']
-  },
-  { 
-    id: 18, question: 'מהם שלבי הטיפול ב-A ו-B במטופל ש*יש לו דופק* אך אינו נושם?', answer: 'סילוק הפרשות -> פתיחת נתיב אוויר -> הנשמה כל 5 שניות, ובדיקת דופק כל 2 דקות.', explanation: 'מצב זה נקרא Respiratory Arrest (דום נשימה). אם לא ננשים, המטופל ידרדר מהר לדום לב.', status: 'unseen',
-    type: 'single', options: ['סילוק הפרשות, נ"א, הנשמה כל 5 שניות, בדיקת דופק כל 2 דק', 'סילוק הפרשות והמתנה שיחזור לנשום, אין להנשים שיש דופק', 'החדרת מנתב אוויר והנשמה מהירה של כל 2 שניות', 'מעבר לביצוע עיסויים מונעים ביחס של 15:2'], correctAnswers: ['סילוק הפרשות, נ"א, הנשמה כל 5 שניות, בדיקת דופק כל 2 דק']
-  },
-  { 
-    id: 19, question: 'מה תפקידו של הדפיברילטור (AED)?', answer: 'לתת שוק חשמלי במקרה של הפרעות קצב ספציפיות כדי להחזיר את הלב לקצב תקין.', explanation: 'שוק מאפס פרפור חדרים ונותן לקוצב הטבעי בלב הזדמנות לשלוט בחזרה.', status: 'unseen',
-    type: 'single', options: ['לתת שוק להפרעות קצב ספציפיות ולהחזיר קצב תקין', 'להתניע מחדש לב שעצר לחלוטין מפעולה (Asystole)', 'להחליף את העיסויים ולייצר פעימות מלאכותיות עצמאיות', 'למדוד את רמת החמצן והדופק של המטופל'], correctAnswers: ['לתת שוק להפרעות קצב ספציפיות ולהחזיר קצב תקין']
-  },
-  { 
-    id: 20, question: 'מה יש לעשות *מיד* לאחר שוק או אבחון של הדפיברילטור?', answer: 'המשך עיסויים באופן מיידי וללא בדיקת דופק.', explanation: 'הלב "המום" אחרי השוק החשמלי ולוקח לו זמן לייצר דופק אפקטיבי. עיסויים יעזרו לו במחזורי הדם הראשונים.', status: 'unseen',
-    type: 'single', options: ['התחלת עיסויים מיידית וללא בדיקת דופק', 'לבדוק דופק בקרוטיד במשך 10 שניות', 'להמתין להוראה קולית מהמכשיר האם יש דופק', 'לתת 2 הנשמות לפני חזרה לעיסויים'], correctAnswers: ['התחלת עיסויים מיידית וללא בדיקת דופק']
-  },
-  { 
-    id: 21, question: 'מהו תפקידו המרכזי של החובש בתור ראש צוות (BLS)?', answer: 'ניהול, חלוקת עבודה, מתן פידבקים לעיסויים, ואחריות על הנשמות.', explanation: 'ניהול נכון מונע כאוס ומבטיח טיפול מציל חיים רציף ואיכותי.', status: 'unseen',
-    type: 'multiple', options: ['ניהול וחלוקת עבודה', 'אחראי על הנשמת המטופל', 'מתן פידבקים לעיסויים והחלפת מעסים', 'החלטה על מתן תרופות ALS'], correctAnswers: ['ניהול וחלוקת עבודה', 'אחראי על הנשמת המטופל', 'מתן פידבקים לעיסויים והחלפת מעסים']
-  },
-  { 
-    id: 22, question: 'מה ההגדרה ל"נוכח" וכיצד ניעזר בו?', answer: 'אדם שאינו איש רפואה המזדמן לאירוע. נבקש ממנו להזעיק עזרה ולסייע בעיסויים.', explanation: 'ידיים נוספות בעיסויים מונעות התעייפות המטפל, וקריאה מוקדמת לכוחות תשפר את סיכויי ההישרדות.', status: 'unseen',
-    type: 'single', options: ['אדם ללא הכשרה. נעזר בו להזעקת עזרה ולעיסויים פשוטים', 'מטפל בכיר יותר. נעביר לו מיד את הפיקוד', 'אזרח בלתי מעורב. נבקש ממנו להתרחק ולא להתערב', 'חובש בהכשרתו שעבר במקרה. ינהל את ההנשמה והתרופות'], correctAnswers: ['אדם ללא הכשרה. נעזר בו להזעקת עזרה ולעיסויים פשוטים']
-  },
-  { 
-    id: 23, question: 'אילו פעולות קריטיות יותר בהחייאה על רקע טביעה? (בחר 2)', answer: 'סילוק הפרשות (מים) והנשמות אפקטיביות.', explanation: 'בניגוד לדום לב לבבי, בטביעה הלב עצר בגלל מחסור בחמצן. הנשמה חשובה כאן כמו עיסויים ואף יותר.', status: 'unseen',
-    type: 'multiple', options: ['סילוק הפרשות ופתיחת נתיב אוויר', 'מתן הנשמות אפקטיביות', 'שימוש בדפיברילטור עוד כשהמטופל רטוב', 'החייאה בקצב מהיר יותר (140 לדקה)'], correctAnswers: ['סילוק הפרשות ופתיחת נתיב אוויר', 'מתן הנשמות אפקטיביות']
-  },
-  { 
-    id: 24, question: 'באילו מצבים (התוויות) *נפסיק* החייאה שהתחלנו?', answer: 'המטופל מתנגד להחייאה, או הגעת צוות מתקדם (ALS).', explanation: 'התנגדות שרירית מעידה על חזרת דופק ופעילות מוחית.', status: 'unseen',
-    type: 'single', options: ['המטופל מתנגד להחייאה או בהגעת צוות ALS', 'כאשר המעסה הראשי התעייף ואין מי שיחליפו', 'לאחר 10 דקות של עיסויים ללא תגובה', 'כשהדפיברילטור אומר "אין המלצה לשוק" 3 פעמים ברצף'], correctAnswers: ['המטופל מתנגד להחייאה או בהגעת צוות ALS']
-  },
-  { 
-    id: 25, question: 'מתי *לא נתחיל* כלל החייאה?', answer: 'ניתוק הראש או האגן מהגוף (איבוד צלם אנוש). חובה לקבל אישור.', explanation: 'פציעות שאינן מאפשרות חיים. דורש אישור מגורם רפואי בכיר (מד"א 101/מטפל בכיר ביחידה).', status: 'unseen',
-    type: 'single', options: ['ניתוק ראש/אגן (מצריך קבלת אישור מגורם בכיר)', 'בכל מצב של חוסר הכרה ודימום רב (טראומה)', 'במקרים של טביעה ששהו מעל שעה במים', 'כאשר למטופל יש נשימות אגונאליות ללא דופק'], correctAnswers: ['ניתוק ראש/אגן (מצריך קבלת אישור מגורם בכיר)']
-  },
-  { 
-    id: 26, question: 'מהי שרשרת ההישרדות בהחייאה לפי הסדר? (בחר את השלבים הנכונים)', answer: 'קריאה לעזרה -> החייאה בסיסית -> דפיברילציה -> החייאה מתקדמת -> טיפול נמרץ בבי"ח.', explanation: 'כל שלב בשרשרת קריטי להישרדות המטופל. עיכוב באחד השלבים יפגע דרסטית בסיכוי לחיים.', status: 'unseen',
-    type: 'multiple', options: ['זיהוי וקריאה לעזרה מוקדמת', 'החייאה בסיסית מהירה (BLS)', 'דפיברילציה (מכות חשמל) מוקדמת', 'ניתוח לב פתוח בשטח'], correctAnswers: ['זיהוי וקריאה לעזרה מוקדמת', 'החייאה בסיסית מהירה (BLS)', 'דפיברילציה (מכות חשמל) מוקדמת']
-  },
-  { 
-    id: 27, question: 'מהן הגדרות הגילאים לתינוק וילד?', answer: 'תינוק: 28 יום עד שנה. ילד: שנה ועד בגרות מינית.', explanation: 'חלוקה שמגדירה האם לעסות עם אצבעות, יד אחת או שתיים.', status: 'unseen',
-    type: 'single', options: ['תינוק: 28 יום עד שנה. ילד: שנה עד סימני בגרות מינית', 'תינוק: עד גיל שנתיים. ילד: שנתיים עד 14', 'תינוק: עד 28 יום. ילד: עד 3 שנים', 'תינוק: חצי שנה. ילד: עד סוף גיל ההתבגרות'], correctAnswers: ['תינוק: 28 יום עד שנה. ילד: שנה עד סימני בגרות מינית']
-  },
-  { 
-    id: 28, question: 'מהם הגורמים העיקריים לדום לב בילדים ותינוקות? (בחר 3)', answer: 'בעיות נשימה, מוות בעריסה (SIDS), ומומי לב מולדים.', explanation: 'דום לב בילד נגרם לרוב מחוסר חמצן ולא מאוטם שריר הלב כמו במבוגרים.', status: 'unseen',
-    type: 'multiple', options: ['בעיות נשימה (חנק, אסטמה)', 'מוות עריסה', 'מומי לב מולדים', 'אוטם שריר הלב (התקף לב)', 'פרפור חדרים ספונטני'], correctAnswers: ['בעיות נשימה (חנק, אסטמה)', 'מוות עריסה', 'מומי לב מולדים']
-  },
-  { 
-    id: 29, question: 'כיצד בודקים הכרה ודופק בתינוק?', answer: 'הכרה: מחיאת כף וצביטה ברגל. דופק: עורק ברכיאלי (זרוע).', explanation: 'העורק הברכיאלי בולט ונגיש יותר מצוואר התינוק, שהוא לרוב קצר ושמנמן.', status: 'unseen',
-    type: 'single', options: ['הכרה: רעש/צביטה ברגל. דופק: ברכיאלי (בזרוע)', 'הכרה: צביטה בטרפז. דופק: קרוטידי (בצוואר)', 'הכרה: קריאה בשם התינוק. דופק: רדיאלי (בכף היד)', 'הכרה: מכה על החזה. דופק: פמוראלי (במפשעה)'], correctAnswers: ['הכרה: רעש/צביטה ברגל. דופק: ברכיאלי (בזרוע)']
-  },
-  { 
-    id: 30, question: 'מהם ההבדלים בטכניקת העיסויים בין תינוק לילד?', answer: 'תינוק: 2 אצבעות/אגודלים, לעומק 3 ס"מ. ילד: יד אחת או שתיים, 4-5 ס"מ.', explanation: 'התאמת הכוח והמנח לעצמות הקטנות והרכות.', status: 'unseen',
-    type: 'single', options: ['תינוק: 2 אצבעות (3 ס"מ). ילד: יד/שתיים (4-5 ס"מ)', 'תינוק: יד אחת (3 ס"מ). ילד: 2 ידיים בלבד (6 ס"מ)', 'אין הבדל. שניהם מעוסים עם שתי ידיים במרכז החזה', 'תינוק: עיסוי בטן קלים. ילד: עיסויי חזה עם יד אחת'], correctAnswers: ['תינוק: 2 אצבעות (3 ס"מ). ילד: יד/שתיים (4-5 ס"מ)']
-  },
-  { 
-    id: 31, question: 'מהו יחס ההחייאה (עיסויים:הנשמות) בתינוקות וילדים?', answer: 'מטפל יחיד: 30:2. צוות רפואי (שניים ומעלה): 15:2.', explanation: 'כשיש צוות, מגדילים את תדירות ההנשמות כי חמצן הוא הגורם המכריע בדום לב בילדים.', status: 'unseen',
-    type: 'single', options: ['יחיד: 30:2. צוות: 15:2', 'יחיד: 15:2. צוות: 30:2', 'תמיד 30:2 ללא תלות במספר המטפלים', 'תמיד 15:2 כדי לשפר חמצון'], correctAnswers: ['יחיד: 30:2. צוות: 15:2']
-  },
-  { 
-    id: 32, question: 'מתי בסמכות חובש להשתמש במכשירי החייאה (אמבו/בלון)?', answer: 'רק בעבודה בצוות עם מטפל בכיר (מט"ב) או במרפאה.', explanation: 'אם חובש יעבוד לבדו בשטח ויעסוק בציוד, רצף העיסויים ייפגע דרסטית.', status: 'unseen',
-    type: 'single', options: ['בצוות עם מט"ב או בעבודה במרפאה', 'תמיד. על החובש להשתמש בציוד כדי לשפר חמצון', 'רק בהחייאה על רקע טביעה או מחלה', 'החובש לעולם לא ישתמש בציוד, רק המט"ב'], correctAnswers: ['בצוות עם מט"ב או בעבודה במרפאה']
-  },
-  { 
-    id: 33, question: 'מהן ההתוויות לחיבור מטופל לחמצן? (בחר 3)', answer: 'מצוקה נשימתית, כיחלון פריפרי, שימוש בשרירי עזר.', explanation: 'סימנים אלו מראים שהריאות אינן מצליחות לחמצן את הרקמות, ויש צורך בחמצן מרוכז.', status: 'unseen',
-    type: 'multiple', options: ['נשימה שטחית ומהירה', 'כיחלון (ציאנוזיס) פריפרי או מרכזי', 'שימוש בשרירי עזר (צוואר, צלעות)', 'כאב בטן עז', 'ירידה בלחץ הדם בלבד'], correctAnswers: ['נשימה שטחית ומהירה', 'כיחלון (ציאנוזיס) פריפרי או מרכזי', 'שימוש בשרירי עזר (צוואר, צלעות)']
-  },
-  { 
-    id: 34, question: 'מהי הזרימה (LPM) המותרת לחובש במיכל חמצן ללא מט"ב?', answer: 'זרימה של עד 10 LPM.', explanation: 'סמכות החובש הוגבלה למנוע נזק מחשיפת יתר לחמצן מרוכז במצבים שאינם דורשים זאת.', status: 'unseen',
-    type: 'single', options: ['עד 10 ליטר בדקה (LPM)', 'עד 5 ליטר בדקה', 'מותר לפתוח עד המקסימום (15-25 ליטר בדקה)', 'אסור לחובש לפתוח חמצן ללא הוראת רופא'], correctAnswers: ['עד 10 ליטר בדקה (LPM)']
-  },
-  { 
-    id: 35, question: 'מהו הסד"פ הנכון לפירוק וסת מבלון חמצן?', answer: 'סגירת LPM -> סגירת ברז ראשי -> פריקת לחץ (LPM פתוח) -> פתיחת הבורג המקבע.', explanation: 'פריקת הלחץ מונעת שחרור אלים של הווסת שיכול לפצוע את המטפל.', status: 'unseen',
-    type: 'single', options: ['סגירת LPM -> סגירת ראשי -> פריקת לחץ -> הברגה החוצה', 'הברגה החוצה -> סגירת הברז הראשי -> סגירת ה-LPM', 'סגירת הברז הראשי -> פתיחת הבורג המקבע בזהירות', 'פריקת לחץ -> הוצאת הבורג המקבע -> סגירת ראשי'], correctAnswers: ['סגירת LPM -> סגירת ראשי -> פריקת לחץ -> הברגה החוצה']
-  },
-  { 
-    id: 36, question: 'אילו הוראות בטיחות חלות על שימוש בחמצן? (בחר את כולם)', answer: 'הרחקה משמן ואש, השכבת המיכל לרגלי המטופל, לא לכוון וסת לאנשים.', explanation: 'חמצן מאיץ בעירה, והמיכל עלול להפוך לטיל אם הברז יישבר בנפילה.', status: 'unseen',
-    type: 'multiple', options: ['אין לקרב לאש ולשמן', 'השכבת המכל כשהראש פונה לרגלי המטופל', 'אין לכוון את הווסת כלפי אנשים', 'ניקוי המכל עם חומר אלכוהולי לפני פתיחה'], correctAnswers: ['אין לקרב לאש ולשמן', 'השכבת המכל כשהראש פונה לרגלי המטופל', 'אין לכוון את הווסת כלפי אנשים']
-  },
-  { 
-    id: 37, question: 'למי מותר להחדיר מנתב אוויר (A.W) וכיצד מודדים אותו?', answer: 'רק למטופל שאינו מגיב לכאב. נמדד מתנוך האוזן לזווית הפה.', explanation: 'מטופל המגיב לכאב עלול להקיא מהמנתב ולשאוף קיא לריאות (אספירציה).', status: 'unseen',
-    type: 'single', options: ['מחוסר הכרה עמוק (לא מגיב לכאב). מדידה אוזן-פה', 'לכל מחוסר הכרה. מדידה מהסנטר לצוואר', 'לכל מטופל קשה נשימה. מדידה מקצה האף לאוזן', 'רק למטופל שאין לו דופק. אין צורך במדידה מדויקת'], correctAnswers: ['מחוסר הכרה עמוק (לא מגיב לכאב). מדידה אוזן-פה']
-  },
-  { 
-    id: 38, question: 'מהם 3 תפקידיו של מנתב האוויר? (בחר נכונים)', answer: 'מונע נעילת לסתות, מנתב אוויר לקנה, *מפחית* סכנה לצניחת לשון.', explanation: 'המנתב מסייע אך עדיין חובה להטות את הראש (Head Tilt) כדי לפתוח את הנתיב.', status: 'unseen',
-    type: 'multiple', options: ['מונע נעילת לסתות', 'מנתב את האוויר ישירות לקנה', 'מפחית סכנה לצניחת בסיס הלשון', 'מונע צניחת לשון ב-100% ואין צורך בהטיית ראש', 'מעשיר את כמות החמצן הנכנסת לריאות'], correctAnswers: ['מונע נעילת לסתות', 'מנתב את האוויר ישירות לקנה', 'מפחית סכנה לצניחת בסיס הלשון']
-  },
-  { 
-    id: 39, question: 'מהם הנפחים של מפוחי ההנשמה (אמבו)?', answer: 'מבוגר: 1000 סמ"ק. בייבי: 400 סמ"ק.', explanation: 'שימוש במפוח מבוגר על תינוק יגרום לקריעת הריאות מלחץ יתר (ברוטראומה).', status: 'unseen',
-    type: 'single', options: ['מבוגר 1000 סמ"ק, בייבי 400 סמ"ק', 'מבוגר 2000 סמ"ק, בייבי 1000 סמ"ק', 'מבוגר 500 סמ"ק, בייבי 200 סמ"ק', 'אין הבדל בנפחים, ההבדל הוא רק בגודל המסכה'], correctAnswers: ['מבוגר 1000 סמ"ק, בייבי 400 סמ"ק']
-  },
-  { 
-    id: 40, question: 'כיצד בודקים את שלמות מפוח האמבו ואת השסתום האחורי?', answer: 'שלמות: אוטמים חור אחורי -> המפוח מתכווץ ולא מתנפח שוב. שסתום: אוטמים יציאה לפצוע -> המפוח מסרב להיסחט.', explanation: 'מוודאים שהמפוח לא קרוע ושהשסתום החד כיווני מזרים אוויר רק למטופל.', status: 'unseen',
-    type: 'single', options: ['אוטמים פתח אחורי (שלמות) ואוטמים יציאה קדמית (שסתום)', 'מנפחים מים בתוך האמבו ובודקים דליפות', 'מחברים לחמצן ומקשיבים לשריקות אוויר מהשקית', 'מנשימים פצוע דמה ובודקים אם החזה עולה'], correctAnswers: ['אוטמים פתח אחורי (שלמות) ואוטמים יציאה קדמית (שסתום)']
-  },
-  { 
-    id: 41, question: 'כמה אחוז חמצן מספק אמבו עם ובלי שקית העשרה?', answer: 'חיבור ישיר: 60-80%. עם שקית העשרה: 85-100%.', explanation: 'שקית ההעשרה משמשת כמאגר אוויר נקי ב-100% חמצן שמונע שאיבת אוויר חדר רגיל (21%) לתוך המפוח.', status: 'unseen',
-    type: 'single', options: ['בלי שקית: 60-80%, עם שקית: 85-100%', 'בלי שקית: 21% (אוויר חדר), עם שקית: 50%', 'בלי שקית 100%, השקית מיועדת רק לאגירת פחמן דו חמצני', 'תלוי בזרימה שמכוונים ב-LPM ולא בשקית'], correctAnswers: ['בלי שקית: 60-80%, עם שקית: 85-100%']
-  },
-  { 
-    id: 42, question: 'מהם הדגשים להנשמה נכונה עם אמבו? (בחר 3)', answer: 'מנתב אוויר, חיבור מסנן ויראלי (פילטר), חובש אוטם ונוכח סוחט (2 אנשים).', explanation: 'אטימת המסכה בשתי ידיים (C-E grip) של החובש קריטית למניעת דליפות אוויר.', status: 'unseen',
-    type: 'multiple', options: ['להשתמש במנתב אוויר', 'להרכיב מסנן ויראלי', 'החובש אוטם והנוכח סוחט (הנשמה בשניים)', 'לסחוט את האמבו בחוזקה ומהירות עד הסוף', 'להנשים ללא הטיית ראש לאחור'], correctAnswers: ['להשתמש במנתב אוויר', 'להרכיב מסנן ויראלי', 'החובש אוטם והנוכח סוחט (הנשמה בשניים)']
-  },
-  { 
-    id: 43, question: 'מהו קצב ההנשמה התקין לפי מצב המטופל?', answer: 'לא נושם/איטי: כל 5 שניות. נשימות מהירות: כל 5 שניות *בתיאום עם המטופל*.', explanation: 'הנשמה נגד נשימות המטופל תדחף אוויר לקיבה ותגרום להקאות וחנק מחודש.', status: 'unseen',
-    type: 'single', options: ['הנשמה כל 5 שניות (במהירות - בסינכרון עם הפצוע)', 'הנשמה פעם ב-10 שניות לכל המטופלים ללא יוצא מן הכלל', 'אם הוא נושם לאט - לא מנשימים. לא נושם - כל 3 שניות', 'הנשמה מהירה של 20 בדקה עד שהפצוע מתעורר'], correctAnswers: ['הנשמה כל 5 שניות (במהירות - בסינכרון עם הפצוע)']
-  },
-  { 
-    id: 44, question: 'מה נעשה אם בית החזה לא מתרומם בהנשמה? (בחר פעולות אפשריות)', answer: 'שיפור קיבוע ראש, שיפור אטימה, הגדלת נפח, ושלילת חסימה של גוף זר בפה.', explanation: 'הבעיה לרוב טכנית (מסכה לא אטומה/הראש לא מוטה נכון). רק בסוף מחפשים חסימה אמיתית.', status: 'unseen',
-    type: 'multiple', options: ['שיפור קיבוע ראש (Head Tilt)', 'שיפור אטימת המסיכה', 'הגדלת נפח ההנשמה באמבו', 'ביצוע סקשן עמוק ישר לקנה הנשימה', 'מתן מכות חזקות בחזה (Precordial Thump)'], correctAnswers: ['שיפור קיבוע ראש (Head Tilt)', 'שיפור אטימת המסיכה', 'הגדלת נפח ההנשמה באמבו']
-  },
-  { 
-    id: 45, question: 'מהם שלבי בדיקת התקינות של מכשיר הסקשן?', answer: 'שלמות מכל והימצאות גולה -> תקינות בוכנה -> אטימת קטטר ובדיקת ואקום -> שאיבה ממימיה.', explanation: 'מטרת הבדיקה לוודא שברגע האמת הסקשן באמת ישאב נוזלים סמיכים ולא ייתקע.', status: 'unseen',
-    type: 'single', options: ['שלמות, בוכנה, בדיקת ואקום, ושאיבת מים ממימייה', 'חיבור לחשמל, שמיעת זמזום מנוע ושאיבת מים ממימייה', 'דחיפת הקטטר לפה פצוע דמה ובדיקת התנגדות הבוכנה', 'אין צורך בבדיקה, יש לסמוך על תקינות המכשיר מהאפסנאות'], correctAnswers: ['שלמות, בוכנה, בדיקת ואקום, ושאיבת מים ממימייה']
-  },
-  { 
-    id: 46, question: 'מה תפקידו של הפאלס אוקסימטר ומה נחשב לתקין?', answer: 'מזהה אחוז רוויון החמצן בדם ומודד דופק. סטורציה תקינה: 95%-100%.', explanation: 'מאפשר זיהוי מוקדם של הידרדרות נשימתית עוד לפני שמופיע כיחלון בשפתיים.', status: 'unseen',
-    type: 'single', options: ['מודד רוויון חמצן בדם ודופק. תקין: 95%-100%', 'מודד לחץ דם וחמצן. תקין: 90%-100%', 'בודק את כמות ההמוגלובין בדם. תקין: מעל 80%', 'מודד ריכוז CO2 בנשיפה (קפנוגרף). תקין: 35-45%'], correctAnswers: ['מודד רוויון חמצן בדם ודופק. תקין: 95%-100%']
-  },
-  { 
-    id: 47, question: 'אילו גורמים מפריעים (מגבלות) למדידת פאלס אוקסימטר? (בחר 3)', answer: 'אור חזק, לק בציפורניים/לכלוך, כיווץ כלי דם (בקור), והרעלת CO.', explanation: 'המכשיר עובד על אור, ולכן לק, לכלוך או שמש יסנוורו אותו. כלי דם מכווצים לא מזררימים מספיק דם למדידה.', status: 'unseen',
-    type: 'multiple', options: ['חשיפה לאור שמש חזק', 'רעד המטופל', 'צבע לק או ציפורן מלוכלכת', 'לחץ דם גבוה מדי (מעל 180)', 'עור שחום'], correctAnswers: ['חשיפה לאור שמש חזק', 'רעד המטופל', 'צבע לק או ציפורן מלוכלכת']
-  },
-  { 
-    id: 48, question: 'מדוע שאיפת עשן (CO) מטעה את הפאלס אוקסימטר?', answer: 'המכשיר מזהה את ה-CO שקשור לדם כחמצן, וייתן קריאה גבוהה (ותקינה שקרית) אף על פי שהמטופל נחנק.', explanation: 'גז CO נקשר להמוגלובין בצבע דומה לחמצן, והמכשיר הפשוט לא מבדיל ביניהם.', status: 'unseen',
-    type: 'single', options: ['ה-CO נראה למכשיר כמו חמצן, ולכן הסטורציה תיראה גבוהה ותקינה', 'ה-CO חוסם את החיישן ולכן המכשיר מראה כל הזמן 0%', 'שאיפת עשן גורמת לכוויות שממיסות את פלסטיק המכשיר', 'העשן חוסם את מעבר האור מהאצבע למכשיר ולכן יהיה צפצוף שגיאה'], correctAnswers: ['ה-CO נראה למכשיר כמו חמצן, ולכן הסטורציה תיראה גבוהה ותקינה']
-  },
-  { 
-    id: 49, question: 'כיצד נוודא שהקריאה בפאלס אוקסימטר אמינה?', answer: 'נשווה בין הדופק שמופיע במכשיר לדופק שהרגשנו ידנית. אם הם זהים, הקריאה אמינה.', explanation: 'אם המכשיר מזייף בדופק הפשוט, הוא כנראה מזייף גם באחוזי החמצן המורכבים יותר.', status: 'unseen',
-    type: 'single', options: ['נשווה את קצב הדופק במכשיר לדופק שהרגשנו ידנית (בקרוטיד/רדיאלי)', 'נחבר את המכשיר לשתי אצבעות שונות בו זמנית ונהשווה', 'ננשום עמוק בעצמנו ונוודא שהמכשיר מגיב נכון למטפל', 'נסמוך עליו תמיד, אלא אם מופיע סמל של סוללה חלשה'], correctAnswers: ['נשווה את קצב הדופק במכשיר לדופק שהרגשנו ידנית (בקרוטיד/רדיאלי)']
-  },
-];
-
-// --- עזרי עיצוב UI ---
-const GradientText = ({ children }) => (
-  <span className="bg-clip-text text-transparent bg-gradient-to-l from-blue-600 to-indigo-600">
-    {children}
-  </span>
-);
-
-export default function CompleteCPRApp() {
-  const [currentScreen, setCurrentScreen] = useState('home'); // 'home' | 'flashcards' | 'practice' | 'test'
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>קורס חובשים קרביים - מערכת למידה</title>
   
-  // Flashcards state
-  const [cards, setCards] = useState(initialCards);
-  
-  // Global App Load/Save
-  useEffect(() => {
-    const saved = localStorage.getItem('medicCPR-Pro-V1');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setCards(initialCards.map(c => {
-          const s = parsed.find(p => p.id === c.id);
-          return s ? { ...c, status: s.status } : c;
-        }));
-      } catch (e) { console.error(e); }
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('medicCPR-Pro-V1', JSON.stringify(cards));
-  }, [cards]);
-
-  // Main UI Wrapper
-  return (
-    <div dir="rtl" className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200 z-10">
-         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setCurrentScreen('home')}>
-               <div className="bg-blue-600 p-2 rounded-xl text-white shadow-md">
-                  <Activity size={22} />
-               </div>
-               <div>
-                  <h1 className="text-lg font-black text-slate-800 tracking-tight leading-tight">קורס חובשים <GradientText>ציר החייאה</GradientText></h1>
-               </div>
-            </div>
-            
-            {currentScreen !== 'home' && (
-              <button 
-                onClick={() => setCurrentScreen('home')} 
-                className="flex items-center gap-2 bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
-              >
-                <Home size={16} /> תפריט ראשי
-              </button>
-            )}
-         </div>
-      </header>
-
-      {/* Screens Routing */}
-      <main className="flex-1 flex flex-col relative overflow-hidden">
-         {currentScreen === 'home' && <HomeScreen onNavigate={setCurrentScreen} cards={cards} />}
-         {currentScreen === 'flashcards' && <FlashcardsScreen cards={cards} setCards={setCards} onNavigate={setCurrentScreen} />}
-         {currentScreen === 'practice' && <PracticeQuizScreen cards={cards} />}
-         {currentScreen === 'test' && <TestQuizScreen cards={cards} onNavigate={setCurrentScreen} />}
-      </main>
-    </div>
-  );
-}
-
-// ==========================================
-// 1. מסך בית (Menu)
-// ==========================================
-function HomeScreen({ onNavigate, cards }) {
-  const knownCount = cards.filter(c => c.status === 'known').length;
-  const total = cards.length;
-  const progress = Math.round((knownCount / total) * 100) || 0;
-
-  return (
-    <div className="max-w-4xl mx-auto w-full p-6 py-12 flex-1 overflow-y-auto">
-       <div className="text-center mb-12">
-          <h2 className="text-4xl sm:text-5xl font-black text-slate-800 mb-4 tracking-tight">מוכן לתרגל <GradientText>רפואת חירום</GradientText>?</h2>
-          <p className="text-lg text-slate-600 max-w-xl mx-auto">בחר את שיטת הלמידה שמתאימה לך כעת. המערכת זוכרת את ההתקדמות שלך בכל עת.</p>
-       </div>
-
-       <div className="grid md:grid-cols-3 gap-6">
-          
-          <button onClick={() => onNavigate('flashcards')} className="group text-right bg-white border-2 border-slate-100 hover:border-blue-400 p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start relative overflow-hidden">
-             <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <BookOpen size={32} />
-             </div>
-             <h3 className="text-2xl font-black text-slate-800 mb-2">כרטיסיות למידה</h3>
-             <p className="text-slate-500 font-medium mb-6">למידה והיכרות מעמיקה עם המושגים. כולל אפשרות לסינון ולמידה חכמה.</p>
-             
-             <div className="mt-auto w-full">
-                <div className="flex justify-between text-xs font-bold text-slate-400 mb-2">
-                   <span>התקדמות כללית</span> <span>{progress}%</span>
-                </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden w-full">
-                   <div className="h-full bg-blue-500 rounded-full" style={{width: `${progress}%`}}></div>
-                </div>
-             </div>
-          </button>
-
-          <button onClick={() => onNavigate('practice')} className="group text-right bg-white border-2 border-slate-100 hover:border-orange-400 p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start">
-             <div className="w-16 h-16 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <List size={32} />
-             </div>
-             <h3 className="text-2xl font-black text-slate-800 mb-2">שאלות אמריקאיות</h3>
-             <p className="text-slate-500 font-medium">מצב תרגול אינסופי עם תשובות מבלבלות והסברים רפואיים מפורטים לכל שאלה.</p>
-             <span className="mt-auto inline-flex items-center gap-1.5 text-orange-600 font-bold bg-orange-50 px-4 py-2 rounded-xl">
-                התחל לתרגל <ChevronLeft size={16} />
-             </span>
-          </button>
-
-          <button onClick={() => onNavigate('test')} className="group text-right bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-800 hover:border-indigo-400 p-8 rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-start text-white">
-             <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Target size={32} className="text-indigo-300" />
-             </div>
-             <h3 className="text-2xl font-black mb-2">מבחן מסכם</h3>
-             <p className="text-slate-400 font-medium">בוחן פתע! 25 שאלות רנדומליות על זמן וציון סופי בסיום. בחן את השליטה שלך.</p>
-             <span className="mt-auto inline-flex items-center gap-1.5 text-slate-900 font-black bg-indigo-400 px-4 py-2 rounded-xl group-hover:bg-white transition-colors">
-                התחל מבחן <ChevronLeft size={16} />
-             </span>
-          </button>
-
-       </div>
-    </div>
-  );
-}
-
-// ==========================================
-// 2. מסך כרטיסיות חכם (כולל הגדרות ובחירה)
-// ==========================================
-function FlashcardsScreen({ cards, setCards, onNavigate }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
-  const [filterConfig, setFilterConfig] = useState({ hideKnown: false, specificIds: [] });
-  const [showSettings, setShowSettings] = useState(false);
-  
-  // Drag State 
-  const [dragX, setDragX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartX = useRef(0);
-  const hasMoved = useRef(false);
-
-  // Compute Active List
-  const studyList = cards.filter(c => {
-    if (filterConfig.hideKnown && c.status === 'known') return false;
-    if (filterConfig.specificIds.length > 0 && !filterConfig.specificIds.includes(c.id)) return false;
-    return true;
-  });
-
-  const currentCard = studyList[currentIndex] || null;
-
-  const handleNext = () => {
-    setFlipped(false);
-    setTimeout(() => {
-      if (currentIndex + 1 >= studyList.length) {
-         // Finished a round. Are there 'learning' cards in current list?
-         const hasLearning = studyList.some(c => c.status === 'learning');
-         if (hasLearning && !filterConfig.hideKnown) {
-            // Auto-switch to hide known!
-            alert('סיימת סבב! אנו עוברים אוטומטית לתרגל רק את הכרטיסיות שדרשו חזרה.');
-            setFilterConfig(prev => ({ ...prev, hideKnown: true }));
-            setCurrentIndex(0);
-         } else {
-            // Just loop
-            setCurrentIndex(0);
-         }
-      } else {
-        setCurrentIndex(prev => prev + 1);
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Segoe UI', 'Heebo', 'Rubik', 'sans-serif'] },
+          colors: {
+             darkbg: '#0f172a',
+             darkcard: '#1e293b'
+          }
+        }
       }
-    }, 150);
-  };
+    }
+  </script>
 
-  const markStatus = (status) => {
-    if(!currentCard) return;
-    setCards(cards.map(c => c.id === currentCard.id ? { ...c, status } : c));
-    handleNext();
-  };
+  <!-- Babel for parsing JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  // Drag logic
-  const handlePointerDown = (e) => {
-    dragStartX.current = e.clientX;
-    hasMoved.current = false;
-    setIsDragging(true);
-    e.target.setPointerCapture(e.pointerId);
-  };
-  const handlePointerMove = (e) => {
-    if (!isDragging) return;
-    const delta = e.clientX - dragStartX.current;
-    if (Math.abs(delta) > 10) hasMoved.current = true;
-    setDragX(delta);
-  };
-  const handlePointerUp = (e) => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    e.target.releasePointerCapture(e.pointerId);
-    if (dragX > 100) markStatus('known');
-    else if (dragX < -100) markStatus('learning');
-    else if (!hasMoved.current) setFlipped(!flipped);
-    setDragX(0); 
-  };
-
-  // Keyboard
-  useEffect(() => {
-    const handleKey = (e) => {
-      if (showSettings || !currentCard) return;
-      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setFlipped(f => !f); }
-      if (e.key === 'ArrowRight') markStatus('known');
-      if (e.key === 'ArrowLeft') markStatus('learning');
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  });
-
-  const cardTransform = isDragging ? `translateX(${dragX}px) rotate(${dragX * 0.05}deg)` : 'translateX(0px) rotate(0deg)';
+  <style>
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(156, 163, 175, 0.5); border-radius: 10px; }
+    
+    /* 3D Flip Utilities */
+    .perspective-1000 { perspective: 1000px; }
+    .transform-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    
+    /* Prevent text selection during swipe */
+    .no-select { user-select: none; -webkit-user-select: none; }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-darkbg text-slate-900 dark:text-slate-100 transition-colors duration-300 antialiased overflow-hidden h-screen w-screen flex flex-col">
   
-  let dragHintBg = 'bg-slate-50';
-  if (dragX > 50) dragHintBg = 'bg-green-50';
-  else if (dragX < -50) dragHintBg = 'bg-orange-50';
+  <div id="root" class="h-full w-full flex flex-col"></div>
 
-  return (
-    <div className={`flex-1 flex flex-col relative w-full items-center p-4 transition-colors ${dragHintBg}`}>
-       
-       {/* Settings & Info Bar */}
-       <div className="w-full max-w-lg flex justify-between items-center mb-6 z-10">
-          <button onClick={() => setShowSettings(true)} className="bg-white text-slate-600 px-4 py-2 rounded-xl shadow-sm border border-slate-200 font-bold text-sm flex items-center gap-2 hover:bg-slate-50">
-             <Settings size={16} /> הגדרות וסינון
-          </button>
-          {studyList.length > 0 && (
-            <div className="bg-white font-bold text-slate-500 text-sm px-4 py-2 rounded-xl shadow-sm border border-slate-200">
-               כרטיס {currentIndex + 1} / {studyList.length}
+  <!-- React Code -->
+  <script type="text/babel" data-type="module">
+    import React, { useState, useEffect, useRef } from 'https://esm.sh/react@18.2.0';
+    import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+    import { Check, X, RotateCcw, Activity, BookOpen, Brain, RefreshCw, AlertCircle, Info, Home, Settings, Target, CheckSquare, List, ChevronLeft, ChevronRight, Moon, Sun, LogOut, User } from 'https://esm.sh/lucide-react@0.263.1';
+    
+    // Firebase SDKs
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbqXOWCHseGglYMFRJsTeug6DMbnXrows",
+      authDomain: "hovsim-e9fef.firebaseapp.com",
+      projectId: "hovsim-e9fef",
+      storageBucket: "hovsim-e9fef.firebasestorage.app",
+      messagingSenderId: "522816980545",
+      appId: "1:522816980545:web:b5721ac41a4e5769ba68c0",
+      measurementId: "G-NDDDR1M3LL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    // Data - All 53 Cards
+    const initialCards = [
+        { id: 1, question: 'כיצד יש לטפל בחסימת נתיב אוויר חלקית אצל מבוגר או ילד?', answer: 'עידוד לשיעול בלבד.', explanation: 'השיעול הוא המנגנון הטבעי והיעיל ביותר להוצאת גוף זר.', status: 'unseen', type: 'single', options: ['עידוד לשיעול בלבד', '5 טפיחות בין השכמות', 'תמרון היימליך מיידי', 'החדרת מנתב אוויר'], correctAnswers: ['עידוד לשיעול בלבד'] },
+        { id: 2, question: 'מהו הטיפול בחסימה מלאה במבוגר וילד (תמרון היימליך)?', answer: 'עיסויים שתי ידיים ברום הבטן והטיית הגוף לפנים.', explanation: 'הלחיצה מעלה בפתאומיות את הלחץ ויוצרת "שיעול מלאכותי".', status: 'unseen', type: 'single', options: ['עיסויים ברום הבטן והטיה לפנים', 'מכות חזקות בין השכמות', 'לחיצות במרכז בית החזה', 'הוצאה ידנית עם אצבע'], correctAnswers: ['עיסויים ברום הבטן והטיה לפנים'] },
+        { id: 3, question: 'כיצד נטפל בחסימה מלאה בנשים בהיריון או שמנים?', answer: 'לחיצות חזה (לנשים - מעל העובר), או דחיקה מול קיר.', explanation: 'מייצרים לחץ מבלי לפגוע בעובר או בבטן הגדולה.', status: 'unseen', type: 'multiple', options: ['לחיצות חזה בסטרנום', 'דחיקה מול הקיר', 'היימליך רגיל', '5 טפיחות שכמות והנשמה'], correctAnswers: ['לחיצות חזה בסטרנום', 'דחיקה מול הקיר'] },
+        { id: 4, question: 'כיצד נטפל בחסימה חלקית אצל תינוק?', answer: 'נחזיק במנח שנוח לתינוק להוציא את הגוף הזר.', explanation: 'אנו נמנעים מהתערבות אגרסיבית שעלולה להחמיר.', status: 'unseen', type: 'single', options: ['מנח שנוח לתינוק להוציא', 'מכות גב קלות', 'אצבע לפה לחפש חפץ', 'הנשמה עם אמבו בייבי'], correctAnswers: ['מנח שנוח לתינוק להוציא'] },
+        { id: 5, question: 'מהו סדר הפעולות לטיפול בחסימה מלאה אצל תינוק?', answer: '5 טפיחות בין שכמות -> 5 עיסויי חזה -> פתיחת פה.', explanation: 'שילוב של מכות גב ולחיצות חזה יוצר לחץ ליציאת החפץ.', status: 'unseen', type: 'single', options: ['5 טפיחות שכמות, 5 עיסויי חזה, פתיחת פה', 'עיסויי בטן', '15 עיסויי חזה ו-2 מכות גב', 'סקשן והנשמה'], correctAnswers: ['5 טפיחות שכמות, 5 עיסויי חזה, פתיחת פה'] },
+        { id: 6, question: 'מהם הדגשים בהידרדרות מחסימה להחייאה? (בחר 3)', answer: 'לא בודקים דופק, לא מחדירים מנתב, לחפש גו"ז לפני הנשמה.', explanation: 'הלב עצר מחנק, דופק לא רלוונטי כרגע.', status: 'unseen', type: 'multiple', options: ['לא לבדוק דופק', 'לא להחדיר מנתב', 'לחפש גוף זר לפני הנשמה', 'להמתין לאמבולנס', 'לבדוק דופק כל שתי דקות'], correctAnswers: ['לא לבדוק דופק', 'לא להחדיר מנתב', 'לחפש גוף זר לפני הנשמה'] },
+        { id: 7, question: 'כיצד מוגדר "מוות קליני"?', answer: 'היעדר פעילות לבבית ונשימתית, מצב הפיך.', explanation: 'המוח טרם מת, התחלת החייאה מידית תציל.', status: 'unseen', type: 'single', options: ['היעדר דופק ונשימה, מצב הפיך', 'היעדר דופק ונשימה, בלתי הפיך', 'חוסר הכרה עמוק', 'פגיעת ראש קשה'], correctAnswers: ['היעדר דופק ונשימה, מצב הפיך'] },
+        { id: 8, question: 'כיצד מוגדר "מוות מוחי"?', answer: 'היעדר פעילות לבבית ונשימתית, מצב בלתי הפיך.', explanation: 'תאי המוח מתו. החייאה לא תועיל.', status: 'unseen', type: 'single', options: ['היעדר דופק ונשימה, בלתי הפיך', 'היעדר דופק ונשימה, הפיך', 'נשימות אגונאליות', 'פגיעה חלקית במוח'], correctAnswers: ['היעדר דופק ונשימה, בלתי הפיך'] },
+        { id: 9, question: 'מהי הגדרת "החייאה"?', answer: 'פעולות מלאכותיות לחקות פעולת לב וריאות.', explanation: 'מטרה - אספקת דם למוח עד הגעת שוק.', status: 'unseen', type: 'single', options: ['פעולות לחקות את הלב והריאות', 'החזרת מטופל להכרה', 'שימוש בדפיברילטור לאיפוס קצב', 'טיפול במחוסר הכרה בלבד'], correctAnswers: ['פעולות לחקות את הלב והריאות'] },
+        { id: 10, question: 'באילו מקרי טראומה *כן* נבצע החייאה?', answer: 'תלייה, טביעה, התחשמלות ומכת ברק.', explanation: 'במקרים אלו הדם לא יצא מכליו, לכן עיסויים יעילים.', status: 'unseen', type: 'multiple', options: ['תלייה', 'טביעה והתחשמלות', 'קטיעת גפיים', 'פגיעת ראש פתוחה'], correctAnswers: ['תלייה', 'טביעה והתחשמלות'] },
+        { id: 11, question: 'כיצד מוגדרת "החייאה מוצלחת"?', answer: 'יציאה מבי"ח ללא נזק נוירולוגי משמעותי.', explanation: 'שמירת המוח והחזרה לשגרה היא המדד האמיתי.', status: 'unseen', type: 'single', options: ['יציאה מבי"ח ללא נזק נוירולוגי', 'חזרת דופק בשטח', 'הגעה לחדר הלם', 'קבלת שוק בהצלחה'], correctAnswers: ['יציאה מבי"ח ללא נזק נוירולוגי'] },
+        { id: 12, question: 'מהי הגדרת "מבוגר" לצורך החייאה?', answer: 'גברים - שיער שחי. נשים - שדיים.', explanation: 'לקביעת עומק עיסוי ונפח הנשמה.', status: 'unseen', type: 'single', options: ['גברים: שחי, נשים: שדיים', 'מעל גיל 8', 'מעל גיל 12', 'גברים: זקן, נשים: 18'], correctAnswers: ['גברים: שחי, נשים: שדיים'] },
+        { id: 13, question: 'מה כולל שלב S (בטיחות)? (בחר הכל)', answer: 'ביטחון אישי, הרחקת מטופל, קריאה לכוחות.', explanation: 'בטיחות המטפל קודמת לכל.', status: 'unseen', type: 'multiple', options: ['שמירה על ביטחוננו', 'הרחקת המטופל מסכנה', 'קריאה לכוחות נוספים', 'בדיקת דופק'], correctAnswers: ['שמירה על ביטחוננו', 'הרחקת המטופל מסכנה', 'קריאה לכוחות נוספים'] },
+        { id: 14, question: 'באיזה שלב בסרגל AVPU מבצעים החייאה?', answer: 'U - Unresponsive (מחוסר הכרה לחלוטין).', explanation: 'אם הוא מגיב לכאב, יש לו פריפוזיה.', status: 'unseen', type: 'single', options: ['U (Unresponsive)', 'P (Pain)', 'V (Voice)', 'A (Alert)'], correctAnswers: ['U (Unresponsive)'] },
+        { id: 15, question: 'מה משמעות נשימות "אגונאליות"?', answer: 'נחשבות ל"לא נושם" (מעבר ישיר לעיסויים).', explanation: 'רפלקס גוסס של המוח, אינו יעיל בחמצון.', status: 'unseen', type: 'single', options: ['נחשבות ל"לא נושם" -> עיסויים', 'דורשות הנשמה בלבד', 'תקינות, יש להמתין', 'מחייבות סקשן מיידי'], correctAnswers: ['נחשבות ל"לא נושם" -> עיסויים'] },
+        { id: 16, question: 'כיצד בודקים דופק במבוגר מחוסר הכרה?', answer: 'בעורק הקרוטידי (צוואר) למשך 10 שניות.', explanation: 'עורק מרכזי בו יורגש דופק גם בלחץ נמוך.', status: 'unseen', type: 'single', options: ['קרוטידי כ-10 שניות', 'רדיאלי כ-10 שניות', 'ברכיאלי ל-5 שניות', 'הקשבה לחזה'], correctAnswers: ['קרוטידי כ-10 שניות'] },
+        { id: 17, question: 'דגשים קריטיים לעיסויים איכותיים? (בחר 3)', answer: 'מרכז סטרנום, עומק 5 ס"מ, חזרה מלאה ב-100-120 קצב.', explanation: 'הכרחי לייצור תפוקת לב.', status: 'unseen', type: 'multiple', options: ['מרכז סטרנום', 'עומק לפחות 5 ס"מ', 'קצב 100-120 וחזרה מלאה', 'עצירה כל דקה', 'עיסוי אגרסיבי עד שבירת צלעות'], correctAnswers: ['מרכז סטרנום', 'עומק לפחות 5 ס"מ', 'קצב 100-120 וחזרה מלאה'] },
+        { id: 18, question: 'טיפול A+B כשיש דופק ואין נשימה?', answer: 'סילוק הפרשות -> פתיחת נ"א -> הנשמה כל 5 שניות.', explanation: 'דום נשימה - נמנע הדרדרות לדום לב.', status: 'unseen', type: 'single', options: ['סילוק, פתיחה, הנשמה כל 5 שנ\'', 'המתנה לנשימה עצמונית', 'עיסויים ביחס 15:2', 'הנשמה פעם בדקה'], correctAnswers: ['סילוק, פתיחה, הנשמה כל 5 שנ\''] },
+        { id: 19, question: 'מה תפקידו של הדפיברילטור (AED)?', answer: 'מתן שוק בהפרעות קצב ספציפיות להחזרת קצב תקין.', explanation: 'איפוס הלב ולא "התנעה" של לב שעצר (Asystole).', status: 'unseen', type: 'single', options: ['שוק להפרעות קצב ספציפיות', 'התנעת לב שעצר לחלוטין', 'החלפת עיסויים פנימיים', 'מדידת חמצן בדם'], correctAnswers: ['שוק להפרעות קצב ספציפיות'] },
+        { id: 20, question: 'מה עושים *מיד* לאחר שוק או אבחון של AED?', answer: 'המשך עיסויים באופן מיידי (ללא בדיקת דופק).', explanation: 'לוקח זמן עד שמופיע דופק גם אם הוסדר קצב חשמלי.', status: 'unseen', type: 'single', options: ['המשך עיסויים מיידי', 'לבדוק דופק 10 שניות', 'להמתין להוראה מהמכשיר', 'לתת 2 הנשמות'], correctAnswers: ['המשך עיסויים מיידי'] },
+        { id: 21, question: 'תפקידו של ראש צוות החייאה? (בחר 3)', answer: 'ניהול עבודה, הנשמות, ופידבק לעיסויים.', explanation: 'מונע כאוס בשטח.', status: 'unseen', type: 'multiple', options: ['ניהול העבודה', 'אחראי הנשמה', 'מתן פידבקים', 'קביעת מוות'], correctAnswers: ['ניהול העבודה', 'אחראי הנשמה', 'מתן פידבקים'] },
+        { id: 22, question: 'כיצד ניעזר ב"נוכח" (אזרח)?', answer: 'הזעקת עזרה ועיסויים.', explanation: 'עיסויים דורשים כוח ומעייפים את המטפל.', status: 'unseen', type: 'single', options: ['הזעקת עזרה ועיסויים פשוטים', 'ניהול האירוע', 'שאיבת הפרשות עם סקשן', 'הרחקתו בלבד'], correctAnswers: ['הזעקת עזרה ועיסויים פשוטים'] },
+        { id: 23, question: 'דגשים ייחודיים להחייאת טביעה? (בחר 2)', answer: 'סילוק מים (הפרשות) והנשמות.', explanation: 'הבעיה היא היפוקסיה קשה.', status: 'unseen', type: 'multiple', options: ['סילוק הפרשות', 'הנשמות אפקטיביות', 'דפיברילטור במים', 'עיסויים ללא הנשמה'], correctAnswers: ['סילוק הפרשות', 'הנשמות אפקטיביות'] },
+        { id: 24, question: 'מתי *נפסיק* החייאה?', answer: 'התנגדות המטופל או הגעת ALS.', explanation: 'התנגדות מעידה על פעילות מוחית חיה.', status: 'unseen', type: 'single', options: ['התנגדות מטופל / ALS', 'עייפות המעסה', 'לאחר 10 דקות', 'כשהמכשיר אומר לא מומלץ שוק'], correctAnswers: ['התנגדות מטופל / ALS'] },
+        { id: 25, question: 'מתי *לא* נתחיל החייאה כלל?', answer: 'ניתוק ראש/אגן (מצריך אישור גורם בכיר).', explanation: 'פציעות בלתי הפיכות לא לחיים.', status: 'unseen', type: 'single', options: ['ניתוק ראש/אגן (אישור בכיר)', 'חוסר הכרה עמוק בטראומה', 'טביעה של שעה', 'נשימות אגונאליות'], correctAnswers: ['ניתוק ראש/אגן (אישור בכיר)'] },
+        { id: 26, question: 'שרשרת הישרדות? (בחר לפי סדר הגיוני)', answer: 'קריאה לעזרה, BLS, AED, ALS.', explanation: 'עיכוב בכל חוליה יפגע בסיכוי.', status: 'unseen', type: 'multiple', options: ['קריאה לעזרה', 'החייאה בסיסית', 'דפיברילציה', 'ניתוח בשטח'], correctAnswers: ['קריאה לעזרה', 'החייאה בסיסית', 'דפיברילציה'] },
+        { id: 27, question: 'הגדרות גילאים בילדים?', answer: 'תינוק: 28 יום עד שנה. ילד: משנה עד בגרות.', explanation: 'להחלטה טכנית על סוג עיסוי.', status: 'unseen', type: 'single', options: ['תינוק עד שנה, ילד עד בגרות מינית', 'תינוק עד שנתיים, ילד 14', 'תינוק עד 28 יום', 'ילד עד גיל 18'], correctAnswers: ['תינוק עד שנה, ילד עד בגרות מינית'] },
+        { id: 28, question: 'גורמים נפוצים לדום לב בילדים? (בחר 3)', answer: 'בעיות נשימה, מוות בעריסה, מומי לב.', explanation: 'לא התקף לב כמו מבוגרים.', status: 'unseen', type: 'multiple', options: ['בעיות נשימה', 'מוות בעריסה', 'מומי לב מולדים', 'התקפי לב'], correctAnswers: ['בעיות נשימה', 'מוות בעריסה', 'מומי לב מולדים'] },
+        { id: 29, question: 'בדיקת הכרה ודופק בתינוק?', answer: 'מחיאת כף/צביטה ברגל, ודופק ברכיאלי (זרוע).', explanation: 'הזרוע נגישה יותר מצוואר תינוק.', status: 'unseen', type: 'single', options: ['רעש/צביטה רגל, דופק ברכיאלי', 'צביטה טרפז, קרוטידי', 'קריאה בשם, רדיאלי', 'מכה בחזה, פמוראלי'], correctAnswers: ['רעש/צביטה רגל, דופק ברכיאלי'] },
+        { id: 30, question: 'טכניקת עיסוי לתינוק ולילד?', answer: 'תינוק: 2 אצבעות (3 ס"מ). ילד: יד/שתיים (4-5 ס"מ).', explanation: 'התאמה לשלד הקטן.', status: 'unseen', type: 'single', options: ['תינוק: 2 אצבעות. ילד: יד/שתיים', 'תינוק: יד אחת. ילד: שתיים', 'שניהם 2 ידיים', 'תינוק: עיסוי בטן'], correctAnswers: ['תינוק: 2 אצבעות. ילד: יד/שתיים'] },
+        { id: 31, question: 'יחס החייאה לילדים ותינוקות?', answer: 'מטפל יחיד: 30:2. צוות: 15:2.', explanation: 'צוות מנשים יותר כי חמצן קריטי בילדים.', status: 'unseen', type: 'single', options: ['יחיד 30:2, צוות 15:2', 'יחיד 15:2, צוות 30:2', 'תמיד 30:2', 'תמיד 15:2'], correctAnswers: ['יחיד 30:2, צוות 15:2'] },
+        { id: 32, question: 'מתי חובש ישתמש במכשירי החייאה?', answer: 'בצוות עם מט"ב או במרפאה.', explanation: 'עבודה לבד עם ציוד פוגעת בעיסויים.', status: 'unseen', type: 'single', options: ['בצוות עם מט"ב או מרפאה', 'תמיד', 'רק בטביעה', 'לעולם לא'], correctAnswers: ['בצוות עם מט"ב או מרפאה'] },
+        { id: 33, question: 'התוויות לחמצן? (בחר 3)', answer: 'מצוקה נשימתית, כיחלון, שימוש בשרירי עזר.', explanation: 'הריאות צריכות סיוע להעשיר חמצן.', status: 'unseen', type: 'multiple', options: ['נשימה שטחית', 'כיחלון פריפרי', 'שימוש בשרירי עזר', 'כאב בטן', 'ירידה בלחץ דם'], correctAnswers: ['נשימה שטחית', 'כיחלון פריפרי', 'שימוש בשרירי עזר'] },
+        { id: 34, question: 'LPM מותר לחובש בלי מט"ב?', answer: 'עד 10 ליטר בדקה.', explanation: 'מניעת הרעלת חמצן במצבים לא ברורים.', status: 'unseen', type: 'single', options: ['עד 10 LPM', 'עד 5 LPM', 'עד מקסימום (15-25)', 'אסור ללא רופא'], correctAnswers: ['עד 10 LPM'] },
+        { id: 35, question: 'סד"פ פירוק חמצן?', answer: 'LPM -> ראשי -> פריקת לחץ -> בורג מקבע.', explanation: 'פריקת לחץ מונעת שחרור אלים.', status: 'unseen', type: 'single', options: ['LPM -> ראשי -> פריקת לחץ -> בורג', 'בורג -> ראשי -> LPM', 'ראשי -> בורג בזהירות', 'פריקה -> בורג -> ראשי'], correctAnswers: ['LPM -> ראשי -> פריקת לחץ -> בורג'] },
+        { id: 36, question: 'הוראות בטיחות חמצן? (בחר הכל)', answer: 'ללא שמן ואש, השכבה לרגלי פצוע, וסת הרחק מאנשים.', explanation: 'סכנת פיצוץ והתלקחות.', status: 'unseen', type: 'multiple', options: ['הרחקה מאש/שמן', 'השכבה לרגלי מטופל', 'וסת לא לכיוון אנשים', 'ניקוי באלכוהול'], correctAnswers: ['הרחקה מאש/שמן', 'השכבה לרגלי מטופל', 'וסת לא לכיוון אנשים'] },
+        { id: 37, question: 'החדרת A.W (מנתב)?', answer: 'למחוסר הכרה עמוק (ללא כאב). מדידה: תנוך לזווית פה.', explanation: 'למנוע הקאה ואספירציה.', status: 'unseen', type: 'single', options: ['לא מגיב לכאב, מדידה אוזן-פה', 'לכל מחוסר, מדידה סנטר-צוואר', 'לכל קשה נשימה', 'ללא דופק, אין צורך למדוד'], correctAnswers: ['לא מגיב לכאב, מדידה אוזן-פה'] },
+        { id: 38, question: 'תפקידי ה-A.W? (בחר נכונים)', answer: 'מונע נעילת לסתות, מנתב קנה, *מפחית* צניחת לשון.', explanation: 'עדיין דורש הטיית ראש.', status: 'unseen', type: 'multiple', options: ['מונע נעילת לסתות', 'מנתב לקנה', 'מפחית סכנת לשון', 'מונע לשון ב-100%'], correctAnswers: ['מונע נעילת לסתות', 'מנתב לקנה', 'מפחית סכנת לשון'] },
+        { id: 39, question: 'נפח אמבו?', answer: 'מבוגר: 1000 סמ"ק. בייבי: 400 סמ"ק.', explanation: 'התאמה לגיל מונעת ברוטראומה לריאות.', status: 'unseen', type: 'single', options: ['מבוגר 1000, בייבי 400', 'מבוגר 2000, בייבי 1000', 'מבוגר 500, בייבי 200', 'אחיד לכולם'], correctAnswers: ['מבוגר 1000, בייבי 400'] },
+        { id: 40, question: 'בדיקת אמבו?', answer: 'שלמות (אטימת פתח אחורי) ושסתום (אטימת קדמי והדק).', explanation: 'מוודא העדר קרעים ויציאת אוויר חד כיוונית.', status: 'unseen', type: 'single', options: ['אטימת אחורי לשלמות, קדמי לשסתום', 'מילוי מים לדליפות', 'הקשבה לשריקות מחמצן', 'הנשמת פצוע דמה'], correctAnswers: ['אטימת אחורי לשלמות, קדמי לשסתום'] },
+        { id: 41, question: 'אחוזי חמצן באמבו?', answer: 'ללא שקית: 60-80%. עם: 85-100%.', explanation: 'השקית היא מאגר נקי.', status: 'unseen', type: 'single', options: ['בלי: 60-80%, עם: 85-100%', 'בלי: 21%, עם: 50%', 'בלי: 100%', 'תלוי ב-LPM בלבד'], correctAnswers: ['בלי: 60-80%, עם: 85-100%'] },
+        { id: 42, question: 'הנשמה נכונה? (בחר 3)', answer: 'מנתב, פילטר, עבודה בשניים (חובש אוטם, נוכח סוחט).', explanation: 'C-E grip יעיל רק בשתי ידיים.', status: 'unseen', type: 'multiple', options: ['שימוש במנתב', 'פילטר', 'עבודה בשניים', 'סחיטה אגרסיבית'], correctAnswers: ['שימוש במנתב', 'פילטר', 'עבודה בשניים'] },
+        { id: 43, question: 'קצב הנשמה תקין?', answer: 'כל 5 שניות. למהירים: בתיאום איתם.', explanation: 'הנשמה נגדית דוחפת אוויר לקיבה.', status: 'unseen', type: 'single', options: ['כל 5 שניות (בתיאום למהירים)', 'כל 10 שניות לכולם', 'לאט לא, מהר לא', '20 בדקה'], correctAnswers: ['כל 5 שניות (בתיאום למהירים)'] },
+        { id: 44, question: 'אם החזה לא מתרומם? (בחר נכונים)', answer: 'לשפר מנח ראש, לאטום, להגדיל נפח, לבסוף לחפש גו"ז.', explanation: 'הבעיה לרוב טכנית ולא חסימה.', status: 'unseen', type: 'multiple', options: ['לשפר ראש', 'לשפר אטימה', 'להגדיל נפח', 'סקשן עמוק'], correctAnswers: ['לשפר ראש', 'לשפר אטימה', 'להגדיל נפח'] },
+        { id: 45, question: 'בדיקת סקשן?', answer: 'שלמות, בוכנה, ואקום מול אצבע, שאיבת מים ממימיה.', explanation: 'מוודא מוכנות לנוזלים סמיכים.', status: 'unseen', type: 'single', options: ['שלמות, בוכנה, ואקום, שאיבת מים', 'שמיעת מנוע ומים', 'לדחוף לפצוע דמה', 'לא בודקים, סומכים על הציוד'], correctAnswers: ['שלמות, בוכנה, ואקום, שאיבת מים'] },
+        { id: 46, question: 'מהו פאלס אוקסימטר ותקין?', answer: 'מודד רוויון חמצן ודופק. תקין: 95-100%.', explanation: 'עיניים למצב הנשימה לפני הופעת כיחלון.', status: 'unseen', type: 'single', options: ['מודד חמצן ודופק, 95-100% תקין', 'לחץ דם וחמצן, 90-100%', 'המוגלובין בדם, >80%', 'CO2 בנשיפה, 35-45%'], correctAnswers: ['מודד חמצן ודופק, 95-100% תקין'] },
+        { id: 47, question: 'מגבלות (גורמי טעות) למד חמצן? (בחר 3)', answer: 'אור, לק, כיווץ כלי דם בגלל קור/פחד, CO.', explanation: 'משפיעים על האור והזרימה באצבע.', status: 'unseen', type: 'multiple', options: ['אור שמש עז', 'לק/לכלוך בציפורן', 'כיווץ כלי דם', 'לחץ דם גבוה', 'עור שחום'], correctAnswers: ['אור שמש עז', 'לק/לכלוך בציפורן', 'כיווץ כלי דם'] },
+        { id: 48, question: 'מדוע CO מטעה את הפאלס אוקסימטר?', answer: 'המכשיר חושב שהרעל הוא חמצן ומציג קריאה גבוהה שקרית.', explanation: 'קשירה לאותה מולקולה ללא הבדל צבע למכשיר הפשוט.', status: 'unseen', type: 'single', options: ['CO נראה לחיישן כמו חמצן', 'CO חוסם תצוגה', 'ממיס פלסטיק', 'חוסם מעבר אור לחלוטין'], correctAnswers: ['CO נראה לחיישן כמו חמצן'] },
+        { id: 49, question: 'כיצד לוודא אמינות למד סטורציה?', answer: 'להשוות את הדופק במכשיר לדופק הידני שהרגשנו.', explanation: 'מכשיר שמזייף בדופק הפשוט, מזייף גם בחמצן.', status: 'unseen', type: 'single', options: ['השוואה לדופק ידני', 'חיבור ל-2 אצבעות', 'לנשום בעצמנו', 'לסמוך תמיד אלא אם אין בטרייה'], correctAnswers: ['השוואה לדופק ידני'] }
+    ];
+
+    // --- Component: Login ---
+    function LoginScreen({ onLoginSuccess }) {
+      const [loading, setLoading] = useState(false);
+      const handleLogin = async () => {
+        setLoading(true);
+        try {
+          await signInWithPopup(auth, googleProvider);
+          onLoginSuccess();
+        } catch (error) {
+          console.error(error);
+          alert('שגיאה בהתחברות. נסה שוב או בדוק הגדרות רשת/חסימת חלונות קופצים.');
+        }
+        setLoading(false);
+      };
+
+      return (
+         <div className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-darkbg text-center">
+            <div className="bg-white dark:bg-darkcard p-10 rounded-[2rem] shadow-2xl max-w-md w-full border border-slate-100 dark:border-slate-800 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-full h-2 bg-gradient-to-l from-blue-600 to-indigo-600"></div>
+               <Activity size={56} className="text-blue-600 mx-auto mb-6" />
+               <h1 className="text-3xl font-black text-slate-800 dark:text-white mb-2">ציר החייאה</h1>
+               <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">קורס חובשים קרביים - מערכת למידה ותרגול.</p>
+               
+               <button 
+                  onClick={handleLogin} 
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-3 bg-white border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold py-3.5 rounded-xl shadow-sm transition-all dark:bg-slate-800"
+               >
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6" />
+                  {loading ? 'מתחבר...' : 'התחברות באמצעות Google'}
+               </button>
+               <p className="text-xs text-slate-400 dark:text-slate-500 mt-6">כל ההתקדמות שלך תישמר בענן.</p>
             </div>
-          )}
-       </div>
+         </div>
+      );
+    }
 
-       {/* Empty State */}
-       {studyList.length === 0 ? (
-          <div className="bg-white rounded-[2rem] p-10 text-center shadow-xl border border-slate-100 max-w-lg w-full flex flex-col items-center mt-12 z-10">
-             <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 text-green-600">
-                <Check size={48} />
-             </div>
-             <h2 className="text-2xl font-black text-slate-800 mb-2">אין כרטיסיות להצגה!</h2>
-             <p className="text-slate-500 mb-8 font-medium">כל הכרטיסיות בסינון הנוכחי טופלו, או שסיננת הכל החוצה.</p>
-             <button onClick={() => { setFilterConfig({hideKnown:false, specificIds:[]}); setCurrentIndex(0); }} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold w-full shadow-lg">נקה סינונים והצג הכל</button>
-          </div>
-       ) : (
-          <div className="max-w-lg w-full flex-1 flex flex-col items-center">
-             
-             {/* THE CARD */}
-             <div 
-               className="z-10 w-full h-[400px] sm:h-[450px] cursor-grab active:cursor-grabbing select-none flex-shrink-0"
-               style={{ perspective: '1000px', transform: cardTransform, transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' }}
-               onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerLeave={handlePointerUp} onPointerCancel={handlePointerUp}
-             >
-                <div className="relative w-full h-full" style={{ transition: 'transform 0.5s ease-out', transformStyle: 'preserve-3d', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)'}}>
-                   
-                   {/* FRONT */}
-                   <div className="absolute w-full h-full bg-white rounded-[2rem] shadow-xl border border-slate-200 flex flex-col p-8 text-center justify-center items-center" style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden'}}>
-                      {currentCard.status === 'known' && <span className="absolute top-6 text-xs font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full">ידוע</span>}
-                      {currentCard.status === 'learning' && <span className="absolute top-6 text-xs font-bold text-orange-700 bg-orange-100 px-3 py-1 rounded-full">צריך חזרה</span>}
-                      <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-4 leading-tight">{currentCard.question}</h2>
+    // --- Main App Component ---
+    function App() {
+      const [user, setUser] = useState(null);
+      const [loadingAuth, setLoadingAuth] = useState(true);
+      const [currentScreen, setCurrentScreen] = useState('home'); // home, flashcards, practice, test
+      const [cards, setCards] = useState(initialCards);
+      const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark');
+
+      // Theme sync
+      useEffect(() => {
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        }
+      }, [isDark]);
+
+      // Auth Listener & DB Sync
+      useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+          if (currentUser) {
+            setUser(currentUser);
+            try {
+              const docRef = doc(db, 'users', currentUser.uid);
+              const snap = await getDoc(docRef);
+              if (snap.exists() && snap.data().cardsStatus) {
+                const savedStatuses = snap.data().cardsStatus;
+                setCards(initialCards.map(c => ({
+                  ...c,
+                  status: savedStatuses[c.id] || c.status
+                })));
+              }
+            } catch (e) { console.error('Error fetching data:', e); }
+          } else {
+            setUser(null);
+            setCards(initialCards); // reset
+          }
+          setLoadingAuth(false);
+        });
+        return unsubscribe;
+      }, []);
+
+      // Auto-save on card changes
+      const saveCardsToDB = async (updatedCards) => {
+        if (!user) return;
+        setCards(updatedCards);
+        try {
+           const statusesMap = {};
+           updatedCards.forEach(c => { if(c.status !== 'unseen') statusesMap[c.id] = c.status; });
+           await setDoc(doc(db, 'users', user.uid), { cardsStatus: statusesMap }, { merge: true });
+        } catch (e) { console.error("Save error", e); }
+      };
+
+      if (loadingAuth) {
+         return <div className="flex-1 flex items-center justify-center dark:bg-darkbg"><div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div></div>;
+      }
+
+      if (!user) {
+         return <LoginScreen onLoginSuccess={() => {}} />;
+      }
+
+      return (
+        <div className="h-full flex flex-col">
+          {/* Header */}
+          <header className="bg-white dark:bg-darkcard border-b border-slate-200 dark:border-slate-800 shadow-sm z-20 shrink-0">
+             <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setCurrentScreen('home')}>
+                   <div className="bg-gradient-to-tr from-blue-600 to-indigo-600 p-2 rounded-xl text-white shadow-md group-hover:shadow-lg transition">
+                      <Activity size={20} />
                    </div>
+                   <div className="hidden sm:block">
+                      <h1 className="text-sm font-black text-slate-800 dark:text-white leading-tight">קורס חובשים <span className="text-blue-600 dark:text-blue-400">החייאה</span></h1>
+                   </div>
+                </div>
+                
+                <div className="flex items-center gap-2 sm:gap-4">
+                   <span className="text-sm font-bold text-slate-600 dark:text-slate-300 hidden sm:flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full">
+                      <User size={14}/> שלום, {user.displayName?.split(' ')[0] || 'לוחם'}
+                   </span>
+                   {currentScreen !== 'home' && (
+                      <button onClick={() => setCurrentScreen('home')} className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-lg text-sm font-bold transition">
+                        <Home size={16} /> <span className="hidden sm:inline">ראשי</span>
+                      </button>
+                   )}
+                   <button onClick={() => setIsDark(!isDark)} className="p-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                      {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                   </button>
+                   <button onClick={() => signOut(auth)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition" title="התנתק">
+                      <LogOut size={18} />
+                   </button>
+                </div>
+             </div>
+          </header>
 
-                   {/* BACK */}
-                   <div className="absolute w-full h-full bg-gradient-to-b from-blue-50 to-white rounded-[2rem] shadow-xl border border-blue-200 flex flex-col p-6 overflow-hidden" style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)'}}>
-                      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-center">
-                         <h3 className="text-sm font-bold text-blue-600 mb-2 flex items-center gap-2"><Check size={16} /> תשובה:</h3>
-                         <p className="text-xl font-bold text-slate-800 leading-snug mb-4">{currentCard.answer}</p>
-                         <hr className="border-blue-100 my-4" />
-                         <div className="bg-blue-100/60 rounded-2xl p-4 border border-blue-200">
-                            <h3 className="text-xs font-black text-blue-800 mb-2 flex items-center gap-1.5 uppercase"><Info size={14} /> הסבר:</h3>
-                            <p className="text-sm font-medium text-slate-700 leading-relaxed">{currentCard.explanation}</p>
+          {/* Dynamic Screen */}
+          <main className="flex-1 overflow-hidden relative w-full flex flex-col">
+             {currentScreen === 'home' && <HomeScreen onNavigate={setCurrentScreen} cards={cards} />}
+             {currentScreen === 'flashcards' && <FlashcardsScreen cards={cards} updateCards={saveCardsToDB} />}
+             {currentScreen === 'practice' && <PracticeQuizScreen cards={cards} />}
+             {currentScreen === 'test' && <TestQuizScreen cards={cards} onNavigate={setCurrentScreen} />}
+          </main>
+        </div>
+      );
+    }
+
+    // --- Component: Home / Menu ---
+    function HomeScreen({ onNavigate, cards }) {
+      const knownCount = cards.filter(c => c.status === 'known').length;
+      const total = cards.length;
+      const progress = Math.round((knownCount / total) * 100) || 0;
+
+      return (
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+           <div className="max-w-5xl mx-auto py-8">
+               <div className="text-center mb-10">
+                  <h2 className="text-4xl sm:text-5xl font-black text-slate-800 dark:text-white mb-4">בחר שיטת <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-500 to-indigo-500">למידה</span></h2>
+                  <p className="text-slate-600 dark:text-slate-400 max-w-xl mx-auto">תרגל את החומר בצורה שנוחה לך. ההתקדמות נשמרת אוטומטית לענן.</p>
+               </div>
+
+               <div className="grid md:grid-cols-3 gap-6 relative">
+                  <div className="absolute top-1/2 left-0 w-full h-1/2 bg-blue-500/5 dark:bg-blue-500/10 blur-3xl rounded-full pointer-events-none -z-10"></div>
+                  
+                  <button onClick={() => onNavigate('flashcards')} className="group bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-800 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col items-start text-right">
+                     <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <BookOpen size={32} />
+                     </div>
+                     <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2">כרטיסיות למידה</h3>
+                     <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">למידה יסודית והחלקת מושגים לפי רמת ידע אישית.</p>
+                     <div className="mt-auto w-full">
+                        <div className="flex justify-between text-xs font-bold text-slate-400 mb-2"><span>שליטה</span> <span>{progress}%</span></div>
+                        <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden w-full"><div className="h-full bg-blue-500" style={{width: `${progress}%`}}></div></div>
+                     </div>
+                  </button>
+
+                  <button onClick={() => onNavigate('practice')} className="group bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-800 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col items-start text-right">
+                     <div className="w-16 h-16 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <List size={32} />
+                     </div>
+                     <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2">שאלות אמריקאיות</h3>
+                     <p className="text-slate-500 dark:text-slate-400 text-sm">תרגול אינסופי עם מסיחים מבלבלים והסברים מפורטים.</p>
+                     <span className="mt-auto inline-flex items-center gap-1 text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-900/20 px-4 py-2 rounded-xl">תרגל עכשיו <ChevronLeft size={16} /></span>
+                  </button>
+
+                  <button onClick={() => onNavigate('test')} className="group bg-slate-900 dark:bg-slate-800 border border-slate-800 dark:border-slate-700 p-8 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all flex flex-col items-start text-right text-white">
+                     <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <Target size={32} className="text-indigo-300" />
+                     </div>
+                     <h3 className="text-2xl font-black mb-2">מבחן מסכם</h3>
+                     <p className="text-slate-400 text-sm">בוחן פתע! 25 שאלות רנדומליות על ציון. בדוק מוכנות.</p>
+                     <span className="mt-auto inline-flex items-center gap-1 text-slate-900 font-black bg-indigo-400 px-4 py-2 rounded-xl group-hover:bg-white transition-colors">התחל מבחן <ChevronLeft size={16} /></span>
+                  </button>
+               </div>
+           </div>
+        </div>
+      );
+    }
+
+    // --- Component: Flashcards ---
+    function FlashcardsScreen({ cards, updateCards }) {
+      const [currentIndex, setCurrentIndex] = useState(0);
+      const [flipped, setFlipped] = useState(false);
+      const [filterConfig, setFilterConfig] = useState({ hideKnown: false, specificIds: [] });
+      const [showSettings, setShowSettings] = useState(false);
+      
+      const [dragX, setDragX] = useState(0);
+      const [isDragging, setIsDragging] = useState(false);
+      const dragStartX = useRef(0);
+      const hasMoved = useRef(false);
+
+      const studyList = cards.filter(c => {
+        if (filterConfig.hideKnown && c.status === 'known') return false;
+        if (filterConfig.specificIds.length > 0 && !filterConfig.specificIds.includes(c.id)) return false;
+        return true;
+      });
+
+      const currentCard = studyList[currentIndex] || null;
+
+      const handleNext = () => {
+        setFlipped(false);
+        setTimeout(() => {
+          if (currentIndex + 1 >= studyList.length) {
+             const hasLearning = studyList.some(c => c.status === 'learning');
+             if (hasLearning && !filterConfig.hideKnown) {
+                setFilterConfig(p => ({ ...p, hideKnown: true }));
+                setCurrentIndex(0);
+                alert('סיימת סבב! עוברים לתרגל רק את הכרטיסיות שסימנת כדורשות חזרה.');
+             } else {
+                setCurrentIndex(0);
+             }
+          } else {
+            setCurrentIndex(p => p + 1);
+          }
+        }, 150);
+      };
+
+      const markStatus = (status) => {
+        if(!currentCard) return;
+        const newCards = cards.map(c => c.id === currentCard.id ? { ...c, status } : c);
+        updateCards(newCards);
+        handleNext();
+      };
+
+      const handlePointerDown = (e) => {
+        dragStartX.current = e.clientX;
+        hasMoved.current = false;
+        setIsDragging(true);
+        e.target.setPointerCapture(e.pointerId);
+      };
+      const handlePointerMove = (e) => {
+        if (!isDragging) return;
+        const delta = e.clientX - dragStartX.current;
+        if (Math.abs(delta) > 10) hasMoved.current = true;
+        setDragX(delta);
+      };
+      const handlePointerUp = (e) => {
+        if (!isDragging) return;
+        setIsDragging(false);
+        e.target.releasePointerCapture(e.pointerId);
+        if (dragX > 100) markStatus('known');
+        else if (dragX < -100) markStatus('learning');
+        else if (!hasMoved.current) setFlipped(!flipped);
+        setDragX(0); 
+      };
+
+      useEffect(() => {
+        const handleKey = (e) => {
+          if (showSettings || !currentCard) return;
+          if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setFlipped(f => !f); }
+          if (e.key === 'ArrowRight') markStatus('known');
+          if (e.key === 'ArrowLeft') markStatus('learning');
+        };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+      });
+
+      const cardTransform = isDragging ? `translateX(${dragX}px) rotate(${dragX * 0.05}deg)` : 'translateX(0px) rotate(0deg)';
+      let dragHintClass = '';
+      let IconHint = null;
+      if (dragX > 50) { dragHintClass = 'bg-green-50/50 dark:bg-green-900/20'; IconHint = <Check className="absolute right-10 text-green-500/30 w-32 h-32 pointer-events-none"/>; }
+      else if (dragX < -50) { dragHintClass = 'bg-orange-50/50 dark:bg-orange-900/20'; IconHint = <X className="absolute left-10 text-orange-500/30 w-32 h-32 pointer-events-none"/>; }
+
+      return (
+        <div className={`flex-1 flex flex-col relative w-full items-center p-4 sm:p-6 transition-colors duration-300 overflow-hidden ${dragHintClass}`}>
+           {IconHint}
+           
+           <div className="w-full max-w-lg flex justify-between items-center mb-6 z-10">
+              <button onClick={() => setShowSettings(true)} className="bg-white dark:bg-darkcard text-slate-600 dark:text-slate-300 px-4 py-2 rounded-xl shadow border border-slate-200 dark:border-slate-700 font-bold text-sm flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                 <Settings size={16} /> סינון
+              </button>
+              {studyList.length > 0 && (
+                <div className="font-bold text-slate-500 dark:text-slate-400 text-sm px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-darkcard">
+                   {currentIndex + 1} / {studyList.length}
+                </div>
+              )}
+           </div>
+
+           {studyList.length === 0 ? (
+              <div className="bg-white dark:bg-darkcard rounded-3xl p-10 text-center shadow-lg border border-slate-100 dark:border-slate-800 max-w-lg w-full flex flex-col items-center z-10">
+                 <div className="w-20 h-20 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center mb-6 text-green-600 dark:text-green-400"><Check size={40} /></div>
+                 <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-2">אין כרטיסיות להצגה!</h2>
+                 <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm">כל הכרטיסיות סוננו החוצה. נקה סינונים כדי להמשיך.</p>
+                 <button onClick={() => { setFilterConfig({hideKnown:false, specificIds:[]}); setCurrentIndex(0); }} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold w-full hover:bg-blue-700 transition">נקה והצג הכל</button>
+              </div>
+           ) : (
+              <div className="max-w-lg w-full flex-1 flex flex-col items-center justify-center pb-10">
+                 
+                 <div 
+                   className="z-10 w-full h-[380px] sm:h-[420px] cursor-grab active:cursor-grabbing no-select shrink-0 perspective-1000"
+                   style={{ transform: cardTransform, transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' }}
+                   onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerLeave={handlePointerUp} onPointerCancel={handlePointerUp}
+                 >
+                    <div className="relative w-full h-full transform-3d" style={{ transition: 'transform 0.5s ease-out', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)'}}>
+                       
+                       {/* FRONT */}
+                       <div className="absolute inset-0 backface-hidden bg-white dark:bg-darkcard rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col p-8 text-center justify-center items-center">
+                          {currentCard.status === 'known' && <span className="absolute top-6 text-xs font-bold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/40 px-3 py-1 rounded-full">ידוע</span>}
+                          {currentCard.status === 'learning' && <span className="absolute top-6 text-xs font-bold text-orange-700 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/40 px-3 py-1 rounded-full">צריך חזרה</span>}
+                          <Brain size={32} className="text-blue-500 dark:text-blue-400 mb-6 opacity-50" />
+                          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white leading-tight">{currentCard.question}</h2>
+                       </div>
+
+                       {/* BACK */}
+                       <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-blue-50 to-white dark:from-slate-800 dark:to-darkcard rounded-3xl shadow-xl border border-blue-200 dark:border-slate-700 flex flex-col p-6 overflow-hidden">
+                          <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-center">
+                             <h3 className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-2"><Check size={16} /> תשובה:</h3>
+                             <p className="text-xl font-bold text-slate-800 dark:text-white leading-snug mb-4">{currentCard.answer}</p>
+                             <div className="bg-blue-100/50 dark:bg-blue-900/20 rounded-2xl p-4 mt-2">
+                                <h3 className="text-xs font-black text-blue-800 dark:text-blue-300 mb-1.5 flex items-center gap-1.5 uppercase"><Info size={14} /> הסבר:</h3>
+                                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">{currentCard.explanation}</p>
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+                 </div>
+
+                 <div className="flex w-full gap-4 mt-8 z-10 no-select">
+                    <button onClick={(e) => { e.stopPropagation(); markStatus('learning'); }} className="flex-1 bg-white dark:bg-darkcard border-2 border-orange-100 dark:border-orange-900 text-orange-600 dark:text-orange-400 font-bold py-4 rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 hover:bg-orange-50 dark:hover:bg-slate-800 transition">
+                       <X size={24} /> <span className="text-sm">צריך חזרה</span>
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); markStatus('known'); }} className="flex-1 bg-green-500 border-2 border-transparent text-white font-bold py-4 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-1 hover:bg-green-600 transition">
+                       <Check size={24} /> <span className="text-sm">יודע היטב</span>
+                    </button>
+                 </div>
+              </div>
+           )}
+
+           {/* Settings Modal */}
+           {showSettings && (
+             <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowSettings(false)}></div>
+                <div className="bg-white dark:bg-darkcard w-full max-w-md rounded-3xl shadow-2xl p-6 relative flex flex-col max-h-[85vh] border border-slate-200 dark:border-slate-700">
+                   <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-xl font-black dark:text-white">הגדרות וסינון</h3>
+                      <button onClick={() => setShowSettings(false)} className="bg-slate-100 dark:bg-slate-800 p-2 rounded-full text-slate-600 dark:text-slate-300"><X size={18}/></button>
+                   </div>
+                   
+                   <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-1 pb-4">
+                      <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                         <div>
+                            <h4 className="font-bold text-slate-800 dark:text-white">הסתר ידועות</h4>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">הצג רק מושגים שדורשים חזרה.</p>
+                         </div>
+                         <button onClick={() => { setFilterConfig(p => ({...p, hideKnown: !p.hideKnown})); setCurrentIndex(0); }} className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors ${filterConfig.hideKnown ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'}`}>
+                            <div className={`bg-white w-4 h-4 rounded-full shadow transform transition-transform ${filterConfig.hideKnown ? 'translate-x-0' : '-translate-x-6'}`}></div>
+                         </button>
+                      </div>
+
+                      <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-900/50">
+                         <h4 className="font-bold text-red-800 dark:text-red-400 mb-1">איפוס נתונים</h4>
+                         <button onClick={() => {
+                               if(window.confirm('לאפס את כל ההתקדמות לחלוטין?')) {
+                                  updateCards(cards.map(c => ({...c, status: 'unseen'})));
+                                  setFilterConfig({hideKnown: false, specificIds: []});
+                                  setCurrentIndex(0); setShowSettings(false);
+                               }
+                            }}
+                            className="bg-red-500 text-white font-bold py-2 px-4 rounded-xl text-sm flex items-center gap-2 mt-2 hover:bg-red-600 transition"
+                         ><RotateCcw size={16} /> איפוס מלא</button>
+                      </div>
+
+                      <div>
+                         <h4 className="font-bold text-slate-800 dark:text-white mb-2">בחירה חופשית:</h4>
+                         <button onClick={() => setFilterConfig(p => ({...p, specificIds: []}))} className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-3 hover:underline">נקה סינונים ספציפיים</button>
+                         <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-2 max-h-48 overflow-y-auto custom-scrollbar space-y-1 bg-slate-50 dark:bg-slate-800/50">
+                            {cards.map(c => {
+                               const isSel = filterConfig.specificIds.includes(c.id);
+                               return (
+                                  <div key={c.id} onClick={() => {
+                                        setFilterConfig(p => ({...p, specificIds: p.specificIds.includes(c.id) ? p.specificIds.filter(id => id !== c.id) : [...p.specificIds, c.id]}));
+                                        setCurrentIndex(0);
+                                     }}
+                                     className={`flex items-start gap-3 p-2 rounded-lg cursor-pointer text-sm border ${isSel ? 'bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800' : 'bg-white dark:bg-darkcard border-slate-100 dark:border-slate-700'}`}
+                                  >
+                                     <div className={`mt-0.5 w-4 h-4 rounded flex items-center justify-center border shrink-0 ${isSel ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white dark:bg-darkcard border-slate-300 dark:border-slate-600'}`}>
+                                        {isSel && <Check size={12} />}
+                                     </div>
+                                     <span className="text-slate-700 dark:text-slate-300 leading-tight">{c.question}</span>
+                                  </div>
+                               );
+                            })}
                          </div>
                       </div>
                    </div>
                 </div>
              </div>
+           )}
+        </div>
+      );
+    }
 
-             {/* Action Buttons */}
-             <div className="flex w-full gap-4 mt-8 z-10 no-select pb-8">
-                <button onClick={(e) => { e.stopPropagation(); markStatus('learning'); }} className="flex-1 bg-white border-2 border-orange-100 text-orange-600 font-bold py-4 rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 hover:bg-orange-50">
-                   <X size={24} /> <span className="text-sm">צריך חזרה</span>
-                </button>
-                <button onClick={(e) => { e.stopPropagation(); markStatus('known'); }} className="flex-1 bg-green-500 border-2 border-transparent text-white font-bold py-4 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-1 hover:bg-green-600">
-                   <Check size={24} /> <span className="text-sm">יודע היטב</span>
-                </button>
-             </div>
-          </div>
-       )}
+    // --- Component: Practice ---
+    function PracticeQuizScreen({ cards }) {
+      const [qIndex, setQIndex] = useState(0);
+      const [selectedOptions, setSelectedOptions] = useState([]);
+      const [isChecked, setIsChecked] = useState(false);
+      const [quizList] = useState(() => [...cards].sort(() => 0.5 - Math.random()));
+      const q = quizList[qIndex];
 
-       {/* --- Settings Modal --- */}
-       {showSettings && (
-         <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowSettings(false)}></div>
-            <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-6 relative flex flex-col max-h-[90vh]">
-               <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-black">הגדרות וסינון</h3>
-                  <button onClick={() => setShowSettings(false)} className="bg-slate-100 p-2 rounded-full text-slate-600"><X size={20}/></button>
-               </div>
+      if (!q) return null;
+
+      const handleOptionClick = (opt) => {
+        if (isChecked) return;
+        if (q.type === 'multiple') setSelectedOptions(p => p.includes(opt) ? p.filter(o => o !== opt) : [...p, opt]);
+        else setSelectedOptions([opt]);
+      };
+
+      const handleCheck = () => {
+        if (selectedOptions.length === 0) { alert('יש לבחור תשובה!'); return; }
+        setIsChecked(true);
+      };
+
+      const isCorrectOption = (opt) => q.correctAnswers.includes(opt);
+      const isFullyCorrect = selectedOptions.length === q.correctAnswers.length && selectedOptions.every(opt => isCorrectOption(opt));
+
+      return (
+         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 flex justify-center">
+            <div className="w-full max-w-2xl bg-white dark:bg-darkcard rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden my-auto max-h-full">
                
-               <div className="flex-1 overflow-y-auto custom-scrollbar space-y-6 pr-2">
-                  {/* Toggle Known */}
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
-                     <div>
-                        <h4 className="font-bold text-slate-800">הסתר כרטיסיות ידועות</h4>
-                        <p className="text-xs text-slate-500 mt-1">הצג רק מושגים שדורשים חזרה או שטרם נלמדו.</p>
-                     </div>
-                     <button 
-                        onClick={() => { setFilterConfig(p => ({...p, hideKnown: !p.hideKnown})); setCurrentIndex(0); }}
-                        className={`w-14 h-8 flex items-center rounded-full p-1 transition-colors ${filterConfig.hideKnown ? 'bg-green-500' : 'bg-slate-300'}`}
-                     >
-                        <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform ${filterConfig.hideKnown ? 'translate-x-0' : '-translate-x-6'}`}></div>
-                     </button>
+               <div className="p-6 bg-slate-800 dark:bg-slate-900 text-white relative">
+                  <div className="flex justify-between items-center mb-3">
+                     <span className="bg-white/20 text-xs font-bold px-3 py-1 rounded-full"><List size={12} className="inline mr-1"/> תרגול</span>
+                     {q.type === 'multiple' && <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">רב-ברירה</span>}
                   </div>
+                  <h2 className="text-2xl font-black leading-tight">{q.question}</h2>
+               </div>
 
-                  {/* Reset Data */}
-                  <div className="bg-red-50 p-4 rounded-2xl border border-red-100 flex flex-col">
-                     <h4 className="font-bold text-red-800 mb-1">איפוס נתונים</h4>
-                     <p className="text-xs text-red-600/70 mb-3">יאפס את כל הסטטיסטיקה וההתקדמות. הפעולה לא ניתנת לביטול.</p>
-                     <button 
-                        onClick={() => {
-                           if(window.confirm('בטוח שברצונך לאפס את הכל?')) {
-                              setCards(cards.map(c => ({...c, status: 'unseen'})));
-                              setFilterConfig({hideKnown: false, specificIds: []});
-                              setCurrentIndex(0);
-                              setShowSettings(false);
-                           }
-                        }}
-                        className="bg-red-500 text-white font-bold py-2 rounded-xl text-sm self-start px-4 flex items-center gap-2"
-                     >
-                        <RotateCcw size={16} /> איפוס מלא
-                     </button>
-                  </div>
-
-                  {/* Specific Cards Selection */}
-                  <div className="flex flex-col">
-                     <h4 className="font-bold text-slate-800 mb-2">בחירת כרטיסיות ידנית:</h4>
-                     <p className="text-xs text-slate-500 mb-3">סמן וי ליד כרטיסיות כדי ללמוד רק אותן. (נקה הכל כדי ללמוד רגיל).</p>
+               <div className="p-6 space-y-3 flex-1 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-darkbg">
+                  {q.options.map((opt, idx) => {
+                     const isSelected = selectedOptions.includes(opt);
+                     let style = "bg-white dark:bg-darkcard border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200";
+                     let icon = <div className={`w-5 h-5 rounded shrink-0 border-2 ${q.type==='single'?'rounded-full':''} ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 dark:border-slate-600'}`}></div>;
                      
-                     <div className="flex gap-2 mb-3">
-                        <button onClick={() => setFilterConfig(p => ({...p, specificIds: []}))} className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg flex-1">בחר הכל (נקה סינון)</button>
-                     </div>
+                     if (isChecked) {
+                        style = "bg-white dark:bg-darkcard border-slate-200 dark:border-slate-700 opacity-60"; 
+                        icon = <div className={`w-5 h-5 shrink-0`}></div>; 
+                        if (isCorrectOption(opt)) {
+                           style = "bg-green-50 dark:bg-green-900/20 border-green-500 text-green-900 dark:text-green-300";
+                           icon = <Check className="text-green-600 dark:text-green-400 w-6 h-6 shrink-0" />;
+                        } else if (isSelected && !isCorrectOption(opt)) {
+                           style = "bg-red-50 dark:bg-red-900/20 border-red-400 text-red-900 dark:text-red-300";
+                           icon = <X className="text-red-500 dark:text-red-400 w-6 h-6 shrink-0" />;
+                        }
+                     } else if (isSelected) {
+                        style = "bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-900 dark:text-blue-300 shadow-sm";
+                     }
 
-                     <div className="border border-slate-200 rounded-2xl p-2 max-h-48 overflow-y-auto custom-scrollbar space-y-1 bg-slate-50">
-                        {cards.map(c => {
-                           const isSelected = filterConfig.specificIds.includes(c.id);
-                           return (
-                              <div key={c.id} 
-                                 onClick={() => {
-                                    setFilterConfig(p => {
-                                       let newIds = p.specificIds.includes(c.id) ? p.specificIds.filter(id => id !== c.id) : [...p.specificIds, c.id];
-                                       return {...p, specificIds: newIds};
-                                    });
-                                    setCurrentIndex(0);
-                                 }}
-                                 className={`flex items-start gap-3 p-2 rounded-xl cursor-pointer text-sm ${isSelected ? 'bg-blue-100 border-blue-200 border' : 'bg-white border border-slate-100 hover:bg-slate-100'}`}
-                              >
-                                 <div className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center border shrink-0 ${isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-300'}`}>
-                                    {isSelected && <Check size={14} />}
-                                 </div>
-                                 <span className="font-medium text-slate-700 leading-tight">{c.question}</span>
-                              </div>
-                           );
-                        })}
+                     return (
+                        <div key={idx} onClick={() => handleOptionClick(opt)} className={`p-4 rounded-2xl border-2 flex items-center gap-4 transition-all cursor-pointer ${style}`}>
+                           {icon}
+                           <span className="font-bold text-lg leading-tight">{opt}</span>
+                        </div>
+                     );
+                  })}
+               </div>
+
+               {isChecked ? (
+                  <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-darkcard">
+                     <div className={`flex items-start gap-3 p-4 rounded-xl mb-4 ${isFullyCorrect ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300'}`}>
+                        {isFullyCorrect ? <Check size={24} className="shrink-0 mt-0.5" /> : <AlertCircle size={24} className="shrink-0 mt-0.5" />}
+                        <div>
+                           <h3 className="font-black mb-1">{isFullyCorrect ? 'תשובה נכונה!' : 'טעות.'}</h3>
+                           <p className="text-sm font-medium leading-relaxed">{q.explanation}</p>
+                        </div>
                      </div>
+                     <button onClick={() => { setSelectedOptions([]); setIsChecked(false); setQIndex(p => (p + 1) % quizList.length); }} className="w-full bg-blue-600 text-white font-black py-3.5 rounded-xl hover:bg-blue-700 transition">השאלה הבאה</button>
+                  </div>
+               ) : (
+                  <div className="p-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-darkcard">
+                     <button onClick={handleCheck} className={`w-full font-black py-3.5 rounded-xl transition-all ${selectedOptions.length > 0 ? 'bg-slate-900 dark:bg-slate-700 text-white hover:bg-slate-800' : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'}`}>בדוק תשובה</button>
+                  </div>
+               )}
+            </div>
+         </div>
+      );
+    }
+
+    // --- Component: Test ---
+    function TestQuizScreen({ cards, onNavigate }) {
+      const [testCards] = useState(() => [...cards].sort(() => 0.5 - Math.random()).slice(0, 25));
+      const [answers, setAnswers] = useState({});
+      const [currentIdx, setCurrentIdx] = useState(0);
+      const [isFinished, setIsFinished] = useState(false);
+
+      const q = testCards[currentIdx];
+      const selectedOptions = answers[q?.id] || [];
+
+      const handleOptionClick = (opt) => {
+        if (isFinished) return;
+        if (q.type === 'multiple') {
+          const updated = selectedOptions.includes(opt) ? selectedOptions.filter(o => o !== opt) : [...selectedOptions, opt];
+          setAnswers({...answers, [q.id]: updated});
+        } else setAnswers({...answers, [q.id]: [opt]});
+      };
+
+      if (isFinished) {
+         let correct = 0;
+         testCards.forEach(c => {
+            const a = answers[c.id] || [];
+            if(a.length === c.correctAnswers.length && a.every(x => c.correctAnswers.includes(x))) correct++;
+         });
+         const percent = Math.round((correct/testCards.length)*100);
+         let color = "text-green-500";
+         if (percent < 70) color = "text-orange-500";
+         if (percent < 50) color = "text-red-500";
+
+         return (
+            <div className="flex-1 overflow-y-auto p-4 flex items-center justify-center">
+               <div className="bg-white dark:bg-darkcard max-w-lg w-full rounded-3xl shadow-2xl p-8 text-center border border-slate-200 dark:border-slate-800 relative">
+                  <Target size={64} className={`mx-auto mb-4 ${color}`} />
+                  <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-6">סיום המבחן!</h2>
+                  
+                  <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 mb-8 border border-slate-100 dark:border-slate-700">
+                     <div className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">הציון שלך</div>
+                     <div className={`text-6xl font-black ${color} mb-2`}>{percent}</div>
+                     <div className="text-slate-600 dark:text-slate-300 font-bold">{correct} / {testCards.length}</div>
+                  </div>
+
+                  <div className="space-y-3">
+                     <button onClick={() => onNavigate('home')} className="w-full bg-slate-900 dark:bg-slate-700 text-white font-black py-3.5 rounded-xl hover:bg-slate-800 transition">לתפריט הראשי</button>
+                     <button onClick={() => { setAnswers({}); setCurrentIdx(0); setIsFinished(false); }} className="w-full bg-white dark:bg-darkcard text-slate-700 dark:text-slate-300 font-bold py-3.5 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition">מבחן חדש</button>
                   </div>
                </div>
             </div>
-         </div>
-       )}
-    </div>
-  );
-}
+         );
+      }
 
-// ==========================================
-// 3. מצב שאלות אמריקאיות (תרגול אינסופי)
-// ==========================================
-function PracticeQuizScreen({ cards }) {
-  const [qIndex, setQIndex] = useState(0);
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const [isChecked, setIsChecked] = useState(false);
-  
-  // Scramble questions array on mount (infinite feel)
-  const [quizList] = useState(() => [...cards].sort(() => 0.5 - Math.random()));
-  const q = quizList[qIndex];
+      return (
+        <div className="flex-1 w-full max-w-2xl mx-auto p-4 flex flex-col py-6 overflow-hidden">
+            <div className="mb-4 flex items-center justify-between">
+               <div className="font-bold text-slate-500 dark:text-slate-400">שאלה {currentIdx + 1} מתוך {testCards.length}</div>
+               <div className="w-1/2 bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                  <div className="bg-indigo-600 h-full transition-all" style={{width: `${((currentIdx+1)/testCards.length)*100}%`}}></div>
+               </div>
+            </div>
 
-  if (!q) return null; // safety
+            <div className="bg-white dark:bg-darkcard flex-1 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
+               <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex-1 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-darkbg">
+                  {q.type === 'multiple' && <span className="inline-flex bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 text-xs font-bold px-3 py-1 rounded-full items-center gap-1.5 mb-4">רב-ברירה</span>}
+                  <h2 className="text-2xl font-black leading-tight text-slate-800 dark:text-white mb-6">{q.question}</h2>
 
-  const handleOptionClick = (opt) => {
-    if (isChecked) return;
-    if (q.type === 'multiple') {
-      setSelectedOptions(prev => prev.includes(opt) ? prev.filter(o => o !== opt) : [...prev, opt]);
-    } else {
-      setSelectedOptions([opt]);
+                  <div className="space-y-3">
+                     {q.options.map((opt, idx) => {
+                        const isSelected = selectedOptions.includes(opt);
+                        let style = isSelected ? "bg-indigo-50 dark:bg-indigo-900/30 border-indigo-500 text-indigo-900 dark:text-indigo-300 shadow-sm" : "bg-white dark:bg-darkcard border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300";
+                        let icon = <div className={`w-5 h-5 rounded shrink-0 border-2 ${q.type==='single'?'rounded-full':''} ${isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 dark:border-slate-600'}`}></div>;
+                        
+                        return (
+                           <div key={idx} onClick={() => handleOptionClick(opt)} className={`p-4 rounded-xl border-2 flex items-center gap-4 transition-all cursor-pointer ${style}`}>
+                              {icon}
+                              <span className="font-bold text-lg leading-tight">{opt}</span>
+                           </div>
+                        );
+                     })}
+                  </div>
+               </div>
+
+               <div className="p-4 bg-white dark:bg-darkcard shrink-0 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                  <button onClick={() => {if(currentIdx>0) setCurrentIdx(currentIdx-1)}} className={`font-bold px-4 py-2 rounded-lg transition ${currentIdx === 0 ? 'text-slate-300 dark:text-slate-600' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>קודמת</button>
+                  <button onClick={() => {
+                        if(selectedOptions.length===0 && !confirm('לא בחרת תשובה, להמשיך? (תשובה ריקה תיחשב כשגיאה)')) return;
+                        if(currentIdx < testCards.length-1) setCurrentIdx(p=>p+1); else setIsFinished(true);
+                     }} 
+                     className="bg-indigo-600 text-white font-black px-6 py-3 rounded-xl hover:bg-indigo-700 shadow-lg flex items-center gap-2"
+                  >
+                     {currentIdx === testCards.length - 1 ? 'סיים מבחן' : 'השאלה הבאה'} <ChevronLeft size={18} />
+                  </button>
+               </div>
+            </div>
+        </div>
+      );
     }
-  };
 
-  const handleCheck = () => {
-    if (selectedOptions.length === 0) { alert('יש לבחור תשובה!'); return; }
-    setIsChecked(true);
-  };
-
-  const handleNext = () => {
-    setSelectedOptions([]);
-    setIsChecked(false);
-    setQIndex(prev => (prev + 1) % quizList.length);
-  };
-
-  // Grading
-  const isCorrectOption = (opt) => q.correctAnswers.includes(opt);
-  const isFullyCorrect = selectedOptions.length === q.correctAnswers.length && 
-                         selectedOptions.every(opt => isCorrectOption(opt));
-
-  return (
-     <div className="flex-1 w-full max-w-2xl mx-auto p-4 flex flex-col py-8 overflow-y-auto">
-        <div className="bg-white rounded-[2rem] shadow-xl border border-slate-200 flex flex-col overflow-hidden">
-           
-           {/* Question Header */}
-           <div className="p-6 sm:p-8 bg-slate-800 text-white">
-              <div className="flex justify-between items-center mb-4">
-                 <span className="bg-white/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
-                   <List size={14} /> מצב תרגול
-                 </span>
-                 {q.type === 'multiple' && (
-                    <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 animate-pulse">
-                      <CheckSquare size={14} /> שאלת רב-ברירה
-                    </span>
-                 )}
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black leading-tight">{q.question}</h2>
-           </div>
-
-           {/* Options */}
-           <div className="p-6 sm:p-8 space-y-3 flex-1 bg-slate-50">
-              {q.options.map((opt, idx) => {
-                 const isSelected = selectedOptions.includes(opt);
-                 let style = "bg-white border-2 border-slate-200 text-slate-700 hover:border-blue-300 cursor-pointer";
-                 let icon = <div className={`w-5 h-5 rounded shrink-0 border-2 ${q.type==='single'?'rounded-full':''} ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300'}`}></div>;
-                 
-                 // Result Styling
-                 if (isChecked) {
-                    style = "bg-white border-2 border-slate-200 opacity-60 cursor-default"; // default checked state
-                    icon = <div className={`w-5 h-5 shrink-0`}></div>; // hide default icon
-                    if (isCorrectOption(opt)) {
-                       style = "bg-green-50 border-2 border-green-500 text-green-900 shadow-sm cursor-default";
-                       icon = <Check className="text-green-600 w-6 h-6 shrink-0" />;
-                    } else if (isSelected && !isCorrectOption(opt)) {
-                       style = "bg-red-50 border-2 border-red-400 text-red-900 cursor-default";
-                       icon = <X className="text-red-500 w-6 h-6 shrink-0" />;
-                    }
-                 } else if (isSelected) {
-                    style = "bg-blue-50 border-2 border-blue-500 text-blue-900 shadow-sm cursor-pointer";
-                 }
-
-                 return (
-                    <div key={idx} onClick={() => handleOptionClick(opt)} className={`p-4 rounded-2xl flex items-center gap-4 transition-all ${style}`}>
-                       {icon}
-                       <span className="font-bold text-lg leading-tight">{opt}</span>
-                    </div>
-                 );
-              })}
-           </div>
-
-           {/* Feedback Area */}
-           {isChecked && (
-              <div className="p-6 sm:p-8 border-t border-slate-200 bg-white">
-                 <div className={`flex items-start gap-4 p-4 rounded-2xl mb-6 ${isFullyCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                    {isFullyCorrect ? <Check size={32} className="text-green-600 shrink-0 mt-1" /> : <AlertCircle size={32} className="text-red-600 shrink-0 mt-1" />}
-                    <div>
-                       <h3 className={`text-xl font-black mb-1 ${isFullyCorrect ? 'text-green-800' : 'text-red-800'}`}>
-                          {isFullyCorrect ? 'מעולה! תשובה נכונה.' : 'טעות הפעם.'}
-                       </h3>
-                       <p className="text-sm font-medium text-slate-700 leading-relaxed"><span className="font-bold">הסבר: </span>{q.explanation}</p>
-                    </div>
-                 </div>
-                 <button onClick={handleNext} className="w-full bg-blue-600 text-white font-black text-xl py-4 rounded-2xl hover:bg-blue-700 shadow-lg flex items-center justify-center gap-2">
-                    השאלה הבאה <ChevronLeft size={24} />
-                 </button>
-              </div>
-           )}
-
-           {/* Submit Button */}
-           {!isChecked && (
-              <div className="p-6 sm:p-8 border-t border-slate-200 bg-white">
-                 <button 
-                    onClick={handleCheck} 
-                    className={`w-full font-black text-xl py-4 rounded-2xl shadow-lg transition-all ${selectedOptions.length > 0 ? 'bg-slate-900 text-white hover:bg-slate-800 hover:-translate-y-1' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
-                 >
-                    בדוק תשובה
-                 </button>
-              </div>
-           )}
-
-        </div>
-     </div>
-  );
-}
-
-// ==========================================
-// 4. מבחן מסכם (25 שאלות, סקור סופי)
-// ==========================================
-function TestQuizScreen({ cards, onNavigate }) {
-  const [testCards] = useState(() => [...cards].sort(() => 0.5 - Math.random()).slice(0, 25));
-  const [answers, setAnswers] = useState({}); // { cardId: [selected options] }
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [isFinished, setIsFinished] = useState(false);
-
-  const q = testCards[currentIdx];
-  const selectedOptions = answers[q?.id] || [];
-
-  const handleOptionClick = (opt) => {
-    if (isFinished) return;
-    if (q.type === 'multiple') {
-      const current = selectedOptions;
-      const updated = current.includes(opt) ? current.filter(o => o !== opt) : [...current, opt];
-      setAnswers({...answers, [q.id]: updated});
-    } else {
-      setAnswers({...answers, [q.id]: [opt]});
-    }
-  };
-
-  const handleNext = () => {
-     if(selectedOptions.length === 0 && !window.confirm('לא בחרת תשובה, להמשיך הלאה? תשובה ריקה תיחשב כשגיאה.')) return;
-     if (currentIdx < testCards.length - 1) setCurrentIdx(prev => prev + 1);
-     else setIsFinished(true);
-  };
-
-  const calculateScore = () => {
-     let correctCount = 0;
-     testCards.forEach(card => {
-        const userAns = answers[card.id] || [];
-        const isCorrect = userAns.length === card.correctAnswers.length && userAns.every(ans => card.correctAnswers.includes(ans));
-        if(isCorrect) correctCount++;
-     });
-     return { correct: correctCount, total: testCards.length, percent: Math.round((correctCount/testCards.length)*100) };
-  };
-
-  if (isFinished) {
-     const score = calculateScore();
-     let message = "כל הכבוד!";
-     let color = "text-green-600";
-     if (score.percent < 70) { message = "יש צורך בחזרה נוספת."; color = "text-orange-500"; }
-     if (score.percent < 50) { message = "מומלץ לעבור על הכרטיסיות מחדש."; color = "text-red-500"; }
-
-     return (
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center bg-slate-50">
-           <div className="bg-white max-w-lg w-full rounded-[2rem] shadow-2xl p-10 text-center border border-slate-200 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-white"></div>
-              
-              <div className="relative z-10">
-                 <Target size={64} className={`mx-auto mb-6 ${color}`} />
-                 <h2 className="text-4xl font-black text-slate-800 mb-2">סיום המבחן!</h2>
-                 <p className="text-slate-500 font-medium mb-8 text-lg">{message}</p>
-                 
-                 <div className="bg-slate-50 border border-slate-200 rounded-[2rem] p-8 mb-8">
-                    <div className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">הציון שלך</div>
-                    <div className={`text-6xl font-black ${color} mb-2`}>{score.percent}</div>
-                    <div className="text-slate-600 font-bold">{score.correct} תשובות נכונות מתוך {score.total}</div>
-                 </div>
-
-                 <div className="flex flex-col gap-3">
-                    <button onClick={() => onNavigate('home')} className="w-full bg-slate-900 text-white font-black text-lg py-4 rounded-xl hover:bg-slate-800 transition shadow-lg">חזרה לתפריט הראשי</button>
-                    <button onClick={() => { setAnswers({}); setCurrentIdx(0); setIsFinished(false); }} className="w-full bg-white text-slate-700 font-bold text-lg py-4 rounded-xl border border-slate-300 hover:bg-slate-50 transition">מבחן חדש</button>
-                 </div>
-              </div>
-           </div>
-        </div>
-     );
-  }
-
-  return (
-    <div className="flex-1 w-full max-w-2xl mx-auto p-4 flex flex-col py-6 overflow-hidden">
-        
-        {/* Progress header */}
-        <div className="mb-6 flex items-center justify-between">
-           <div className="font-bold text-slate-500">שאלה {currentIdx + 1} מתוך {testCards.length}</div>
-           <div className="w-1/2 bg-slate-200 h-2.5 rounded-full overflow-hidden">
-              <div className="bg-indigo-600 h-full transition-all" style={{width: `${((currentIdx+1)/testCards.length)*100}%`}}></div>
-           </div>
-        </div>
-
-        <div className="bg-white flex-1 rounded-[2rem] shadow-xl border border-slate-200 flex flex-col overflow-hidden relative">
-           
-           <div className="p-6 sm:p-8 border-b border-slate-100 flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-br from-white to-slate-50">
-              {q.type === 'multiple' && (
-                 <span className="inline-flex bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full items-center gap-1.5 mb-4">
-                   <CheckSquare size={14} /> שאלת בחירה מרובה
-                 </span>
-              )}
-              <h2 className="text-2xl sm:text-3xl font-black leading-tight text-slate-800 mb-8">{q.question}</h2>
-
-              <div className="space-y-3">
-                 {q.options.map((opt, idx) => {
-                    const isSelected = selectedOptions.includes(opt);
-                    let style = isSelected ? "bg-indigo-50 border-indigo-500 text-indigo-900 shadow-sm" : "bg-white border-slate-200 text-slate-700 hover:border-indigo-300";
-                    let icon = <div className={`w-5 h-5 rounded shrink-0 border-2 ${q.type==='single'?'rounded-full':''} ${isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'}`}></div>;
-                    
-                    return (
-                       <div key={idx} onClick={() => handleOptionClick(opt)} className={`p-4 rounded-2xl border-2 flex items-center gap-4 transition-all cursor-pointer ${style}`}>
-                          {icon}
-                          <span className="font-bold text-lg leading-tight">{opt}</span>
-                       </div>
-                    );
-                 })}
-              </div>
-           </div>
-
-           <div className="p-4 sm:p-6 bg-white shrink-0 border-t border-slate-100 flex justify-between items-center">
-              <button onClick={() => {if(currentIdx>0) setCurrentIdx(currentIdx-1)}} className={`font-bold px-6 py-3 rounded-xl transition ${currentIdx === 0 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-100'}`}>
-                 חזור לשאלה קודמת
-              </button>
-              <button onClick={handleNext} className="bg-indigo-600 text-white font-black px-8 py-3.5 rounded-xl hover:bg-indigo-700 shadow-lg flex items-center gap-2">
-                 {currentIdx === testCards.length - 1 ? 'סיים מבחן' : 'השאלה הבאה'} <ChevronLeft size={20} />
-              </button>
-           </div>
-        </div>
-    </div>
-  );
-}
-
+    const root = createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
 
