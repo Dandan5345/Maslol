@@ -1,956 +1,829 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Road Trip Pro - Ultimate Design</title>
-    
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Check, X, RotateCcw, Activity, BookOpen, Brain, RefreshCw, AlertCircle, 
+  Info, Home, Settings, Play, Target, CheckSquare, List, ChevronLeft, ChevronRight
+} from 'lucide-react';
 
-    <style>
-        body {
-            font-family: 'Rubik', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            background: #f1f5f9;
-            color: #334155;
-            overscroll-behavior-y: none;
-        }
-        
-        html { scroll-behavior: smooth; }
+// === נתונים משודרגים: שאלות, תשובות, הסברים ואופציות למבחן ===
+// type: 'single' (תשובה אחת) | 'multiple' (כמה תשובות)
+const initialCards = [
+  { 
+    id: 1, question: 'כיצד יש לטפל בחסימת נתיב אוויר חלקית אצל מבוגר או ילד?', answer: 'עידוד לשיעול בלבד.', explanation: 'השיעול הוא המנגנון הטבעי והיעיל ביותר להוצאת גוף זר.', status: 'unseen',
+    type: 'single', options: ['עידוד לשיעול בלבד', '5 טפיחות בין השכמות', 'תמרון היימליך מיידי', 'החדרת מנתב אוויר (A.W)'], correctAnswers: ['עידוד לשיעול בלבד']
+  },
+  { 
+    id: 2, question: 'מהו הטיפול בחסימה מלאה במבוגר וילד (תמרון היימליך)?', answer: 'עיסויים באמצעות שתי הידיים ברום הבטן והטיית הגוף לפנים.', explanation: 'הלחיצה ברום הבטן מעלה בפתאומיות את הלחץ בחזה, ויוצרת מעין "שיעול מלאכותי".', status: 'unseen',
+    type: 'single', options: ['עיסויים שתי ידיים ברום הבטן והטיה לפנים', 'מכות חזקות בין השכמות בלבד', 'לחיצות במרכז בית החזה בקצב מהיר', 'פתיחת פה והוצאה ידנית עם אצבע'], correctAnswers: ['עיסויים שתי ידיים ברום הבטן והטיה לפנים']
+  },
+  { 
+    id: 3, question: 'כיצד נטפל בחסימה מלאה אצל נשים בהיריון או מטופלים שמנים?', answer: 'לחיצות חזה (לנשים בהריון - מעל העובר), או דחיקה מול הקיר.', explanation: 'המטרה היא לייצר לחץ בבית החזה מבלי לפגוע בעובר או כאשר לא ניתן להקיף את הבטן.', status: 'unseen',
+    type: 'multiple', options: ['לחיצות חזה בסטרנום', 'דחיקה מול הקיר למרותקים/שמנים', 'לחיצות ברום הבטן (היימליך רגיל)', '5 טפיחות שכמות והנשמה'], correctAnswers: ['לחיצות חזה בסטרנום', 'דחיקה מול הקיר למרותקים/שמנים']
+  },
+  { 
+    id: 4, question: 'כיצד נטפל בחסימה חלקית אצל תינוק?', answer: 'נחזיק את התינוק במנח שנוח לו להוציא החוצה את הגוף הזר.', explanation: 'אנו נמנעים מהתערבות אגרסיבית שעלולה להחמיר את החסימה, ונותנים לרפלקסים לעבוד.', status: 'unseen',
+    type: 'single', options: ['נחזיק במנח שנוח לתינוק להוציא את הגו"ז', 'נבצע מכות גב קלות', 'נכניס אצבע לפה לחפש את החפץ', 'ננשים עם אמבו בייבי'], correctAnswers: ['נחזיק במנח שנוח לתינוק להוציא את הגו"ז']
+  },
+  { 
+    id: 5, question: 'מהו סדר הפעולות לטיפול בחסימה מלאה אצל תינוק?', answer: '5 טפיחות בין שכמות -> 5 עיסויי חזה -> פתיחת פה והתרשמות מנ"א.', explanation: 'לתינוק אי אפשר לבצע היימליך, לכן משלבים מכות גב ולחיצות חזה עד יציאת הגוף או אובדן הכרה.', status: 'unseen',
+    type: 'single', options: ['5 טפיחות בין שכמות, 5 עיסויי חזה, פתיחת פה', 'עיסויי בטן (היימליך תינוקות)', '15 עיסויי חזה ו-2 מכות גב', 'סקשן ולאחר מכן הנשמה'], correctAnswers: ['5 טפיחות בין שכמות, 5 עיסויי חזה, פתיחת פה']
+  },
+  { 
+    id: 6, question: 'מהם הדגשים בהידרדרות מחסימה מלאה להחייאה? (בחר 3 נכונים)', answer: 'לא בודקים דופק, לא מחדירים מנתב אוויר, לפני הנשמה מחפשים ומוציאים גו"ז.', explanation: 'הלב עצר מחנק ולכן אין טעם לבדוק דופק. המנתב ידחוף את הגוף הזר פנימה.', status: 'unseen',
+    type: 'multiple', options: ['אין צורך לבדוק דופק לפני ההחייאה', 'חובה להחדיר מנתב אוויר (A.W) כדי לאבטח נתיב', 'יש לחפש גוף זר לפני כל ניסיון הנשמה', 'החייאה רציפה ללא בדיקת דופק עד הגעת נט"ן', 'בודקים דופק כל שתי דקות'], correctAnswers: ['אין צורך לבדוק דופק לפני ההחייאה', 'יש לחפש גוף זר לפני כל ניסיון הנשמה', 'החייאה רציפה ללא בדיקת דופק עד הגעת נט"ן']
+  },
+  { 
+    id: 7, question: 'כיצד מוגדר "מוות קליני"?', answer: 'היעדר פעילות לבבית ונשימתית, מצב הפיך.', explanation: 'המוח טרם מת מחוסר חמצן, והתחלת החייאה מידית יכולה להציל חיים.', status: 'unseen',
+    type: 'single', options: ['היעדר דופק ונשימה, מצב הפיך', 'היעדר דופק ונשימה, מצב בלתי הפיך', 'חוסר הכרה עמוק עם נשימות אגונאליות', 'פגיעת ראש קשה שאינה מאפשרת חזרה להכרה'], correctAnswers: ['היעדר דופק ונשימה, מצב הפיך']
+  },
+  { 
+    id: 8, question: 'כיצד מוגדר "מוות מוחי"?', answer: 'היעדר פעילות לבבית ונשימתית, מצב בלתי הפיך.', explanation: 'תאי המוח עברו תהליך נקרוזיס עקב חוסר חמצן ממושך. החייאה לא תועיל.', status: 'unseen',
+    type: 'single', options: ['היעדר דופק ונשימה, מצב בלתי הפיך', 'היעדר דופק ונשימה, מצב הפיך', 'מצב בו הלב עובד אך הפצוע לא נושם עקב פגיעה מוחית', 'הרס של גזע המוח המלווה בנשימות אגונאליות'], correctAnswers: ['היעדר דופק ונשימה, מצב בלתי הפיך']
+  },
+  { 
+    id: 9, question: 'מהי ההגדרה המדויקת של "החייאה"?', answer: 'אוסף פעולות מלאכותיות הנעשות על מנת לחקות את פעולת הלב והריאות למטופל חסר דופק ונשימה.', explanation: 'מטרת ההחייאה היא לספק זרימת דם מחומצן למוח עד להגעת שוק/תרופות.', status: 'unseen',
+    type: 'single', options: ['פעולות לחקות את הלב והריאות למטופל ללא דופק ונשימה', 'החזרת המטופל להכרה מלאה לאחר דום לב', 'שימוש בדפיברילטור ואמבו במטרה לאפס את קצב הלב', 'טיפול במטופל מחוסר הכרה שאינו מגיב לכאב'], correctAnswers: ['פעולות לחקות את הלב והריאות למטופל ללא דופק ונשימה']
+  },
+  { 
+    id: 10, question: 'באילו מקרי טראומה *כן* נבצע החייאה?', answer: 'תלייה, טביעה, התחשמלות ומכת ברק.', explanation: 'במקרים אלו הדם לא יצא מכליו אלא הייתה פגיעה מערכתית/נשימתית ולכן לעיסויים יש סיכוי רב.', status: 'unseen',
+    type: 'multiple', options: ['תלייה', 'קטיעת גפיים משמעותית', 'טביעה והתחשמלות', 'פגיעת ראש פתוחה'], correctAnswers: ['תלייה', 'טביעה והתחשמלות']
+  },
+  { 
+    id: 11, question: 'כיצד מוגדרת "החייאה מוצלחת"?', answer: 'מטופל אשר יצא מבית החולים ללא נזק נוירולוגי משמעותי.', explanation: 'המדד האמיתי הוא שמירת תפקוד המוח והחזרה לשגרה, לא רק חזרת דופק בשטח.', status: 'unseen',
+    type: 'single', options: ['יציאה מבית החולים ללא נזק נוירולוגי משמעותי', 'חזרת דופק ונשימה ספונטניים בשטח (ROSC)', 'הגעה לחדר הלם בבית החולים עם דופק יציב', 'קבלת שוק בהצלחה מהדפיברילטור'], correctAnswers: ['יציאה מבית החולים ללא נזק נוירולוגי משמעותי']
+  },
+  { 
+    id: 12, question: 'מהי הגדרת "מבוגר" לצורך החייאה?', answer: 'גברים - משלב הופעת שיער בבית השחי. נשים - משלב הופעת שדיים.', explanation: 'האנטומיה קובעת את עומק העיסויים ונפח ההנשמה שיש לספק.', status: 'unseen',
+    type: 'single', options: ['גברים: שיער בבית שחי, נשים: שדיים', 'מעל גיל 8 לשני המינים', 'מעל גיל 12 או משקל של 40 ק"ג', 'גברים: הופעת זקן, נשים: גיל ההתבגרות'], correctAnswers: ['גברים: שיער בבית שחי, נשים: שדיים']
+  },
+  { 
+    id: 13, question: 'מה כולל שלב S (Safety - בטיחות) בסכמת ההחייאה? (בחר את כולם)', answer: '1. שמירה על ביטחוננו האישי 2. הרחקת המטופל 3. קריאה לכוחות נוספים.', explanation: 'מטפל פצוע לא יכול לטפל באחרים. בטיחות קודמת לכל.', status: 'unseen',
+    type: 'multiple', options: ['שמירה על ביטחוננו האישי', 'הרחקת המטופל מאזור הסכנה', 'קריאה לכוחות נוספים', 'בדיקת הכרה מהירה'], correctAnswers: ['שמירה על ביטחוננו האישי', 'הרחקת המטופל מאזור הסכנה', 'קריאה לכוחות נוספים']
+  },
+  { 
+    id: 14, question: 'באיזה שלב בסרגל AVPU מצוי מטופל הדורש החייאה?', answer: 'U - Unresponsive (לא מגיב כלל).', explanation: 'אם הוא מגיב לכאב, יש לו פריפוזיה מוחית (כלומר, יש דופק ולחץ דם). אנו נבצע החייאה רק ל-U.', status: 'unseen',
+    type: 'single', options: ['U (Unresponsive - מחוסר הכרה)', 'P (Pain - מגיב לכאב)', 'V (Voice - מגיב לקול)', 'A (Alert - ערני)'], correctAnswers: ['U (Unresponsive - מחוסר הכרה)']
+  },
+  { 
+    id: 15, question: 'כיצד נבדוק נשימה, ומה המשמעות של נשימות "אגונאליות"?', answer: 'שיטת ל.ל.ל ל-10 שניות. נשימות אגונאליות נחשבות למצב של "לא נושם" (מעבר ישיר לעיסויים).', explanation: 'נשימות אגונאליות אינן מכניסות חמצן (זהו רפלקס גוסס).', status: 'unseen',
+    type: 'single', options: ['ל.ל.ל ל-10 שניות, אגונאליות מחייבות מעבר לעיסויים ישירות', 'ל.ל.ל ל-5 שניות, אגונאליות דורשות הנשמה באמבו', 'הסתכלות על בית החזה, אגונאליות נחשבות לנשימה תקינה', 'ל.ל.ל ל-10 שניות, אגונאליות מחייבות סקשן מיידי'], correctAnswers: ['ל.ל.ל ל-10 שניות, אגונאליות מחייבות מעבר לעיסויים ישירות']
+  },
+  { 
+    id: 16, question: 'כיצד בודקים דופק במבוגר מחוסר הכרה?', answer: 'בעורק הקרוטידי למשך 10 שניות.', explanation: 'עורק מרכזי גדול שיורגש בו דופק גם כשלחץ הדם נמוך מאוד.', status: 'unseen',
+    type: 'single', options: ['בעורק הקרוטידי בצוואר למשך כ-10 שניות', 'בעורק הרדיאלי ביד למשך כ-10 שניות', 'בעורק הברכיאלי בזרוע למשך 5 שניות', 'שמים אוזן על לב המטופל למשך 10 שניות'], correctAnswers: ['בעורק הקרוטידי בצוואר למשך כ-10 שניות']
+  },
+  { 
+    id: 17, question: 'מהם הדגשים הקריטיים לביצוע עיסויים איכותיים? (בחר 3)', answer: 'מרכז הסטרנום, עומק לפחות 5 ס"מ, חזרה מלאה של החזה (קצב 100-120).', explanation: 'ביצוע מדויק לוחץ את הלב ומייצר תפוקת לב (Cardic Output) שתספק דם למוח.', status: 'unseen',
+    type: 'multiple', options: ['מרכז הסטרנום ועל מצע קשיח', 'עומק של לפחות 5 ס"מ', 'קצב של 100-120 בדקה תוך חזרה מלאה של החזה', 'עיסויים עד שבירת צלעות מבוקרת', 'עצירת עיסויים כל דקה כדי להעריך מצב'], correctAnswers: ['מרכז הסטרנום ועל מצע קשיח', 'עומק של לפחות 5 ס"מ', 'קצב של 100-120 בדקה תוך חזרה מלאה של החזה']
+  },
+  { 
+    id: 18, question: 'מהם שלבי הטיפול ב-A ו-B במטופל ש*יש לו דופק* אך אינו נושם?', answer: 'סילוק הפרשות -> פתיחת נתיב אוויר -> הנשמה כל 5 שניות, ובדיקת דופק כל 2 דקות.', explanation: 'מצב זה נקרא Respiratory Arrest (דום נשימה). אם לא ננשים, המטופל ידרדר מהר לדום לב.', status: 'unseen',
+    type: 'single', options: ['סילוק הפרשות, נ"א, הנשמה כל 5 שניות, בדיקת דופק כל 2 דק', 'סילוק הפרשות והמתנה שיחזור לנשום, אין להנשים שיש דופק', 'החדרת מנתב אוויר והנשמה מהירה של כל 2 שניות', 'מעבר לביצוע עיסויים מונעים ביחס של 15:2'], correctAnswers: ['סילוק הפרשות, נ"א, הנשמה כל 5 שניות, בדיקת דופק כל 2 דק']
+  },
+  { 
+    id: 19, question: 'מה תפקידו של הדפיברילטור (AED)?', answer: 'לתת שוק חשמלי במקרה של הפרעות קצב ספציפיות כדי להחזיר את הלב לקצב תקין.', explanation: 'שוק מאפס פרפור חדרים ונותן לקוצב הטבעי בלב הזדמנות לשלוט בחזרה.', status: 'unseen',
+    type: 'single', options: ['לתת שוק להפרעות קצב ספציפיות ולהחזיר קצב תקין', 'להתניע מחדש לב שעצר לחלוטין מפעולה (Asystole)', 'להחליף את העיסויים ולייצר פעימות מלאכותיות עצמאיות', 'למדוד את רמת החמצן והדופק של המטופל'], correctAnswers: ['לתת שוק להפרעות קצב ספציפיות ולהחזיר קצב תקין']
+  },
+  { 
+    id: 20, question: 'מה יש לעשות *מיד* לאחר שוק או אבחון של הדפיברילטור?', answer: 'המשך עיסויים באופן מיידי וללא בדיקת דופק.', explanation: 'הלב "המום" אחרי השוק החשמלי ולוקח לו זמן לייצר דופק אפקטיבי. עיסויים יעזרו לו במחזורי הדם הראשונים.', status: 'unseen',
+    type: 'single', options: ['התחלת עיסויים מיידית וללא בדיקת דופק', 'לבדוק דופק בקרוטיד במשך 10 שניות', 'להמתין להוראה קולית מהמכשיר האם יש דופק', 'לתת 2 הנשמות לפני חזרה לעיסויים'], correctAnswers: ['התחלת עיסויים מיידית וללא בדיקת דופק']
+  },
+  { 
+    id: 21, question: 'מהו תפקידו המרכזי של החובש בתור ראש צוות (BLS)?', answer: 'ניהול, חלוקת עבודה, מתן פידבקים לעיסויים, ואחריות על הנשמות.', explanation: 'ניהול נכון מונע כאוס ומבטיח טיפול מציל חיים רציף ואיכותי.', status: 'unseen',
+    type: 'multiple', options: ['ניהול וחלוקת עבודה', 'אחראי על הנשמת המטופל', 'מתן פידבקים לעיסויים והחלפת מעסים', 'החלטה על מתן תרופות ALS'], correctAnswers: ['ניהול וחלוקת עבודה', 'אחראי על הנשמת המטופל', 'מתן פידבקים לעיסויים והחלפת מעסים']
+  },
+  { 
+    id: 22, question: 'מה ההגדרה ל"נוכח" וכיצד ניעזר בו?', answer: 'אדם שאינו איש רפואה המזדמן לאירוע. נבקש ממנו להזעיק עזרה ולסייע בעיסויים.', explanation: 'ידיים נוספות בעיסויים מונעות התעייפות המטפל, וקריאה מוקדמת לכוחות תשפר את סיכויי ההישרדות.', status: 'unseen',
+    type: 'single', options: ['אדם ללא הכשרה. נעזר בו להזעקת עזרה ולעיסויים פשוטים', 'מטפל בכיר יותר. נעביר לו מיד את הפיקוד', 'אזרח בלתי מעורב. נבקש ממנו להתרחק ולא להתערב', 'חובש בהכשרתו שעבר במקרה. ינהל את ההנשמה והתרופות'], correctAnswers: ['אדם ללא הכשרה. נעזר בו להזעקת עזרה ולעיסויים פשוטים']
+  },
+  { 
+    id: 23, question: 'אילו פעולות קריטיות יותר בהחייאה על רקע טביעה? (בחר 2)', answer: 'סילוק הפרשות (מים) והנשמות אפקטיביות.', explanation: 'בניגוד לדום לב לבבי, בטביעה הלב עצר בגלל מחסור בחמצן. הנשמה חשובה כאן כמו עיסויים ואף יותר.', status: 'unseen',
+    type: 'multiple', options: ['סילוק הפרשות ופתיחת נתיב אוויר', 'מתן הנשמות אפקטיביות', 'שימוש בדפיברילטור עוד כשהמטופל רטוב', 'החייאה בקצב מהיר יותר (140 לדקה)'], correctAnswers: ['סילוק הפרשות ופתיחת נתיב אוויר', 'מתן הנשמות אפקטיביות']
+  },
+  { 
+    id: 24, question: 'באילו מצבים (התוויות) *נפסיק* החייאה שהתחלנו?', answer: 'המטופל מתנגד להחייאה, או הגעת צוות מתקדם (ALS).', explanation: 'התנגדות שרירית מעידה על חזרת דופק ופעילות מוחית.', status: 'unseen',
+    type: 'single', options: ['המטופל מתנגד להחייאה או בהגעת צוות ALS', 'כאשר המעסה הראשי התעייף ואין מי שיחליפו', 'לאחר 10 דקות של עיסויים ללא תגובה', 'כשהדפיברילטור אומר "אין המלצה לשוק" 3 פעמים ברצף'], correctAnswers: ['המטופל מתנגד להחייאה או בהגעת צוות ALS']
+  },
+  { 
+    id: 25, question: 'מתי *לא נתחיל* כלל החייאה?', answer: 'ניתוק הראש או האגן מהגוף (איבוד צלם אנוש). חובה לקבל אישור.', explanation: 'פציעות שאינן מאפשרות חיים. דורש אישור מגורם רפואי בכיר (מד"א 101/מטפל בכיר ביחידה).', status: 'unseen',
+    type: 'single', options: ['ניתוק ראש/אגן (מצריך קבלת אישור מגורם בכיר)', 'בכל מצב של חוסר הכרה ודימום רב (טראומה)', 'במקרים של טביעה ששהו מעל שעה במים', 'כאשר למטופל יש נשימות אגונאליות ללא דופק'], correctAnswers: ['ניתוק ראש/אגן (מצריך קבלת אישור מגורם בכיר)']
+  },
+  { 
+    id: 26, question: 'מהי שרשרת ההישרדות בהחייאה לפי הסדר? (בחר את השלבים הנכונים)', answer: 'קריאה לעזרה -> החייאה בסיסית -> דפיברילציה -> החייאה מתקדמת -> טיפול נמרץ בבי"ח.', explanation: 'כל שלב בשרשרת קריטי להישרדות המטופל. עיכוב באחד השלבים יפגע דרסטית בסיכוי לחיים.', status: 'unseen',
+    type: 'multiple', options: ['זיהוי וקריאה לעזרה מוקדמת', 'החייאה בסיסית מהירה (BLS)', 'דפיברילציה (מכות חשמל) מוקדמת', 'ניתוח לב פתוח בשטח'], correctAnswers: ['זיהוי וקריאה לעזרה מוקדמת', 'החייאה בסיסית מהירה (BLS)', 'דפיברילציה (מכות חשמל) מוקדמת']
+  },
+  { 
+    id: 27, question: 'מהן הגדרות הגילאים לתינוק וילד?', answer: 'תינוק: 28 יום עד שנה. ילד: שנה ועד בגרות מינית.', explanation: 'חלוקה שמגדירה האם לעסות עם אצבעות, יד אחת או שתיים.', status: 'unseen',
+    type: 'single', options: ['תינוק: 28 יום עד שנה. ילד: שנה עד סימני בגרות מינית', 'תינוק: עד גיל שנתיים. ילד: שנתיים עד 14', 'תינוק: עד 28 יום. ילד: עד 3 שנים', 'תינוק: חצי שנה. ילד: עד סוף גיל ההתבגרות'], correctAnswers: ['תינוק: 28 יום עד שנה. ילד: שנה עד סימני בגרות מינית']
+  },
+  { 
+    id: 28, question: 'מהם הגורמים העיקריים לדום לב בילדים ותינוקות? (בחר 3)', answer: 'בעיות נשימה, מוות בעריסה (SIDS), ומומי לב מולדים.', explanation: 'דום לב בילד נגרם לרוב מחוסר חמצן ולא מאוטם שריר הלב כמו במבוגרים.', status: 'unseen',
+    type: 'multiple', options: ['בעיות נשימה (חנק, אסטמה)', 'מוות עריסה', 'מומי לב מולדים', 'אוטם שריר הלב (התקף לב)', 'פרפור חדרים ספונטני'], correctAnswers: ['בעיות נשימה (חנק, אסטמה)', 'מוות עריסה', 'מומי לב מולדים']
+  },
+  { 
+    id: 29, question: 'כיצד בודקים הכרה ודופק בתינוק?', answer: 'הכרה: מחיאת כף וצביטה ברגל. דופק: עורק ברכיאלי (זרוע).', explanation: 'העורק הברכיאלי בולט ונגיש יותר מצוואר התינוק, שהוא לרוב קצר ושמנמן.', status: 'unseen',
+    type: 'single', options: ['הכרה: רעש/צביטה ברגל. דופק: ברכיאלי (בזרוע)', 'הכרה: צביטה בטרפז. דופק: קרוטידי (בצוואר)', 'הכרה: קריאה בשם התינוק. דופק: רדיאלי (בכף היד)', 'הכרה: מכה על החזה. דופק: פמוראלי (במפשעה)'], correctAnswers: ['הכרה: רעש/צביטה ברגל. דופק: ברכיאלי (בזרוע)']
+  },
+  { 
+    id: 30, question: 'מהם ההבדלים בטכניקת העיסויים בין תינוק לילד?', answer: 'תינוק: 2 אצבעות/אגודלים, לעומק 3 ס"מ. ילד: יד אחת או שתיים, 4-5 ס"מ.', explanation: 'התאמת הכוח והמנח לעצמות הקטנות והרכות.', status: 'unseen',
+    type: 'single', options: ['תינוק: 2 אצבעות (3 ס"מ). ילד: יד/שתיים (4-5 ס"מ)', 'תינוק: יד אחת (3 ס"מ). ילד: 2 ידיים בלבד (6 ס"מ)', 'אין הבדל. שניהם מעוסים עם שתי ידיים במרכז החזה', 'תינוק: עיסוי בטן קלים. ילד: עיסויי חזה עם יד אחת'], correctAnswers: ['תינוק: 2 אצבעות (3 ס"מ). ילד: יד/שתיים (4-5 ס"מ)']
+  },
+  { 
+    id: 31, question: 'מהו יחס ההחייאה (עיסויים:הנשמות) בתינוקות וילדים?', answer: 'מטפל יחיד: 30:2. צוות רפואי (שניים ומעלה): 15:2.', explanation: 'כשיש צוות, מגדילים את תדירות ההנשמות כי חמצן הוא הגורם המכריע בדום לב בילדים.', status: 'unseen',
+    type: 'single', options: ['יחיד: 30:2. צוות: 15:2', 'יחיד: 15:2. צוות: 30:2', 'תמיד 30:2 ללא תלות במספר המטפלים', 'תמיד 15:2 כדי לשפר חמצון'], correctAnswers: ['יחיד: 30:2. צוות: 15:2']
+  },
+  { 
+    id: 32, question: 'מתי בסמכות חובש להשתמש במכשירי החייאה (אמבו/בלון)?', answer: 'רק בעבודה בצוות עם מטפל בכיר (מט"ב) או במרפאה.', explanation: 'אם חובש יעבוד לבדו בשטח ויעסוק בציוד, רצף העיסויים ייפגע דרסטית.', status: 'unseen',
+    type: 'single', options: ['בצוות עם מט"ב או בעבודה במרפאה', 'תמיד. על החובש להשתמש בציוד כדי לשפר חמצון', 'רק בהחייאה על רקע טביעה או מחלה', 'החובש לעולם לא ישתמש בציוד, רק המט"ב'], correctAnswers: ['בצוות עם מט"ב או בעבודה במרפאה']
+  },
+  { 
+    id: 33, question: 'מהן ההתוויות לחיבור מטופל לחמצן? (בחר 3)', answer: 'מצוקה נשימתית, כיחלון פריפרי, שימוש בשרירי עזר.', explanation: 'סימנים אלו מראים שהריאות אינן מצליחות לחמצן את הרקמות, ויש צורך בחמצן מרוכז.', status: 'unseen',
+    type: 'multiple', options: ['נשימה שטחית ומהירה', 'כיחלון (ציאנוזיס) פריפרי או מרכזי', 'שימוש בשרירי עזר (צוואר, צלעות)', 'כאב בטן עז', 'ירידה בלחץ הדם בלבד'], correctAnswers: ['נשימה שטחית ומהירה', 'כיחלון (ציאנוזיס) פריפרי או מרכזי', 'שימוש בשרירי עזר (צוואר, צלעות)']
+  },
+  { 
+    id: 34, question: 'מהי הזרימה (LPM) המותרת לחובש במיכל חמצן ללא מט"ב?', answer: 'זרימה של עד 10 LPM.', explanation: 'סמכות החובש הוגבלה למנוע נזק מחשיפת יתר לחמצן מרוכז במצבים שאינם דורשים זאת.', status: 'unseen',
+    type: 'single', options: ['עד 10 ליטר בדקה (LPM)', 'עד 5 ליטר בדקה', 'מותר לפתוח עד המקסימום (15-25 ליטר בדקה)', 'אסור לחובש לפתוח חמצן ללא הוראת רופא'], correctAnswers: ['עד 10 ליטר בדקה (LPM)']
+  },
+  { 
+    id: 35, question: 'מהו הסד"פ הנכון לפירוק וסת מבלון חמצן?', answer: 'סגירת LPM -> סגירת ברז ראשי -> פריקת לחץ (LPM פתוח) -> פתיחת הבורג המקבע.', explanation: 'פריקת הלחץ מונעת שחרור אלים של הווסת שיכול לפצוע את המטפל.', status: 'unseen',
+    type: 'single', options: ['סגירת LPM -> סגירת ראשי -> פריקת לחץ -> הברגה החוצה', 'הברגה החוצה -> סגירת הברז הראשי -> סגירת ה-LPM', 'סגירת הברז הראשי -> פתיחת הבורג המקבע בזהירות', 'פריקת לחץ -> הוצאת הבורג המקבע -> סגירת ראשי'], correctAnswers: ['סגירת LPM -> סגירת ראשי -> פריקת לחץ -> הברגה החוצה']
+  },
+  { 
+    id: 36, question: 'אילו הוראות בטיחות חלות על שימוש בחמצן? (בחר את כולם)', answer: 'הרחקה משמן ואש, השכבת המיכל לרגלי המטופל, לא לכוון וסת לאנשים.', explanation: 'חמצן מאיץ בעירה, והמיכל עלול להפוך לטיל אם הברז יישבר בנפילה.', status: 'unseen',
+    type: 'multiple', options: ['אין לקרב לאש ולשמן', 'השכבת המכל כשהראש פונה לרגלי המטופל', 'אין לכוון את הווסת כלפי אנשים', 'ניקוי המכל עם חומר אלכוהולי לפני פתיחה'], correctAnswers: ['אין לקרב לאש ולשמן', 'השכבת המכל כשהראש פונה לרגלי המטופל', 'אין לכוון את הווסת כלפי אנשים']
+  },
+  { 
+    id: 37, question: 'למי מותר להחדיר מנתב אוויר (A.W) וכיצד מודדים אותו?', answer: 'רק למטופל שאינו מגיב לכאב. נמדד מתנוך האוזן לזווית הפה.', explanation: 'מטופל המגיב לכאב עלול להקיא מהמנתב ולשאוף קיא לריאות (אספירציה).', status: 'unseen',
+    type: 'single', options: ['מחוסר הכרה עמוק (לא מגיב לכאב). מדידה אוזן-פה', 'לכל מחוסר הכרה. מדידה מהסנטר לצוואר', 'לכל מטופל קשה נשימה. מדידה מקצה האף לאוזן', 'רק למטופל שאין לו דופק. אין צורך במדידה מדויקת'], correctAnswers: ['מחוסר הכרה עמוק (לא מגיב לכאב). מדידה אוזן-פה']
+  },
+  { 
+    id: 38, question: 'מהם 3 תפקידיו של מנתב האוויר? (בחר נכונים)', answer: 'מונע נעילת לסתות, מנתב אוויר לקנה, *מפחית* סכנה לצניחת לשון.', explanation: 'המנתב מסייע אך עדיין חובה להטות את הראש (Head Tilt) כדי לפתוח את הנתיב.', status: 'unseen',
+    type: 'multiple', options: ['מונע נעילת לסתות', 'מנתב את האוויר ישירות לקנה', 'מפחית סכנה לצניחת בסיס הלשון', 'מונע צניחת לשון ב-100% ואין צורך בהטיית ראש', 'מעשיר את כמות החמצן הנכנסת לריאות'], correctAnswers: ['מונע נעילת לסתות', 'מנתב את האוויר ישירות לקנה', 'מפחית סכנה לצניחת בסיס הלשון']
+  },
+  { 
+    id: 39, question: 'מהם הנפחים של מפוחי ההנשמה (אמבו)?', answer: 'מבוגר: 1000 סמ"ק. בייבי: 400 סמ"ק.', explanation: 'שימוש במפוח מבוגר על תינוק יגרום לקריעת הריאות מלחץ יתר (ברוטראומה).', status: 'unseen',
+    type: 'single', options: ['מבוגר 1000 סמ"ק, בייבי 400 סמ"ק', 'מבוגר 2000 סמ"ק, בייבי 1000 סמ"ק', 'מבוגר 500 סמ"ק, בייבי 200 סמ"ק', 'אין הבדל בנפחים, ההבדל הוא רק בגודל המסכה'], correctAnswers: ['מבוגר 1000 סמ"ק, בייבי 400 סמ"ק']
+  },
+  { 
+    id: 40, question: 'כיצד בודקים את שלמות מפוח האמבו ואת השסתום האחורי?', answer: 'שלמות: אוטמים חור אחורי -> המפוח מתכווץ ולא מתנפח שוב. שסתום: אוטמים יציאה לפצוע -> המפוח מסרב להיסחט.', explanation: 'מוודאים שהמפוח לא קרוע ושהשסתום החד כיווני מזרים אוויר רק למטופל.', status: 'unseen',
+    type: 'single', options: ['אוטמים פתח אחורי (שלמות) ואוטמים יציאה קדמית (שסתום)', 'מנפחים מים בתוך האמבו ובודקים דליפות', 'מחברים לחמצן ומקשיבים לשריקות אוויר מהשקית', 'מנשימים פצוע דמה ובודקים אם החזה עולה'], correctAnswers: ['אוטמים פתח אחורי (שלמות) ואוטמים יציאה קדמית (שסתום)']
+  },
+  { 
+    id: 41, question: 'כמה אחוז חמצן מספק אמבו עם ובלי שקית העשרה?', answer: 'חיבור ישיר: 60-80%. עם שקית העשרה: 85-100%.', explanation: 'שקית ההעשרה משמשת כמאגר אוויר נקי ב-100% חמצן שמונע שאיבת אוויר חדר רגיל (21%) לתוך המפוח.', status: 'unseen',
+    type: 'single', options: ['בלי שקית: 60-80%, עם שקית: 85-100%', 'בלי שקית: 21% (אוויר חדר), עם שקית: 50%', 'בלי שקית 100%, השקית מיועדת רק לאגירת פחמן דו חמצני', 'תלוי בזרימה שמכוונים ב-LPM ולא בשקית'], correctAnswers: ['בלי שקית: 60-80%, עם שקית: 85-100%']
+  },
+  { 
+    id: 42, question: 'מהם הדגשים להנשמה נכונה עם אמבו? (בחר 3)', answer: 'מנתב אוויר, חיבור מסנן ויראלי (פילטר), חובש אוטם ונוכח סוחט (2 אנשים).', explanation: 'אטימת המסכה בשתי ידיים (C-E grip) של החובש קריטית למניעת דליפות אוויר.', status: 'unseen',
+    type: 'multiple', options: ['להשתמש במנתב אוויר', 'להרכיב מסנן ויראלי', 'החובש אוטם והנוכח סוחט (הנשמה בשניים)', 'לסחוט את האמבו בחוזקה ומהירות עד הסוף', 'להנשים ללא הטיית ראש לאחור'], correctAnswers: ['להשתמש במנתב אוויר', 'להרכיב מסנן ויראלי', 'החובש אוטם והנוכח סוחט (הנשמה בשניים)']
+  },
+  { 
+    id: 43, question: 'מהו קצב ההנשמה התקין לפי מצב המטופל?', answer: 'לא נושם/איטי: כל 5 שניות. נשימות מהירות: כל 5 שניות *בתיאום עם המטופל*.', explanation: 'הנשמה נגד נשימות המטופל תדחף אוויר לקיבה ותגרום להקאות וחנק מחודש.', status: 'unseen',
+    type: 'single', options: ['הנשמה כל 5 שניות (במהירות - בסינכרון עם הפצוע)', 'הנשמה פעם ב-10 שניות לכל המטופלים ללא יוצא מן הכלל', 'אם הוא נושם לאט - לא מנשימים. לא נושם - כל 3 שניות', 'הנשמה מהירה של 20 בדקה עד שהפצוע מתעורר'], correctAnswers: ['הנשמה כל 5 שניות (במהירות - בסינכרון עם הפצוע)']
+  },
+  { 
+    id: 44, question: 'מה נעשה אם בית החזה לא מתרומם בהנשמה? (בחר פעולות אפשריות)', answer: 'שיפור קיבוע ראש, שיפור אטימה, הגדלת נפח, ושלילת חסימה של גוף זר בפה.', explanation: 'הבעיה לרוב טכנית (מסכה לא אטומה/הראש לא מוטה נכון). רק בסוף מחפשים חסימה אמיתית.', status: 'unseen',
+    type: 'multiple', options: ['שיפור קיבוע ראש (Head Tilt)', 'שיפור אטימת המסיכה', 'הגדלת נפח ההנשמה באמבו', 'ביצוע סקשן עמוק ישר לקנה הנשימה', 'מתן מכות חזקות בחזה (Precordial Thump)'], correctAnswers: ['שיפור קיבוע ראש (Head Tilt)', 'שיפור אטימת המסיכה', 'הגדלת נפח ההנשמה באמבו']
+  },
+  { 
+    id: 45, question: 'מהם שלבי בדיקת התקינות של מכשיר הסקשן?', answer: 'שלמות מכל והימצאות גולה -> תקינות בוכנה -> אטימת קטטר ובדיקת ואקום -> שאיבה ממימיה.', explanation: 'מטרת הבדיקה לוודא שברגע האמת הסקשן באמת ישאב נוזלים סמיכים ולא ייתקע.', status: 'unseen',
+    type: 'single', options: ['שלמות, בוכנה, בדיקת ואקום, ושאיבת מים ממימייה', 'חיבור לחשמל, שמיעת זמזום מנוע ושאיבת מים ממימייה', 'דחיפת הקטטר לפה פצוע דמה ובדיקת התנגדות הבוכנה', 'אין צורך בבדיקה, יש לסמוך על תקינות המכשיר מהאפסנאות'], correctAnswers: ['שלמות, בוכנה, בדיקת ואקום, ושאיבת מים ממימייה']
+  },
+  { 
+    id: 46, question: 'מה תפקידו של הפאלס אוקסימטר ומה נחשב לתקין?', answer: 'מזהה אחוז רוויון החמצן בדם ומודד דופק. סטורציה תקינה: 95%-100%.', explanation: 'מאפשר זיהוי מוקדם של הידרדרות נשימתית עוד לפני שמופיע כיחלון בשפתיים.', status: 'unseen',
+    type: 'single', options: ['מודד רוויון חמצן בדם ודופק. תקין: 95%-100%', 'מודד לחץ דם וחמצן. תקין: 90%-100%', 'בודק את כמות ההמוגלובין בדם. תקין: מעל 80%', 'מודד ריכוז CO2 בנשיפה (קפנוגרף). תקין: 35-45%'], correctAnswers: ['מודד רוויון חמצן בדם ודופק. תקין: 95%-100%']
+  },
+  { 
+    id: 47, question: 'אילו גורמים מפריעים (מגבלות) למדידת פאלס אוקסימטר? (בחר 3)', answer: 'אור חזק, לק בציפורניים/לכלוך, כיווץ כלי דם (בקור), והרעלת CO.', explanation: 'המכשיר עובד על אור, ולכן לק, לכלוך או שמש יסנוורו אותו. כלי דם מכווצים לא מזררימים מספיק דם למדידה.', status: 'unseen',
+    type: 'multiple', options: ['חשיפה לאור שמש חזק', 'רעד המטופל', 'צבע לק או ציפורן מלוכלכת', 'לחץ דם גבוה מדי (מעל 180)', 'עור שחום'], correctAnswers: ['חשיפה לאור שמש חזק', 'רעד המטופל', 'צבע לק או ציפורן מלוכלכת']
+  },
+  { 
+    id: 48, question: 'מדוע שאיפת עשן (CO) מטעה את הפאלס אוקסימטר?', answer: 'המכשיר מזהה את ה-CO שקשור לדם כחמצן, וייתן קריאה גבוהה (ותקינה שקרית) אף על פי שהמטופל נחנק.', explanation: 'גז CO נקשר להמוגלובין בצבע דומה לחמצן, והמכשיר הפשוט לא מבדיל ביניהם.', status: 'unseen',
+    type: 'single', options: ['ה-CO נראה למכשיר כמו חמצן, ולכן הסטורציה תיראה גבוהה ותקינה', 'ה-CO חוסם את החיישן ולכן המכשיר מראה כל הזמן 0%', 'שאיפת עשן גורמת לכוויות שממיסות את פלסטיק המכשיר', 'העשן חוסם את מעבר האור מהאצבע למכשיר ולכן יהיה צפצוף שגיאה'], correctAnswers: ['ה-CO נראה למכשיר כמו חמצן, ולכן הסטורציה תיראה גבוהה ותקינה']
+  },
+  { 
+    id: 49, question: 'כיצד נוודא שהקריאה בפאלס אוקסימטר אמינה?', answer: 'נשווה בין הדופק שמופיע במכשיר לדופק שהרגשנו ידנית. אם הם זהים, הקריאה אמינה.', explanation: 'אם המכשיר מזייף בדופק הפשוט, הוא כנראה מזייף גם באחוזי החמצן המורכבים יותר.', status: 'unseen',
+    type: 'single', options: ['נשווה את קצב הדופק במכשיר לדופק שהרגשנו ידנית (בקרוטיד/רדיאלי)', 'נחבר את המכשיר לשתי אצבעות שונות בו זמנית ונהשווה', 'ננשום עמוק בעצמנו ונוודא שהמכשיר מגיב נכון למטפל', 'נסמוך עליו תמיד, אלא אם מופיע סמל של סוללה חלשה'], correctAnswers: ['נשווה את קצב הדופק במכשיר לדופק שהרגשנו ידנית (בקרוטיד/רדיאלי)']
+  },
+];
 
-        /* אנימציית רכב חלקה */
-        @keyframes carFloat {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-2px) rotate(-1deg); }
-        }
+// --- עזרי עיצוב UI ---
+const GradientText = ({ children }) => (
+  <span className="bg-clip-text text-transparent bg-gradient-to-l from-blue-600 to-indigo-600">
+    {children}
+  </span>
+);
 
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
+export default function CompleteCPRApp() {
+  const [currentScreen, setCurrentScreen] = useState('home'); // 'home' | 'flashcards' | 'practice' | 'test'
+  
+  // Flashcards state
+  const [cards, setCards] = useState(initialCards);
+  
+  // Global App Load/Save
+  useEffect(() => {
+    const saved = localStorage.getItem('medicCPR-Pro-V1');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setCards(initialCards.map(c => {
+          const s = parsed.find(p => p.id === c.id);
+          return s ? { ...c, status: s.status } : c;
+        }));
+      } catch (e) { console.error(e); }
+    }
+  }, []);
 
-        .animate-card {
-            animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0; 
-        }
-        
-        /* מיקום הרכב על הציר */
-        .car-marker {
-            position: absolute;
-            right: 17px; /* מרכוז על הפס */
-            z-index: 40;
-            transition: top 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-            pointer-events: none;
-            opacity: 0; 
-            transform: translate(50%, -50%); /* מרכוז */
-            filter: drop-shadow(0 4px 6px rgba(37, 99, 235, 0.3));
-        }
-        
-        .car-inner {
-            background: #2563eb;
-            color: white;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            border: 2px solid white;
-            box-shadow: 0 0 0 2px #bfdbfe;
-            animation: carFloat 3s infinite ease-in-out;
-        }
+  useEffect(() => {
+    localStorage.setItem('medicCPR-Pro-V1', JSON.stringify(cards));
+  }, [cards]);
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .btn-active:active { transform: scale(0.97); }
-        
-        /* Glass Styles */
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-        }
-
-        /* Dashed Line for connector */
-        .connector-line {
-            position: absolute;
-            right: 32px; /* מיקום הקו */
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #cbd5e1; /* slate-300 */
-            z-index: 0;
-        }
-
-        /* Timeline Dot styles */
-        .timeline-dot-container {
-            position: relative;
-            z-index: 10;
-            margin-right: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 34px;
-        }
-
-        .timeline-dot {
-            width: 16px;
-            height: 16px;
-            background: white;
-            border: 3px solid #cbd5e1;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .timeline-dot.active {
-            border-color: #3b82f6;
-            background: #3b82f6;
-            box-shadow: 0 0 0 4px #dbeafe;
-            transform: scale(1.1);
-        }
-    </style>
-</head>
-<body class="pb-32 selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
-
-    <!-- Header -->
-    <div class="fixed top-0 left-0 right-0 glass-nav px-4 py-3 z-50 transition-all duration-300">
-        <div class="max-w-md mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 text-white p-2 rounded-xl shadow-md shadow-blue-200">
-                    <i data-lucide="map-pin" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-black tracking-tight text-slate-800 leading-none">Road Trip</h1>
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">LA <span class="text-blue-400">➔</span> SF</p>
-                        <span id="liveIndicator" class="hidden flex h-1.5 w-1.5 relative">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                        </span>
-                    </div>
-                </div>
+  // Main UI Wrapper
+  return (
+    <div dir="rtl" className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-slate-200 z-10">
+         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setCurrentScreen('home')}>
+               <div className="bg-blue-600 p-2 rounded-xl text-white shadow-md">
+                  <Activity size={22} />
+               </div>
+               <div>
+                  <h1 className="text-lg font-black text-slate-800 tracking-tight leading-tight">קורס חובשים <GradientText>ציר החייאה</GradientText></h1>
+               </div>
             </div>
             
-            <button id="actionBtn" onclick="handleMainButton()" class="btn-active bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 shadow-lg shadow-slate-200 border border-slate-700 transition-all group">
-                <i id="btnIcon" data-lucide="navigation" class="w-3.5 h-3.5 group-hover:text-emerald-400 transition-colors"></i>
-                <span id="btnText">הפעל GPS</span>
-            </button>
-        </div>
-        
-        <div id="statusMsg" class="hidden text-center mt-2 text-[10px] font-bold text-orange-600 bg-orange-50/90 py-1.5 rounded-lg border border-orange-100 max-w-xs mx-auto animate-pulse backdrop-blur-sm shadow-sm">
-            <i data-lucide="satellite" class="w-3 h-3 inline mr-1"></i> מאתר מיקום לווייני...
-        </div>
+            {currentScreen !== 'home' && (
+              <button 
+                onClick={() => setCurrentScreen('home')} 
+                className="flex items-center gap-2 bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+              >
+                <Home size={16} /> תפריט ראשי
+              </button>
+            )}
+         </div>
+      </header>
+
+      {/* Screens Routing */}
+      <main className="flex-1 flex flex-col relative overflow-hidden">
+         {currentScreen === 'home' && <HomeScreen onNavigate={setCurrentScreen} cards={cards} />}
+         {currentScreen === 'flashcards' && <FlashcardsScreen cards={cards} setCards={setCards} onNavigate={setCurrentScreen} />}
+         {currentScreen === 'practice' && <PracticeQuizScreen cards={cards} />}
+         {currentScreen === 'test' && <TestQuizScreen cards={cards} onNavigate={setCurrentScreen} />}
+      </main>
     </div>
+  );
+}
 
-    <!-- Main Container -->
-    <div class="max-w-md mx-auto px-4 pt-24 relative min-h-screen">
-        
-        <!-- Continuous Line Background (Static) -->
-        <div class="connector-line"></div>
+// ==========================================
+// 1. מסך בית (Menu)
+// ==========================================
+function HomeScreen({ onNavigate, cards }) {
+  const knownCount = cards.filter(c => c.status === 'known').length;
+  const total = cards.length;
+  const progress = Math.round((knownCount / total) * 100) || 0;
 
-        <!-- Itinerary Items -->
-        <div id="itinerary-container" class="space-y-0 pb-10"></div>
+  return (
+    <div className="max-w-4xl mx-auto w-full p-6 py-12 flex-1 overflow-y-auto">
+       <div className="text-center mb-12">
+          <h2 className="text-4xl sm:text-5xl font-black text-slate-800 mb-4 tracking-tight">מוכן לתרגל <GradientText>רפואת חירום</GradientText>?</h2>
+          <p className="text-lg text-slate-600 max-w-xl mx-auto">בחר את שיטת הלמידה שמתאימה לך כעת. המערכת זוכרת את ההתקדמות שלך בכל עת.</p>
+       </div>
 
-    </div>
-
-    <!-- Main Modal -->
-    <div id="mainModal" class="fixed inset-0 z-50 hidden flex items-end justify-center sm:items-center p-0 sm:p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity duration-300" onclick="closeModal()"></div>
-        <div class="bg-white w-full max-w-md rounded-t-[32px] sm:rounded-[32px] shadow-2xl animate-[slideIn_0.35s_cubic-bezier(0.16,1,0.3,1)] relative z-10 max-h-[92vh] flex flex-col overflow-hidden">
-            <div id="modalContent" class="flex flex-col h-full overflow-y-auto no-scrollbar bg-slate-50"></div>
-        </div>
-    </div>
-
-    <!-- Gas Modal -->
-    <div id="gasModal" class="fixed inset-0 z-50 hidden flex items-end justify-center sm:items-center p-0 sm:p-4">
-        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeGasModal()"></div>
-        <div class="bg-white w-full max-w-md rounded-t-[28px] sm:rounded-[28px] shadow-2xl relative z-10 max-h-[85vh] flex flex-col transition-transform">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-[28px] sticky top-0 z-20">
-                <div>
-                    <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                        <div class="bg-orange-50 p-2 rounded-xl text-orange-500"><i data-lucide="fuel" class="w-5 h-5"></i></div>
-                        דלק זול בדרך
-                    </h2>
-                    <p class="text-[11px] text-slate-400 font-bold mt-0.5 mr-1">השוואת מחירים למקטע הנוכחי</p>
+       <div className="grid md:grid-cols-3 gap-6">
+          
+          <button onClick={() => onNavigate('flashcards')} className="group text-right bg-white border-2 border-slate-100 hover:border-blue-400 p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start relative overflow-hidden">
+             <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <BookOpen size={32} />
+             </div>
+             <h3 className="text-2xl font-black text-slate-800 mb-2">כרטיסיות למידה</h3>
+             <p className="text-slate-500 font-medium mb-6">למידה והיכרות מעמיקה עם המושגים. כולל אפשרות לסינון ולמידה חכמה.</p>
+             
+             <div className="mt-auto w-full">
+                <div className="flex justify-between text-xs font-bold text-slate-400 mb-2">
+                   <span>התקדמות כללית</span> <span>{progress}%</span>
                 </div>
-                <button onclick="closeGasModal()" class="bg-slate-50 text-slate-400 p-2.5 rounded-full hover:bg-slate-100 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div id="gasModalContent" class="p-5 space-y-3 overflow-y-auto bg-slate-50 no-scrollbar pb-10"></div>
-        </div>
+                <div className="h-2 bg-slate-100 rounded-full overflow-hidden w-full">
+                   <div className="h-full bg-blue-500 rounded-full" style={{width: `${progress}%`}}></div>
+                </div>
+             </div>
+          </button>
+
+          <button onClick={() => onNavigate('practice')} className="group text-right bg-white border-2 border-slate-100 hover:border-orange-400 p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start">
+             <div className="w-16 h-16 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <List size={32} />
+             </div>
+             <h3 className="text-2xl font-black text-slate-800 mb-2">שאלות אמריקאיות</h3>
+             <p className="text-slate-500 font-medium">מצב תרגול אינסופי עם תשובות מבלבלות והסברים רפואיים מפורטים לכל שאלה.</p>
+             <span className="mt-auto inline-flex items-center gap-1.5 text-orange-600 font-bold bg-orange-50 px-4 py-2 rounded-xl">
+                התחל לתרגל <ChevronLeft size={16} />
+             </span>
+          </button>
+
+          <button onClick={() => onNavigate('test')} className="group text-right bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-800 hover:border-indigo-400 p-8 rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-start text-white">
+             <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Target size={32} className="text-indigo-300" />
+             </div>
+             <h3 className="text-2xl font-black mb-2">מבחן מסכם</h3>
+             <p className="text-slate-400 font-medium">בוחן פתע! 25 שאלות רנדומליות על זמן וציון סופי בסיום. בחן את השליטה שלך.</p>
+             <span className="mt-auto inline-flex items-center gap-1.5 text-slate-900 font-black bg-indigo-400 px-4 py-2 rounded-xl group-hover:bg-white transition-colors">
+                התחל מבחן <ChevronLeft size={16} />
+             </span>
+          </button>
+
+       </div>
     </div>
+  );
+}
 
-    <script>
-        // --- DATA CONFIG ---
-        
-        const GAS_STATIONS = {
-            'start': [ { name: "ARCO Oxnard", address: "1935 N Oxnard Blvd", price: "$4.39", note: "זול! מזומן/Debit" }, { name: "United Oil", address: "2888 E Thousand Oaks Blvd", price: "$4.45", note: "על הדרך" } ],
-            'sb': [ { name: "Fuel Depot", address: "5767 Calle Real", price: "$4.55", note: "ביציאה מסנטה ברברה" }, { name: "ARCO Buellton", address: "175 E Hwy 246", price: "$4.35", note: "בכניסה לסולבנג" } ],
-            'solvang': [ { name: "ARCO Pismo", address: "898 Oak Park Blvd", price: "$4.29", note: "הכי מומלץ!" }, { name: "Speedway", address: "1350 Grand Ave", price: "$4.35", note: "" } ],
-            'gas': [ { name: "Morro Bay Fuel", address: "1590 Main St", price: "$4.45", note: "בתוך העיר" }, { name: "Sinclair", address: "940 Morro Bay Blvd", price: "$4.49", note: "דינוזאור ירוק" } ],
-            'morro': [ { name: "Chevron Cambria", address: "2194 Main St", price: "$5.89", note: "יקר מאוד" }, { name: "אזהרה", address: "אין דלק זול מכאן!", price: "---", note: "תדלקו במורו ביי" } ],
-            'seals': [ { name: "Ragged Point", address: "19019 CA-1", price: "$7.99", note: "חירום בלבד" }, { name: "Gorda Gas", address: "Big Sur", price: "$7.50", note: "חירום בלבד" } ],
-            'monterey': [ { name: "Safeway Fuel", address: "104 Canyon Del Rey", price: "$4.25", note: "הכי זול באזור (Del Rey Oaks)" }, { name: "Valero", address: "2200 N Fremont St", price: "$4.39", note: "מחיר טוב" } ],
-            'santacruz': [ { name: "Costco Gas", address: "220 Sylvania Ave", price: "$4.15", note: "הכי זול! (לחברים בלבד)" }, { name: "Safeway Fuel", address: "2111 Mission St", price: "$4.29", note: "מחיר הוגן מאוד" } ],
-            'sharkfin': [ { name: "אזהרה", address: "אין תחנות בדבנפורט", price: "---", note: "מלאו בסנטה קרוז" } ],
-            'hmb': [ { name: "Safeway Fuel", address: "70 N Cabrillo Hwy", price: "$4.55", note: "הכי זול באזור" }, { name: "Chevron", address: "Half Moon Bay", price: "$5.15", note: "יקר יחסית" } ],
-            'pacifica': [ { name: "Valero", address: "Pacific Coast Hwy", price: "$4.65", note: "תחנה אחרונה לפני SF" } ]
-        };
+// ==========================================
+// 2. מסך כרטיסיות חכם (כולל הגדרות ובחירה)
+// ==========================================
+function FlashcardsScreen({ cards, setCards, onNavigate }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const [filterConfig, setFilterConfig] = useState({ hideKnown: false, specificIds: [] });
+  const [showSettings, setShowSettings] = useState(false);
+  
+  // Drag State 
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartX = useRef(0);
+  const hasMoved = useRef(false);
 
-        const ITINERARY = [
-            // --- DAY 1 ---
-            {
-                id: 'start',
-                title: 'יציאה: לוס אנג\'לס',
-                originalTime: '09:00',
-                displayTime: '09:00',
-                subTitle: 'נקודת התחלה',
-                type: 'start',
-                icon: 'car',
-                coords: { lat: 34.0528, lng: -118.2556 },
-                parking: { name: 'לובי המלון', coords: { lat: 34.0528, lng: -118.2556 }, cost: '---' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3p6yTIcIs92AnFZfplUcSVPCaXzjjpc_hdRUxa4vbcA&s=10",
-                longDesc: `<p class="mb-2">יוצאים לדרך! וודאו שארזתם הכל ושהרכב מוכן.</p>`,
-                walkingRoute: null
-            },
-            {
-                id: 'sb',
-                title: 'סנטה ברברה',
-                subTitle: 'Stearns Wharf',
-                originalTime: '11:00',
-                displayTime: '11:00',
-                type: 'stop',
-                icon: 'anchor',
-                coords: { lat: 34.4123, lng: -119.6876 }, 
-                parking: { name: 'City Lot #1', address: '23 E Cabrillo Blvd', coords: { lat: 34.4137, lng: -119.6905 }, cost: 'חינם 75 דק׳ ראשונות' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSB1m_VYizll6MT567ggSruv9ImG91t4HKdwqXT1wxLWA&s=10",
-                longDesc: `<p class="mb-2"><strong>הריביירה האמריקאית.</strong> עיר חוף יפהפייה עם ארכיטקטורה ספרדית.</p>
-                    <div class="bg-blue-50 p-4 rounded-2xl mb-4 border border-blue-100/50">
-                        <h4 class="font-bold text-blue-700 text-xs mb-2 uppercase tracking-wide">מה עושים כאן?</h4>
-                        <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
-                            <li>הליכה על המזח ההיסטורי (Stearns Wharf).</li>
-                            <li>ביקור בבית המשפט (תצפית חינם).</li>
-                            <li>סיבוב קצר ברחוב המדינה (State Street).</li>
-                        </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Stearns+Wharf/State+St,+Santa+Barbara"
-            },
-            {
-                id: 'solvang',
-                title: 'סולבנג',
-                subTitle: 'העיירה הדנית',
-                originalTime: '12:30',
-                displayTime: '12:30',
-                type: 'stop',
-                icon: 'coffee',
-                coords: { lat: 34.5958, lng: -120.1376 },
-                parking: { name: 'Public Parking', address: '1616 Oak St', coords: { lat: 34.5945, lng: -120.1408 }, cost: 'חינם' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2NgP8pvIZShu5F_1XhFvbqpMI-fDt3sSXwxNpXw4IHg&s=10",
-                longDesc: `<p class="mb-2"><strong>דנמרק הקטנה.</strong> הכל נראה כמו באגדות - טחנות רוח ומאפיות.</p>
-                    <div class="bg-orange-50 p-4 rounded-2xl mb-4 border border-orange-100/50">
-                        <h4 class="font-bold text-orange-700 text-xs mb-1 uppercase tracking-wide">חובה לטעום:</h4>
-                        <p class="text-xs text-slate-600 font-medium">Aebleskiver (סופגניות דניות עגולות) עם ריבה ואבקת סוכר.</p>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Solvang+Visitor+Center/The+Little+Mermaid+Fountain"
-            },
-            {
-                id: 'gas',
-                title: 'תדלוק חובה!',
-                subTitle: 'סן לואיס אוביספו',
-                originalTime: '14:30',
-                displayTime: '14:30',
-                type: 'gas',
-                icon: 'fuel',
-                coords: { lat: 35.2675, lng: -120.6481 },
-                parking: { name: 'Conserv Fuel', address: '2211 Broad St', coords: { lat: 35.2675, lng: -120.6481 }, cost: 'מחיר הוגן' },
-                isEmoji: true, emoji: "⛽", bgGradient: "from-orange-400 to-red-500",
-                longDesc: `<p class="font-bold text-red-600 mb-1">עצירה קריטית!</p><p class="text-sm text-slate-600">זה המקום האחרון לתדלק במחיר שפוי לפני שנכנסים לכביש החוף הפראי.</p>`,
-                walkingRoute: null
-            },
-            {
-                id: 'morro',
-                title: 'מורו ביי',
-                subTitle: 'Morro Rock',
-                originalTime: '15:00',
-                displayTime: '15:00',
-                type: 'stop',
-                icon: 'camera',
-                coords: { lat: 35.3712, lng: -120.8667 },
-                parking: { name: 'Coleman Park', address: 'Coleman Dr', coords: { lat: 35.3705, lng: -120.8650 }, cost: 'חינם' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNR-4naNKMPmIiq99YbgSSK0VvTVhUrTG-W_7YMbSYOg&s=10",
-                longDesc: `<p class="text-sm text-slate-600 leading-relaxed">סלע געשי עצום שבוקע מהים. חפשו לוטרות ים (Sea Otters) צפות על הגב במים השקטים של המפרץ.</p>`,
-                walkingRoute: "https://www.google.com/maps/dir/Coleman+Park/Morro+Rock"
-            },
-            {
-                id: 'seals',
-                title: 'פילי הים',
-                subTitle: 'San Simeon',
-                originalTime: '16:15',
-                displayTime: '16:15',
-                type: 'stop',
-                icon: 'fish',
-                coords: { lat: 35.6630, lng: -121.2575 },
-                parking: { name: 'Vista Point', address: 'Hwy 1', coords: { lat: 35.6630, lng: -121.2575 }, cost: 'חינם' },
-                isEmoji: true, emoji: "🦭", bgGradient: "from-blue-400 to-cyan-600",
-                longDesc: `<p class="text-sm text-slate-600 leading-relaxed"><strong>תופעת טבע מדהימה.</strong> אלפי פילי ים שוכבים על החוף. הרעש, הריח והגודל שלהם זו חוויה שלא שוכחים.</p>`,
-                walkingRoute: "https://www.google.com/maps/dir/Elephant+Seal+Vista+Point/Elephant+Seal+Viewing+Walkway"
-            },
-            {
-                id: 'monterey',
-                title: 'לינה במונטריי',
-                subTitle: 'Victorian Inn',
-                originalTime: '18:30',
-                displayTime: '18:30',
-                type: 'hotel',
-                icon: 'bed',
-                coords: { lat: 36.6128, lng: -121.9001 },
-                parking: { name: 'חניון המלון', address: '487 Foam St', coords: { lat: 36.6128, lng: -121.9001 }, cost: 'לאורחים' },
-                isEmoji: true, emoji: "🏨", bgGradient: "from-indigo-500 to-purple-600",
-                longDesc: `<p class="text-sm text-slate-600 leading-relaxed">מלון בסגנון ויקטוריאני במיקום מושלם ליד Cannery Row. צאו לסיבוב ערב ברחוב המפעלים המשוחזר.</p>`,
-                walkingRoute: "https://www.google.com/maps/dir/Victorian+Inn/Cannery+Row"
-            },
-            
-            // --- DAY 2 ---
-            { id: 'day2', title: 'יום 2 - ביג סר וכרמל', type: 'divider' },
-            
-            {
-                id: 'mcway',
-                title: 'מפלי מקוואי',
-                subTitle: 'Julia Pfeiffer Burns',
-                originalTime: '09:45',
-                displayTime: '09:45',
-                type: 'stop',
-                icon: 'camera',
-                coords: { lat: 36.1580, lng: -121.6695 },
-                parking: { name: 'McWay Falls Trailhead', address: 'Hwy 1', coords: { lat: 36.1585, lng: -121.6698 }, cost: '$10 או חינם בכביש' },
-                image: "https://offloadmedia.feverup.com/secretlosangeles.com/wp-content/uploads/2025/06/13073447/McWay-Falls.jpg",
-                longDesc: `
-                    <p class="mb-4 text-xs font-bold text-white bg-teal-600 px-3 py-1.5 rounded-full inline-block shadow-sm">🌲 נסיעה דרומה מהמלון</p>
-                    <p class="mb-3 text-sm text-slate-700"><strong>אחד המקומות היפים בעולם.</strong> מפל שנופל מגובה 25 מטר ישירות לחוף טורקיז בתולי.</p>
-                    <div class="bg-teal-50 p-4 rounded-2xl mb-3 border border-teal-100/60">
-                        <h4 class="font-bold text-teal-800 text-xs mb-2 uppercase tracking-wide">הוראות הגעה:</h4>
-                        <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
-                            <li>חונים בזהירות בצד הכביש או בחניון.</li>
-                            <li>הולכים במנהרה מתחת לכביש לתצפית (10 דקות).</li>
-                            <li><strong>שימו לב:</strong> אי אפשר לרדת לחוף! רק תצפית.</li>
-                        </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/McWay+Falls+Parking/McWay+Falls+Viewpoint"
-            },
-            {
-                id: 'bixby',
-                title: 'גשר ביקסבי',
-                subTitle: 'בחזרה צפונה',
-                originalTime: '11:30',
-                displayTime: '11:30',
-                type: 'stop',
-                icon: 'camera',
-                coords: { lat: 36.3714, lng: -121.9017 },
-                parking: { name: 'מפרץ צפוני', address: 'Hwy 1', coords: { lat: 36.3725, lng: -121.9030 }, cost: 'חינם' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2zJIDl1fe1ZGo7UfUrx2iHn1dYXzNNPtTfggtnUme6A&s=10",
-                longDesc: `<p class="text-sm text-slate-600 leading-relaxed"><strong>האייקון של כביש 1.</strong> הגשר המפורסם ביותר. עצרו במפרץ העפר בצד הצפוני של הגשר (לכיוון מונטריי) לתמונה המושלמת.</p>`,
-                walkingRoute: null
-            },
-            {
-                id: 'carmel',
-                title: 'כרמל',
-                subTitle: 'ארוחת צהריים',
-                originalTime: '12:15',
-                displayTime: '12:15',
-                type: 'stop',
-                icon: 'coffee',
-                coords: { lat: 36.5552, lng: -121.9233 },
-                parking: { name: 'Vista Lobos', address: '3rd Ave & Torres St', coords: { lat: 36.5560, lng: -121.9215 }, cost: 'חינם' },
-                image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0a/66/e2/75/20160221-091502-1-largejpg.jpg?w=600&h=-1&s=1",
-                longDesc: `
-                    <p class="mb-2 text-sm text-slate-600"><strong>עיירת האגדות.</strong> זמן מצוין לארוחת צהריים וסיבוב בחוף הלבן.</p>
-                    <div class="bg-indigo-50 p-4 rounded-2xl mb-3 border border-indigo-100/50">
-                        <h4 class="font-bold text-indigo-700 text-xs mb-1 uppercase tracking-wide">טיפ של מקומיים:</h4>
-                        <p class="text-xs text-slate-600 font-medium">חנו את הרכב בחינם בחניון Vista Lobos ורדו ברגל את Ocean Avenue עד לים.</p>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Ocean+Ave,+Carmel/Carmel+Beach"
-            },
+  // Compute Active List
+  const studyList = cards.filter(c => {
+    if (filterConfig.hideKnown && c.status === 'known') return false;
+    if (filterConfig.specificIds.length > 0 && !filterConfig.specificIds.includes(c.id)) return false;
+    return true;
+  });
 
-            // --- DAY 3: NORTH TO SF (NEW) ---
-            { id: 'day3', title: 'המשך צפונה: סנטה קרוז ל-SF', type: 'divider' },
+  const currentCard = studyList[currentIndex] || null;
 
-            {
-                id: 'moss',
-                title: 'מוס לנדינג',
-                subTitle: 'לוטרות ים!',
-                originalTime: '13:45',
-                displayTime: '13:45',
-                type: 'stop',
-                icon: 'fish',
-                coords: { lat: 36.8044, lng: -121.7863 },
-                parking: { name: 'Moss Landing Harbor', address: 'Hwy 1', coords: { lat: 36.8044, lng: -121.7863 }, cost: 'חינם באזור הנמל' },
-                isEmoji: true, emoji: "🦦", bgGradient: "from-amber-500 to-orange-400",
-                longDesc: `
-                    <p class="mb-3 text-sm text-slate-700"><strong>בירת הלוטרות של קליפורניה.</strong> המקום הכי טוב בחוף המערבי לראות לוטרות ים (Sea Otters) שוחות בטבע.</p>
-                    <div class="bg-amber-50 p-4 rounded-2xl mb-3 border border-amber-100">
-                         <h4 class="font-bold text-amber-800 text-xs mb-2 uppercase tracking-wide">מה עושים כאן?</h4>
-                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
-                            <li>תצפית על לוטרות מנמל הדייגים (צד ימין).</li>
-                            <li>קיאקים ב-Elkhorn Slough (מומלץ להזמין מראש).</li>
-                            <li>מסעדות דגים מצוינות על המים.</li>
-                         </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Moss+Landing+Harbor+District/Elkhorn+Slough"
-            },
-            {
-                id: 'santacruz',
-                title: 'סנטה קרוז',
-                subTitle: 'הטיילת המפורסמת',
-                originalTime: '14:30',
-                displayTime: '14:30',
-                type: 'stop',
-                icon: 'palmtree',
-                coords: { lat: 36.9642, lng: -122.0181 },
-                parking: { name: 'חנייה ברחוב', address: '3rd St (מדחנים)', coords: { lat: 36.9660, lng: -122.0200 }, cost: 'זול יותר מהחניון הראשי ($25)' },
-                isEmoji: true, emoji: "🎡", bgGradient: "from-pink-500 to-rose-400",
-                longDesc: `
-                    <p class="mb-3 text-sm text-slate-700"><strong>הווייב של קליפורניה.</strong> עיירת גולשים קלאסית עם טיילת צבעונית ולונה פארק על החוף.</p>
-                    <div class="bg-rose-50 p-4 rounded-2xl mb-3 border border-rose-100">
-                         <h4 class="font-bold text-rose-800 text-xs mb-2 uppercase tracking-wide">אטרקציות חובה:</h4>
-                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
-                            <li>הליכה על ה-Broadwalk (כניסה חינם).</li>
-                            <li>צפייה באריות ים מתחת למזח (Wharf).</li>
-                            <li>נסיעה ב-West Cliff Drive לצפייה בגולשים.</li>
-                         </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Santa+Cruz+Beach+Boardwalk/Santa+Cruz+Wharf"
-            },
-            {
-                id: 'sharkfin',
-                title: 'מפרץ סנפיר הכריש',
-                subTitle: 'Davenport',
-                originalTime: '15:30',
-                displayTime: '15:30',
-                type: 'stop',
-                icon: 'camera',
-                coords: { lat: 37.0034, lng: -122.1852 },
-                parking: { name: 'מפרץ עפר (צד ימין)', address: 'Hwy 1', coords: { lat: 37.0038, lng: -122.1848 }, cost: 'חינם (זהירות בחצייה!)' },
-                isEmoji: true, emoji: "🦈", bgGradient: "from-cyan-500 to-blue-500",
-                longDesc: `
-                    <p class="mb-3 text-sm text-slate-700"><strong>תופעת טבע פוטוגנית.</strong> סלע עצום בצורת סנפיר כריש בולט מתוך המים במפרץ מבודד.</p>
-                    <div class="bg-cyan-50 p-4 rounded-2xl mb-3 border border-cyan-100">
-                         <h4 class="font-bold text-cyan-800 text-xs mb-2 uppercase tracking-wide">טיפים לביקור:</h4>
-                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
-                            <li>הליכה קצרה (5 דק') משביל העפר לתצפית.</li>
-                            <li>המקום הכי יפה לתמונות באזור.</li>
-                            <li>אפשר לרדת לחוף (זהירות, ירידה תלולה).</li>
-                         </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Shark+Fin+Cove+Parking/Shark+Fin+Cove+Overlook"
-            },
-            {
-                id: 'pigeon',
-                title: 'המגדלור',
-                subTitle: 'Pigeon Point',
-                originalTime: '16:15',
-                displayTime: '16:15',
-                type: 'stop',
-                icon: 'anchor',
-                coords: { lat: 37.1843, lng: -122.3946 },
-                parking: { name: 'חניון המגדלור', address: 'Pigeon Point Rd', coords: { lat: 37.1843, lng: -122.3940 }, cost: 'חינם' },
-                isEmoji: true, emoji: "🗼", bgGradient: "from-slate-500 to-gray-600",
-                longDesc: `
-                    <p class="mb-3 text-sm text-slate-700">אחד המגדלורים הגבוהים והיפים בארה"ב (35 מטר). נבנה ב-1871 ועדיין פעיל.</p>
-                    <div class="bg-slate-100 p-4 rounded-2xl mb-3 border border-slate-200">
-                         <h4 class="font-bold text-slate-700 text-xs mb-2 uppercase tracking-wide">מה רואים?</h4>
-                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
-                            <li>סיבוב קצר סביב המגדלור.</li>
-                            <li>תצפית על לווייתנים (בעונה - דצמבר עד אפריל).</li>
-                            <li>תמונות דרמטיות של הצוקים.</li>
-                         </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Pigeon+Point+Light+Station/Whaler's+Cove"
-            },
-            {
-                id: 'hmb',
-                title: 'האף מוּן ביי',
-                subTitle: 'עיירה יוקרתית',
-                originalTime: '17:00',
-                displayTime: '17:00',
-                type: 'stop',
-                icon: 'coffee',
-                coords: { lat: 37.4636, lng: -122.4286 },
-                parking: { name: 'Poplar Beach', address: 'Poplar St', coords: { lat: 37.4593, lng: -122.4418 }, cost: '$10 במכונה (חובה!)' },
-                isEmoji: true, emoji: "🌊", bgGradient: "from-teal-400 to-emerald-500",
-                longDesc: `
-                    <p class="mb-3 text-sm text-slate-700">עיירת חוף עשירה ומהממת עם אווירה כפרית. ידועה בפסטיבל הדלעות ובגלישת גלי ענק.</p>
-                    <div class="bg-teal-50 p-4 rounded-2xl mb-3 border border-teal-100">
-                         <h4 class="font-bold text-teal-800 text-xs mb-2 uppercase tracking-wide">המלצות:</h4>
-                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
-                            <li>הליכה ב-Main Street ההיסטורי.</li>
-                            <li>קפה ומאפה ב-San Benito House.</li>
-                            <li>צפייה במלון ריץ-קרלטון שיושב על הצוק.</li>
-                         </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Poplar+Beach+Parking/Half+Moon+Bay+Coastal+Trail"
-            },
-            {
-                id: 'pacifica',
-                title: 'מגלשת השטן',
-                subTitle: 'Devil\'s Slide Trail',
-                originalTime: '17:45',
-                displayTime: '17:45',
-                type: 'stop',
-                icon: 'footprints',
-                coords: { lat: 37.5843, lng: -122.5020 },
-                parking: { name: 'South Parking Lot', address: 'Hwy 1', coords: { lat: 37.5843, lng: -122.5020 }, cost: 'חינם (קטן מאוד)' },
-                isEmoji: true, emoji: "🥾", bgGradient: "from-green-500 to-lime-600",
-                longDesc: `
-                    <p class="mb-3 text-sm text-slate-700"><strong>ה-הליכה של הטיול.</strong> קטע כביש ישן שהפך למסלול הליכה תלוי מעל התהום. נופים עוצרי נשימה ללא מכוניות.</p>
-                    <div class="bg-green-50 p-4 rounded-2xl mb-3 border border-green-100">
-                         <h4 class="font-bold text-green-800 text-xs mb-2 uppercase tracking-wide">פרטים:</h4>
-                         <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600 font-medium">
-                            <li>אורך המסלול: כ-2 ק"מ (סלול וקל).</li>
-                            <li>לא לפספס: התצפית מהבונקר הישן.</li>
-                            <li>בונוס: עצירה ב-Taco Bell היפה בעולם (על החוף).</li>
-                         </ul>
-                    </div>`,
-                walkingRoute: "https://www.google.com/maps/dir/Devil's+Slide+Trail+South+Parking/Devil's+Slide+Bunker"
-            },
+  const handleNext = () => {
+    setFlipped(false);
+    setTimeout(() => {
+      if (currentIndex + 1 >= studyList.length) {
+         // Finished a round. Are there 'learning' cards in current list?
+         const hasLearning = studyList.some(c => c.status === 'learning');
+         if (hasLearning && !filterConfig.hideKnown) {
+            // Auto-switch to hide known!
+            alert('סיימת סבב! אנו עוברים אוטומטית לתרגל רק את הכרטיסיות שדרשו חזרה.');
+            setFilterConfig(prev => ({ ...prev, hideKnown: true }));
+            setCurrentIndex(0);
+         } else {
+            // Just loop
+            setCurrentIndex(0);
+         }
+      } else {
+        setCurrentIndex(prev => prev + 1);
+      }
+    }, 150);
+  };
 
-            {
-                id: 'sf',
-                title: 'סיום: סן פרנסיסקו',
-                subTitle: 'Fisherman\'s Wharf',
-                originalTime: '19:00',
-                displayTime: '19:00',
-                type: 'stop',
-                icon: 'anchor',
-                coords: { lat: 37.8080, lng: -122.4177 },
-                parking: { name: 'חניון המלון', coords: { lat: 37.8080, lng: -122.4177 }, cost: '$50-$70 ללילה' },
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThRZsv_ufgRrqGw4E1tFyxdTSwAQoAxAfQGk5jrZAlaTvcZzTjQ3fM_-J5&s=10",
-                longDesc: `<p class="text-sm text-slate-600 leading-relaxed"><strong>הגעתם ליעד!</strong> רציף הדייגים. לכו לראות את אריות הים ב-Pier 39 ולאכול מרק צדפות בלחם חמוץ ב-Boudin.</p>`,
-                walkingRoute: "https://www.google.com/maps/dir/Fisherman's+Wharf/Pier+39"
-            }
-        ];
+  const markStatus = (status) => {
+    if(!currentCard) return;
+    setCards(cards.map(c => c.id === currentCard.id ? { ...c, status } : c));
+    handleNext();
+  };
 
-        // --- UTILS ---
-        
-        function deg2rad(deg) { return deg * (Math.PI/180); }
-        function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; 
-            const dLat = deg2rad(lat2 - lat1);
-            const dLon = deg2rad(lon2 - lon1);
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        }
+  // Drag logic
+  const handlePointerDown = (e) => {
+    dragStartX.current = e.clientX;
+    hasMoved.current = false;
+    setIsDragging(true);
+    e.target.setPointerCapture(e.pointerId);
+  };
+  const handlePointerMove = (e) => {
+    if (!isDragging) return;
+    const delta = e.clientX - dragStartX.current;
+    if (Math.abs(delta) > 10) hasMoved.current = true;
+    setDragX(delta);
+  };
+  const handlePointerUp = (e) => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    e.target.releasePointerCapture(e.pointerId);
+    if (dragX > 100) markStatus('known');
+    else if (dragX < -100) markStatus('learning');
+    else if (!hasMoved.current) setFlipped(!flipped);
+    setDragX(0); 
+  };
 
-        function getDriveTime(distKm, speedKmh = 75) {
-            const minutes = Math.round((distKm * 1.3 / speedKmh) * 60);
-            const hrs = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            if (hrs > 0) return `${hrs} ש׳ ${mins} דק׳`;
-            return `${mins} דק׳`;
-        }
+  // Keyboard
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (showSettings || !currentCard) return;
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setFlipped(f => !f); }
+      if (e.key === 'ArrowRight') markStatus('known');
+      if (e.key === 'ArrowLeft') markStatus('learning');
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  });
 
-        // --- STATE ---
-        let isTracking = false;
-        let userLocation = null;
-        let lastCoords = null; 
+  const cardTransform = isDragging ? `translateX(${dragX}px) rotate(${dragX * 0.05}deg)` : 'translateX(0px) rotate(0deg)';
+  
+  let dragHintBg = 'bg-slate-50';
+  if (dragX > 50) dragHintBg = 'bg-green-50';
+  else if (dragX < -50) dragHintBg = 'bg-orange-50';
 
-        // --- CORE LOGIC ---
+  return (
+    <div className={`flex-1 flex flex-col relative w-full items-center p-4 transition-colors ${dragHintBg}`}>
+       
+       {/* Settings & Info Bar */}
+       <div className="w-full max-w-lg flex justify-between items-center mb-6 z-10">
+          <button onClick={() => setShowSettings(true)} className="bg-white text-slate-600 px-4 py-2 rounded-xl shadow-sm border border-slate-200 font-bold text-sm flex items-center gap-2 hover:bg-slate-50">
+             <Settings size={16} /> הגדרות וסינון
+          </button>
+          {studyList.length > 0 && (
+            <div className="bg-white font-bold text-slate-500 text-sm px-4 py-2 rounded-xl shadow-sm border border-slate-200">
+               כרטיס {currentIndex + 1} / {studyList.length}
+            </div>
+          )}
+       </div>
 
-        function initItinerary() {
-            const container = document.getElementById('itinerary-container');
-            container.innerHTML = '';
-            
-            // Set start coordinates based on first item
-            lastCoords = ITINERARY[0].coords;
+       {/* Empty State */}
+       {studyList.length === 0 ? (
+          <div className="bg-white rounded-[2rem] p-10 text-center shadow-xl border border-slate-100 max-w-lg w-full flex flex-col items-center mt-12 z-10">
+             <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 text-green-600">
+                <Check size={48} />
+             </div>
+             <h2 className="text-2xl font-black text-slate-800 mb-2">אין כרטיסיות להצגה!</h2>
+             <p className="text-slate-500 mb-8 font-medium">כל הכרטיסיות בסינון הנוכחי טופלו, או שסיננת הכל החוצה.</p>
+             <button onClick={() => { setFilterConfig({hideKnown:false, specificIds:[]}); setCurrentIndex(0); }} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold w-full shadow-lg">נקה סינונים והצג הכל</button>
+          </div>
+       ) : (
+          <div className="max-w-lg w-full flex-1 flex flex-col items-center">
+             
+             {/* THE CARD */}
+             <div 
+               className="z-10 w-full h-[400px] sm:h-[450px] cursor-grab active:cursor-grabbing select-none flex-shrink-0"
+               style={{ perspective: '1000px', transform: cardTransform, transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)' }}
+               onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerLeave={handlePointerUp} onPointerCancel={handlePointerUp}
+             >
+                <div className="relative w-full h-full" style={{ transition: 'transform 0.5s ease-out', transformStyle: 'preserve-3d', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)'}}>
+                   
+                   {/* FRONT */}
+                   <div className="absolute w-full h-full bg-white rounded-[2rem] shadow-xl border border-slate-200 flex flex-col p-8 text-center justify-center items-center" style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden'}}>
+                      {currentCard.status === 'known' && <span className="absolute top-6 text-xs font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full">ידוע</span>}
+                      {currentCard.status === 'learning' && <span className="absolute top-6 text-xs font-bold text-orange-700 bg-orange-100 px-3 py-1 rounded-full">צריך חזרה</span>}
+                      <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-4 leading-tight">{currentCard.question}</h2>
+                   </div>
 
-            ITINERARY.forEach((stop, index) => {
-                
-                // --- DIVIDER LOGIC (New Day) ---
-                if (stop.type === 'divider') {
-                    // We don't change coords here, but we render the divider
-                    container.innerHTML += `
-                        <div class="relative z-10 my-10 flex items-center justify-center">
-                            <div class="bg-slate-800 text-white px-5 py-2 rounded-full text-xs font-bold shadow-lg shadow-slate-300 border-[3px] border-slate-100 flex items-center gap-2 relative">
-                                <div class="absolute inset-0 rounded-full border border-slate-600"></div>
-                                <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-300"></i> ${stop.title}
-                            </div>
-                        </div>`;
-                    return; 
-                }
+                   {/* BACK */}
+                   <div className="absolute w-full h-full bg-gradient-to-b from-blue-50 to-white rounded-[2rem] shadow-xl border border-blue-200 flex flex-col p-6 overflow-hidden" style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)'}}>
+                      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-center">
+                         <h3 className="text-sm font-bold text-blue-600 mb-2 flex items-center gap-2"><Check size={16} /> תשובה:</h3>
+                         <p className="text-xl font-bold text-slate-800 leading-snug mb-4">{currentCard.answer}</p>
+                         <hr className="border-blue-100 my-4" />
+                         <div className="bg-blue-100/60 rounded-2xl p-4 border border-blue-200">
+                            <h3 className="text-xs font-black text-blue-800 mb-2 flex items-center gap-1.5 uppercase"><Info size={14} /> הסבר:</h3>
+                            <p className="text-sm font-medium text-slate-700 leading-relaxed">{currentCard.explanation}</p>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
 
-                // --- DRIVE TIME CALCULATION ---
-                let driveTimeHtml = '';
-                let distance = 0;
-                let isMorningDrive = false;
+             {/* Action Buttons */}
+             <div className="flex w-full gap-4 mt-8 z-10 no-select pb-8">
+                <button onClick={(e) => { e.stopPropagation(); markStatus('learning'); }} className="flex-1 bg-white border-2 border-orange-100 text-orange-600 font-bold py-4 rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 hover:bg-orange-50">
+                   <X size={24} /> <span className="text-sm">צריך חזרה</span>
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); markStatus('known'); }} className="flex-1 bg-green-500 border-2 border-transparent text-white font-bold py-4 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-1 hover:bg-green-600">
+                   <Check size={24} /> <span className="text-sm">יודע היטב</span>
+                </button>
+             </div>
+          </div>
+       )}
 
-                // If not the first stop, calculate distance from LAST processed stop
-                if (index > 0) {
-                    distance = getDistance(lastCoords.lat, lastCoords.lng, stop.coords.lat, stop.coords.lng);
-                    
-                    // Detect morning drive (if previous item was divider)
-                    if (ITINERARY[index-1].type === 'divider') {
-                        isMorningDrive = true;
+       {/* --- Settings Modal --- */}
+       {showSettings && (
+         <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowSettings(false)}></div>
+            <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-6 relative flex flex-col max-h-[90vh]">
+               <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-black">הגדרות וסינון</h3>
+                  <button onClick={() => setShowSettings(false)} className="bg-slate-100 p-2 rounded-full text-slate-600"><X size={20}/></button>
+               </div>
+               
+               <div className="flex-1 overflow-y-auto custom-scrollbar space-y-6 pr-2">
+                  {/* Toggle Known */}
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
+                     <div>
+                        <h4 className="font-bold text-slate-800">הסתר כרטיסיות ידועות</h4>
+                        <p className="text-xs text-slate-500 mt-1">הצג רק מושגים שדורשים חזרה או שטרם נלמדו.</p>
+                     </div>
+                     <button 
+                        onClick={() => { setFilterConfig(p => ({...p, hideKnown: !p.hideKnown})); setCurrentIndex(0); }}
+                        className={`w-14 h-8 flex items-center rounded-full p-1 transition-colors ${filterConfig.hideKnown ? 'bg-green-500' : 'bg-slate-300'}`}
+                     >
+                        <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform ${filterConfig.hideKnown ? 'translate-x-0' : '-translate-x-6'}`}></div>
+                     </button>
+                  </div>
+
+                  {/* Reset Data */}
+                  <div className="bg-red-50 p-4 rounded-2xl border border-red-100 flex flex-col">
+                     <h4 className="font-bold text-red-800 mb-1">איפוס נתונים</h4>
+                     <p className="text-xs text-red-600/70 mb-3">יאפס את כל הסטטיסטיקה וההתקדמות. הפעולה לא ניתנת לביטול.</p>
+                     <button 
+                        onClick={() => {
+                           if(window.confirm('בטוח שברצונך לאפס את הכל?')) {
+                              setCards(cards.map(c => ({...c, status: 'unseen'})));
+                              setFilterConfig({hideKnown: false, specificIds: []});
+                              setCurrentIndex(0);
+                              setShowSettings(false);
+                           }
+                        }}
+                        className="bg-red-500 text-white font-bold py-2 rounded-xl text-sm self-start px-4 flex items-center gap-2"
+                     >
+                        <RotateCcw size={16} /> איפוס מלא
+                     </button>
+                  </div>
+
+                  {/* Specific Cards Selection */}
+                  <div className="flex flex-col">
+                     <h4 className="font-bold text-slate-800 mb-2">בחירת כרטיסיות ידנית:</h4>
+                     <p className="text-xs text-slate-500 mb-3">סמן וי ליד כרטיסיות כדי ללמוד רק אותן. (נקה הכל כדי ללמוד רגיל).</p>
+                     
+                     <div className="flex gap-2 mb-3">
+                        <button onClick={() => setFilterConfig(p => ({...p, specificIds: []}))} className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg flex-1">בחר הכל (נקה סינון)</button>
+                     </div>
+
+                     <div className="border border-slate-200 rounded-2xl p-2 max-h-48 overflow-y-auto custom-scrollbar space-y-1 bg-slate-50">
+                        {cards.map(c => {
+                           const isSelected = filterConfig.specificIds.includes(c.id);
+                           return (
+                              <div key={c.id} 
+                                 onClick={() => {
+                                    setFilterConfig(p => {
+                                       let newIds = p.specificIds.includes(c.id) ? p.specificIds.filter(id => id !== c.id) : [...p.specificIds, c.id];
+                                       return {...p, specificIds: newIds};
+                                    });
+                                    setCurrentIndex(0);
+                                 }}
+                                 className={`flex items-start gap-3 p-2 rounded-xl cursor-pointer text-sm ${isSelected ? 'bg-blue-100 border-blue-200 border' : 'bg-white border border-slate-100 hover:bg-slate-100'}`}
+                              >
+                                 <div className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center border shrink-0 ${isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-300'}`}>
+                                    {isSelected && <Check size={14} />}
+                                 </div>
+                                 <span className="font-medium text-slate-700 leading-tight">{c.question}</span>
+                              </div>
+                           );
+                        })}
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+       )}
+    </div>
+  );
+}
+
+// ==========================================
+// 3. מצב שאלות אמריקאיות (תרגול אינסופי)
+// ==========================================
+function PracticeQuizScreen({ cards }) {
+  const [qIndex, setQIndex] = useState(0);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [isChecked, setIsChecked] = useState(false);
+  
+  // Scramble questions array on mount (infinite feel)
+  const [quizList] = useState(() => [...cards].sort(() => 0.5 - Math.random()));
+  const q = quizList[qIndex];
+
+  if (!q) return null; // safety
+
+  const handleOptionClick = (opt) => {
+    if (isChecked) return;
+    if (q.type === 'multiple') {
+      setSelectedOptions(prev => prev.includes(opt) ? prev.filter(o => o !== opt) : [...prev, opt]);
+    } else {
+      setSelectedOptions([opt]);
+    }
+  };
+
+  const handleCheck = () => {
+    if (selectedOptions.length === 0) { alert('יש לבחור תשובה!'); return; }
+    setIsChecked(true);
+  };
+
+  const handleNext = () => {
+    setSelectedOptions([]);
+    setIsChecked(false);
+    setQIndex(prev => (prev + 1) % quizList.length);
+  };
+
+  // Grading
+  const isCorrectOption = (opt) => q.correctAnswers.includes(opt);
+  const isFullyCorrect = selectedOptions.length === q.correctAnswers.length && 
+                         selectedOptions.every(opt => isCorrectOption(opt));
+
+  return (
+     <div className="flex-1 w-full max-w-2xl mx-auto p-4 flex flex-col py-8 overflow-y-auto">
+        <div className="bg-white rounded-[2rem] shadow-xl border border-slate-200 flex flex-col overflow-hidden">
+           
+           {/* Question Header */}
+           <div className="p-6 sm:p-8 bg-slate-800 text-white">
+              <div className="flex justify-between items-center mb-4">
+                 <span className="bg-white/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+                   <List size={14} /> מצב תרגול
+                 </span>
+                 {q.type === 'multiple' && (
+                    <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 animate-pulse">
+                      <CheckSquare size={14} /> שאלת רב-ברירה
+                    </span>
+                 )}
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black leading-tight">{q.question}</h2>
+           </div>
+
+           {/* Options */}
+           <div className="p-6 sm:p-8 space-y-3 flex-1 bg-slate-50">
+              {q.options.map((opt, idx) => {
+                 const isSelected = selectedOptions.includes(opt);
+                 let style = "bg-white border-2 border-slate-200 text-slate-700 hover:border-blue-300 cursor-pointer";
+                 let icon = <div className={`w-5 h-5 rounded shrink-0 border-2 ${q.type==='single'?'rounded-full':''} ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300'}`}></div>;
+                 
+                 // Result Styling
+                 if (isChecked) {
+                    style = "bg-white border-2 border-slate-200 opacity-60 cursor-default"; // default checked state
+                    icon = <div className={`w-5 h-5 shrink-0`}></div>; // hide default icon
+                    if (isCorrectOption(opt)) {
+                       style = "bg-green-50 border-2 border-green-500 text-green-900 shadow-sm cursor-default";
+                       icon = <Check className="text-green-600 w-6 h-6 shrink-0" />;
+                    } else if (isSelected && !isCorrectOption(opt)) {
+                       style = "bg-red-50 border-2 border-red-400 text-red-900 cursor-default";
+                       icon = <X className="text-red-500 w-6 h-6 shrink-0" />;
                     }
+                 } else if (isSelected) {
+                    style = "bg-blue-50 border-2 border-blue-500 text-blue-900 shadow-sm cursor-pointer";
+                 }
 
-                    // Adjust speed for curvy roads
-                    const speed = (stop.id === 'mcway' || stop.id === 'bixby' || stop.id === 'sharkfin' || stop.id === 'pacifica') ? 50 : 75; 
-                    const timeStr = getDriveTime(distance, speed);
-                    
-                    // Style for the "Pill" connector
-                    const pillClass = isMorningDrive 
-                        ? "bg-teal-50 text-teal-700 border-teal-200" 
-                        : "bg-white text-slate-500 border-slate-200";
-                    
-                    const icon = isMorningDrive ? 'coffee' : 'car';
-                    const textPrefix = isMorningDrive ? 'נסיעת בוקר:' : '';
-
-                    driveTimeHtml = `
-                        <div class="flex justify-end items-center relative h-8 -my-3 pr-[41px] z-0">
-                             <div class="${pillClass} border text-[10px] font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1.5 z-0 relative">
-                                <i data-lucide="${icon}" class="w-3 h-3 opacity-70"></i> 
-                                ${textPrefix} ${timeStr}
-                             </div>
-                        </div>
-                    `;
-                }
-
-                // Update coordinates for next iteration
-                lastCoords = stop.coords;
-                
-                // --- MEDIA & CONTENT PREP ---
-                // Only show gas button if there is data AND it's not the very last item
-                const showGas = index < ITINERARY.length - 1 && ITINERARY[index+1].type !== 'divider' && GAS_STATIONS[stop.id];
-
-                let mediaHtml = stop.isEmoji 
-                    ? `<div class="w-full h-full bg-gradient-to-br ${stop.bgGradient} flex items-center justify-center text-6xl drop-shadow-sm select-none">${stop.emoji}</div>`
-                    : `<img src="${stop.image}" class="w-full h-full object-cover select-none transition duration-700 group-hover:scale-105">`;
-
-                // --- RENDER ITEM ---
-                const animationDelay = index * 0.1; // Staggered animation
-
-                container.innerHTML += `
-                    <div id="stop-item-${index}" class="relative mb-6 animate-card" style="animation-delay: ${animationDelay}s">
-                        
-                        ${driveTimeHtml}
-
-                        <!-- The Card Row -->
-                        <div class="flex items-stretch gap-4 mt-6">
-                            
-                            <!-- Timeline Track Column -->
-                            <div class="timeline-dot-container shrink-0 pt-8">
-                                <div id="dot-${index}" class="timeline-dot relative z-10 flex items-center justify-center"></div>
-                                
-                                <!-- Car Marker (Hidden by default) -->
-                                <div id="car-${index}" class="car-marker" style="top: 0%;">
-                                    <div class="car-inner"><i data-lucide="car" class="w-4 h-4 text-white fill-current"></i></div>
-                                </div>
-                            </div>
-
-                            <!-- Card Content -->
-                            <div id="card-${index}" onclick="openModal(${index})" class="grow bg-white rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-slate-100 overflow-hidden cursor-pointer btn-active group relative z-10">
-                                
-                                <div class="h-32 w-full relative bg-slate-100 overflow-hidden">
-                                    ${mediaHtml}
-                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
-                                    <div class="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-md p-1.5 rounded-lg shadow-sm text-slate-700">
-                                        <i data-lucide="${stop.icon}" class="w-3.5 h-3.5"></i>
-                                    </div>
-                                    <div class="absolute bottom-2.5 right-3 text-white">
-                                        <div class="text-lg font-bold leading-none tracking-tight">${stop.title}</div>
-                                        <div class="text-xs opacity-90 font-medium mt-1 tracking-wide text-slate-200">${stop.subTitle}</div>
-                                    </div>
-                                </div>
-
-                                <div class="p-3.5 flex justify-between items-center bg-white relative">
-                                    <div class="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-100">
-                                        <i data-lucide="clock" class="w-3 h-3 text-slate-400"></i>
-                                        <span id="time-${index}" class="text-xs font-bold text-slate-600 font-mono tracking-tight">${stop.displayTime}</span>
-                                    </div>
-                                    
-                                    <div id="eta-${index}" class="hidden flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100 animate-pulse">
-                                        <i data-lucide="timer" class="w-3 h-3"></i> <span id="eta-text-${index}"></span>
-                                    </div>
-                                    
-                                    <div class="text-slate-300">
-                                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Gas Alert (Optional) -->
-                        ${showGas ? `
-                        <div class="mr-[50px] mt-3 relative z-10">
-                            <button onclick="openGasModal('${stop.id}')" class="w-full bg-orange-50/80 border border-orange-100/60 rounded-xl p-2.5 flex items-center gap-3 active:scale-95 transition-transform">
-                                <div class="bg-orange-100 text-orange-500 p-1.5 rounded-lg shadow-sm"><i data-lucide="fuel" class="w-3.5 h-3.5"></i></div>
-                                <div class="text-right grow">
-                                    <div class="text-xs font-bold text-slate-700">תדלוק מומלץ בהמשך</div>
-                                    <div class="text-[10px] text-slate-400">לחץ להשוואת מחירים</div>
-                                </div>
-                                <i data-lucide="chevron-left" class="w-3 h-3 text-orange-300"></i>
-                            </button>
-                        </div>` : ''}
+                 return (
+                    <div key={idx} onClick={() => handleOptionClick(opt)} className={`p-4 rounded-2xl flex items-center gap-4 transition-all ${style}`}>
+                       {icon}
+                       <span className="font-bold text-lg leading-tight">{opt}</span>
                     </div>
-                `;
-            });
-            lucide.createIcons();
-        }
+                 );
+              })}
+           </div>
 
-        // --- TRACKING & MODALS ---
+           {/* Feedback Area */}
+           {isChecked && (
+              <div className="p-6 sm:p-8 border-t border-slate-200 bg-white">
+                 <div className={`flex items-start gap-4 p-4 rounded-2xl mb-6 ${isFullyCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                    {isFullyCorrect ? <Check size={32} className="text-green-600 shrink-0 mt-1" /> : <AlertCircle size={32} className="text-red-600 shrink-0 mt-1" />}
+                    <div>
+                       <h3 className={`text-xl font-black mb-1 ${isFullyCorrect ? 'text-green-800' : 'text-red-800'}`}>
+                          {isFullyCorrect ? 'מעולה! תשובה נכונה.' : 'טעות הפעם.'}
+                       </h3>
+                       <p className="text-sm font-medium text-slate-700 leading-relaxed"><span className="font-bold">הסבר: </span>{q.explanation}</p>
+                    </div>
+                 </div>
+                 <button onClick={handleNext} className="w-full bg-blue-600 text-white font-black text-xl py-4 rounded-2xl hover:bg-blue-700 shadow-lg flex items-center justify-center gap-2">
+                    השאלה הבאה <ChevronLeft size={24} />
+                 </button>
+              </div>
+           )}
 
-        function handleMainButton() {
-            const btn = document.getElementById('actionBtn');
-            const btnText = document.getElementById('btnText');
-            const statusMsg = document.getElementById('statusMsg');
+           {/* Submit Button */}
+           {!isChecked && (
+              <div className="p-6 sm:p-8 border-t border-slate-200 bg-white">
+                 <button 
+                    onClick={handleCheck} 
+                    className={`w-full font-black text-xl py-4 rounded-2xl shadow-lg transition-all ${selectedOptions.length > 0 ? 'bg-slate-900 text-white hover:bg-slate-800 hover:-translate-y-1' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+                 >
+                    בדוק תשובה
+                 </button>
+              </div>
+           )}
 
-            if (!isTracking) {
-                if (navigator.geolocation) {
-                    btnText.innerText = "מאתר...";
-                    statusMsg.classList.remove('hidden');
+        </div>
+     </div>
+  );
+}
+
+// ==========================================
+// 4. מבחן מסכם (25 שאלות, סקור סופי)
+// ==========================================
+function TestQuizScreen({ cards, onNavigate }) {
+  const [testCards] = useState(() => [...cards].sort(() => 0.5 - Math.random()).slice(0, 25));
+  const [answers, setAnswers] = useState({}); // { cardId: [selected options] }
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [isFinished, setIsFinished] = useState(false);
+
+  const q = testCards[currentIdx];
+  const selectedOptions = answers[q?.id] || [];
+
+  const handleOptionClick = (opt) => {
+    if (isFinished) return;
+    if (q.type === 'multiple') {
+      const current = selectedOptions;
+      const updated = current.includes(opt) ? current.filter(o => o !== opt) : [...current, opt];
+      setAnswers({...answers, [q.id]: updated});
+    } else {
+      setAnswers({...answers, [q.id]: [opt]});
+    }
+  };
+
+  const handleNext = () => {
+     if(selectedOptions.length === 0 && !window.confirm('לא בחרת תשובה, להמשיך הלאה? תשובה ריקה תיחשב כשגיאה.')) return;
+     if (currentIdx < testCards.length - 1) setCurrentIdx(prev => prev + 1);
+     else setIsFinished(true);
+  };
+
+  const calculateScore = () => {
+     let correctCount = 0;
+     testCards.forEach(card => {
+        const userAns = answers[card.id] || [];
+        const isCorrect = userAns.length === card.correctAnswers.length && userAns.every(ans => card.correctAnswers.includes(ans));
+        if(isCorrect) correctCount++;
+     });
+     return { correct: correctCount, total: testCards.length, percent: Math.round((correctCount/testCards.length)*100) };
+  };
+
+  if (isFinished) {
+     const score = calculateScore();
+     let message = "כל הכבוד!";
+     let color = "text-green-600";
+     if (score.percent < 70) { message = "יש צורך בחזרה נוספת."; color = "text-orange-500"; }
+     if (score.percent < 50) { message = "מומלץ לעבור על הכרטיסיות מחדש."; color = "text-red-500"; }
+
+     return (
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center bg-slate-50">
+           <div className="bg-white max-w-lg w-full rounded-[2rem] shadow-2xl p-10 text-center border border-slate-200 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-white"></div>
+              
+              <div className="relative z-10">
+                 <Target size={64} className={`mx-auto mb-6 ${color}`} />
+                 <h2 className="text-4xl font-black text-slate-800 mb-2">סיום המבחן!</h2>
+                 <p className="text-slate-500 font-medium mb-8 text-lg">{message}</p>
+                 
+                 <div className="bg-slate-50 border border-slate-200 rounded-[2rem] p-8 mb-8">
+                    <div className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">הציון שלך</div>
+                    <div className={`text-6xl font-black ${color} mb-2`}>{score.percent}</div>
+                    <div className="text-slate-600 font-bold">{score.correct} תשובות נכונות מתוך {score.total}</div>
+                 </div>
+
+                 <div className="flex flex-col gap-3">
+                    <button onClick={() => onNavigate('home')} className="w-full bg-slate-900 text-white font-black text-lg py-4 rounded-xl hover:bg-slate-800 transition shadow-lg">חזרה לתפריט הראשי</button>
+                    <button onClick={() => { setAnswers({}); setCurrentIdx(0); setIsFinished(false); }} className="w-full bg-white text-slate-700 font-bold text-lg py-4 rounded-xl border border-slate-300 hover:bg-slate-50 transition">מבחן חדש</button>
+                 </div>
+              </div>
+           </div>
+        </div>
+     );
+  }
+
+  return (
+    <div className="flex-1 w-full max-w-2xl mx-auto p-4 flex flex-col py-6 overflow-hidden">
+        
+        {/* Progress header */}
+        <div className="mb-6 flex items-center justify-between">
+           <div className="font-bold text-slate-500">שאלה {currentIdx + 1} מתוך {testCards.length}</div>
+           <div className="w-1/2 bg-slate-200 h-2.5 rounded-full overflow-hidden">
+              <div className="bg-indigo-600 h-full transition-all" style={{width: `${((currentIdx+1)/testCards.length)*100}%`}}></div>
+           </div>
+        </div>
+
+        <div className="bg-white flex-1 rounded-[2rem] shadow-xl border border-slate-200 flex flex-col overflow-hidden relative">
+           
+           <div className="p-6 sm:p-8 border-b border-slate-100 flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-br from-white to-slate-50">
+              {q.type === 'multiple' && (
+                 <span className="inline-flex bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full items-center gap-1.5 mb-4">
+                   <CheckSquare size={14} /> שאלת בחירה מרובה
+                 </span>
+              )}
+              <h2 className="text-2xl sm:text-3xl font-black leading-tight text-slate-800 mb-8">{q.question}</h2>
+
+              <div className="space-y-3">
+                 {q.options.map((opt, idx) => {
+                    const isSelected = selectedOptions.includes(opt);
+                    let style = isSelected ? "bg-indigo-50 border-indigo-500 text-indigo-900 shadow-sm" : "bg-white border-slate-200 text-slate-700 hover:border-indigo-300";
+                    let icon = <div className={`w-5 h-5 rounded shrink-0 border-2 ${q.type==='single'?'rounded-full':''} ${isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'}`}></div>;
                     
-                    navigator.geolocation.watchPosition(
-                        (position) => {
-                            isTracking = true;
-                            userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
-                            
-                            btn.classList.remove('bg-slate-900');
-                            btn.classList.add('bg-blue-600', 'shadow-blue-200', 'border-blue-500');
-                            btnText.innerText = "נווט אליי";
-                            statusMsg.classList.add('hidden');
-                            document.getElementById('liveIndicator').classList.remove('hidden');
-
-                            updateLiveLogic();
-                        },
-                        (err) => {
-                            alert("ודא שה-GPS דלוק ונסה שוב.");
-                            btnText.innerText = "הפעל GPS";
-                            statusMsg.classList.add('hidden');
-                        },
-                        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+                    return (
+                       <div key={idx} onClick={() => handleOptionClick(opt)} className={`p-4 rounded-2xl border-2 flex items-center gap-4 transition-all cursor-pointer ${style}`}>
+                          {icon}
+                          <span className="font-bold text-lg leading-tight">{opt}</span>
+                       </div>
                     );
-                }
-            } else {
-                scrollToActive();
-            }
-        }
+                 })}
+              </div>
+           </div>
 
-        function updateLiveLogic() {
-            if (!userLocation) return;
-            const { lat, lng } = userLocation;
-            const now = new Date();
-            let activeSegmentIndex = -1;
-            let segmentProgress = 0;
+           <div className="p-4 sm:p-6 bg-white shrink-0 border-t border-slate-100 flex justify-between items-center">
+              <button onClick={() => {if(currentIdx>0) setCurrentIdx(currentIdx-1)}} className={`font-bold px-6 py-3 rounded-xl transition ${currentIdx === 0 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-100'}`}>
+                 חזור לשאלה קודמת
+              </button>
+              <button onClick={handleNext} className="bg-indigo-600 text-white font-black px-8 py-3.5 rounded-xl hover:bg-indigo-700 shadow-lg flex items-center gap-2">
+                 {currentIdx === testCards.length - 1 ? 'סיים מבחן' : 'השאלה הבאה'} <ChevronLeft size={20} />
+              </button>
+           </div>
+        </div>
+    </div>
+  );
+}
 
-            ITINERARY.forEach((stop, idx) => {
-                if (stop.type === 'divider') return;
-
-                const dist = getDistance(lat, lng, stop.coords.lat, stop.coords.lng);
-                // Adjust logic speed for calculations
-                const speed = 75; 
-                const minutes = Math.round((dist * 1.3 / speed) * 60); 
-                
-                const timeEl = document.getElementById(`time-${idx}`);
-                const etaEl = document.getElementById(`eta-${idx}`);
-                const etaTextEl = document.getElementById(`eta-text-${idx}`);
-                const dot = document.getElementById(`dot-${idx}`);
-                const card = document.getElementById(`card-${idx}`);
-
-                if (lat > stop.coords.lat + 0.02) { 
-                    // Passed this point (Driving North -> Lat increases, so checking if User Lat > Stop Lat)
-                    timeEl.innerText = stop.originalTime;
-                    etaEl.classList.add('hidden');
-                    dot.classList.add('active');
-                    card.classList.remove('ring-2', 'ring-blue-400');
-                } else { 
-                    // Not passed yet
-                    dot.classList.remove('active');
-                    if (minutes > 0 && minutes < 600) {
-                        const arrival = new Date(now.getTime() + minutes * 60000);
-                        timeEl.innerText = `${String(arrival.getHours()).padStart(2,'0')}:${String(arrival.getMinutes()).padStart(2,'0')}`;
-                        etaEl.classList.remove('hidden');
-                        etaTextEl.innerText = `עוד ${Math.floor(minutes/60)}:${String(minutes%60).padStart(2,'0')}`;
-                    }
-                }
-            });
-
-            // Find current segment for car animation
-            const stops = ITINERARY.filter(s => s.type !== 'divider');
-            for (let i = 0; i < stops.length - 1; i++) {
-                const current = stops[i];
-                const next = stops[i+1];
-                
-                // Logic for Northbound (Lat increases)
-                if (lat >= current.coords.lat && lat <= next.coords.lat) {
-                    activeSegmentIndex = ITINERARY.findIndex(s => s.id === current.id);
-                    
-                    const totalDist = Math.abs(next.coords.lat - current.coords.lat);
-                    const covered = Math.abs(lat - current.coords.lat);
-                    segmentProgress = totalDist > 0 ? covered / totalDist : 0;
-                    break;
-                }
-                // Logic for Southbound (Lat decreases - kept for compatibility)
-                else if (lat <= current.coords.lat && lat >= next.coords.lat) {
-                    activeSegmentIndex = ITINERARY.findIndex(s => s.id === current.id);
-                    const totalDist = Math.abs(current.coords.lat - next.coords.lat);
-                    const covered = Math.abs(current.coords.lat - lat);
-                    segmentProgress = totalDist > 0 ? covered / totalDist : 0;
-                    break;
-                }
-            }
-
-            document.querySelectorAll('.car-marker').forEach(el => el.style.opacity = '0');
-            
-            if (activeSegmentIndex !== -1) {
-                const activeCar = document.getElementById(`car-${activeSegmentIndex}`);
-                const activeCard = document.getElementById(`card-${activeSegmentIndex}`);
-                
-                if (activeCar) {
-                    activeCar.style.opacity = '1';
-                    const pixelOffset = segmentProgress * 120; // Approx px height between stops
-                    activeCar.style.top = `${Math.min(pixelOffset, 100)}%`; 
-                }
-                
-                if (activeCard) {
-                     activeCard.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
-                }
-                window.currentActiveIndex = activeSegmentIndex;
-            }
-        }
-
-        function scrollToActive() {
-            if (window.currentActiveIndex !== undefined) {
-                document.getElementById(`stop-item-${window.currentActiveIndex}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-
-        function openModal(idx) {
-            const stop = ITINERARY[idx];
-            const content = document.getElementById('modalContent');
-            const modal = document.getElementById('mainModal');
-            
-            let mediaHtml = stop.isEmoji 
-                ? `<div class="w-full h-full bg-gradient-to-br ${stop.bgGradient} flex items-center justify-center text-8xl">${stop.emoji}</div>`
-                : `<img src="${stop.image}" class="w-full h-full object-cover">`;
-
-            const navButtons = `
-                <div class="grid grid-cols-2 gap-3 mb-3">
-                    <div class="col-span-2 text-[10px] text-slate-400 uppercase tracking-widest font-bold text-center">ניווט ליעד</div>
-                    <button onclick="nav('${stop.coords.lat},${stop.coords.lng}', 'waze')" class="bg-blue-600 text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg shadow-blue-200 btn-active flex justify-center items-center gap-2 transition hover:bg-blue-700">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/67/Waze_2020.svg" class="w-4 h-4 brightness-0 invert"> Waze יעד
-                    </button>
-                    <button onclick="nav('${stop.coords.lat},${stop.coords.lng}', 'google')" class="bg-white text-slate-700 border border-slate-200 py-3.5 rounded-2xl text-sm font-bold shadow-sm btn-active flex justify-center items-center gap-2 transition hover:bg-slate-50">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg" class="w-4 h-4"> Google
-                    </button>
-                </div>
-
-                ${stop.parking ? `
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="col-span-2 text-[10px] text-slate-400 uppercase tracking-widest font-bold text-center mt-2">ניווט לחניה</div>
-                    <button onclick="nav('${stop.parking.coords.lat},${stop.parking.coords.lng}', 'waze')" class="bg-slate-800 text-white py-3 rounded-2xl text-sm font-bold shadow-md btn-active flex justify-center items-center gap-2 transition hover:bg-slate-900">
-                        <span class="bg-white/20 px-1.5 rounded text-[10px]">P</span> Waze
-                    </button>
-                    <button onclick="nav('${stop.parking.coords.lat},${stop.parking.coords.lng}', 'google')" class="bg-slate-100 text-slate-700 border border-slate-200 py-3 rounded-2xl text-sm font-bold shadow-sm btn-active flex justify-center items-center gap-2 transition hover:bg-slate-200">
-                        <span class="bg-slate-300 px-1.5 rounded text-[10px] text-slate-700">P</span> Google
-                    </button>
-                </div>` : ''}
-            `;
-
-            content.innerHTML = `
-                <div class="relative h-64 shrink-0">
-                    ${mediaHtml}
-                    <button onclick="closeModal()" class="absolute top-4 left-4 bg-black/20 backdrop-blur-md text-white p-2.5 rounded-full border border-white/20 btn-active hover:bg-black/30 transition z-50"><i data-lucide="x" class="w-5 h-5"></i></button>
-                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-transparent p-6 pt-24">
-                        <h2 class="text-white text-3xl font-black leading-tight tracking-tight">${stop.title}</h2>
-                        <div class="flex items-center gap-3 mt-2.5">
-                            <span class="bg-white/20 text-white px-2.5 py-0.5 rounded-lg text-xs backdrop-blur font-bold font-mono border border-white/10">${stop.displayTime}</span>
-                            <span class="text-white/90 text-sm font-medium border-r border-white/30 pr-3 mr-1">${stop.subTitle}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="p-6 grow flex flex-col bg-white">
-                    <div class="text-sm text-slate-600 leading-relaxed mb-6">
-                        ${stop.longDesc}
-                    </div>
-                    
-                    ${stop.parking ? `
-                    <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl shadow-sm flex gap-4 mb-6">
-                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center font-bold text-xl shrink-0"><i data-lucide="square-parking" class="w-6 h-6"></i></div>
-                        <div>
-                            <div class="font-bold text-sm text-slate-800">${stop.parking.name}</div>
-                            <div class="text-xs text-slate-500 mt-0.5">${stop.parking.address}</div>
-                            <div class="text-[10px] font-bold text-emerald-600 bg-emerald-50 inline-block px-2 py-0.5 rounded-md mt-1.5 border border-emerald-100">${stop.parking.cost}</div>
-                        </div>
-                    </div>` : ''}
-
-                    ${stop.walkingRoute ? `
-                    <button onclick="window.open('${stop.walkingRoute}', '_blank')" class="w-full mb-6 bg-teal-50 text-teal-700 border border-teal-200 py-3.5 rounded-2xl text-sm font-bold flex justify-center items-center gap-2 btn-active shadow-sm transition hover:bg-teal-100">
-                        <i data-lucide="footprints" class="w-4 h-4"></i> מסלול הליכה מומלץ (Google)
-                    </button>` : ''}
-
-                    <div class="mt-auto pt-4 border-t border-slate-100">
-                        ${navButtons}
-                    </div>
-                </div>
-            `;
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            lucide.createIcons();
-        }
-
-        function openGasModal(id) {
-            const list = document.getElementById('gasModalContent');
-            const data = GAS_STATIONS[id];
-            list.innerHTML = '';
-            
-            if (data) {
-                data.forEach(st => {
-                    list.innerHTML += `
-                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-3">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <div class="font-black text-slate-800 text-lg">${st.name}</div>
-                                    <div class="text-xs text-slate-400 mt-0.5">${st.address}</div>
-                                </div>
-                                <div class="font-black px-2.5 py-1 rounded-lg ${st.price.includes('$7') || st.price.includes('---') ?'bg-red-50 text-red-600':'bg-emerald-50 text-emerald-600'}">${st.price}</div>
-                            </div>
-                            ${st.note ? `<div class="text-[11px] bg-orange-50 text-orange-700 px-2 py-1 rounded-md border border-orange-100 font-bold self-start flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i> ${st.note}</div>` : ''}
-                            ${st.price !== '---' ? `
-                            <button onclick="nav('${st.address}', 'waze')" class="w-full bg-slate-800 text-white py-2.5 rounded-xl text-xs font-bold flex justify-center items-center gap-2 btn-active shadow-md shadow-slate-200 mt-1 hover:bg-slate-900 transition">
-                                <i data-lucide="navigation" class="w-3 h-3"></i> נווט לתחנה
-                            </button>` : ''}
-                        </div>`;
-                });
-            } else {
-                list.innerHTML = `<div class="text-center text-slate-400 py-10">אין מידע למקטע זה</div>`;
-            }
-            document.getElementById('gasModal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            lucide.createIcons();
-        }
-
-        function closeModal() { document.getElementById('mainModal').classList.add('hidden'); document.body.style.overflow = ''; }
-        function closeGasModal() { document.getElementById('gasModal').classList.add('hidden'); document.body.style.overflow = ''; }
-
-        function nav(dest, app) {
-            let url = app === 'waze' 
-                ? `https://www.waze.com/ul?q=${encodeURIComponent(dest)}&navigate=yes`
-                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dest)}`;
-            window.open(url, '_blank');
-        }
-
-        // Init
-        setTimeout(initItinerary, 100);
-
-    </script>
-</body>
-</html>
 
