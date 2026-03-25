@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>קורס חובשים - ציר שגרה</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen overflow-x-hidden bg-slate-100 text-slate-800 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-10 right-4 text-7xl opacity-15">🚑</div>
+        <div class="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-emerald-300/20 blur-3xl"></div>
+        <div class="absolute top-10 left-1/3 h-44 w-44 rounded-full bg-blue-300/15 blur-3xl"></div>
+    </div>
+
+    <div id="page-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm">
+        <div class="text-center">
+            <div class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600 dark:border-slate-700 dark:border-t-blue-400"></div>
+            <p class="font-bold text-slate-500 dark:text-slate-400">טוען...</p>
+        </div>
+    </div>
+
+    <main class="relative z-10 mx-auto flex min-h-screen w-full max-w-4xl flex-col px-4 py-6 sm:px-6 sm:py-8">
+        <header class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-lg backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/85">
+            <div>
+                <p class="text-sm font-bold text-emerald-600 dark:text-emerald-300">ציר שגרה</p>
+                <h1 class="text-2xl font-black sm:text-3xl">העמוד הזה בבנייה</h1>
+                <p id="user-line" class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">התוכן של הציר יעלה כאן בהמשך.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleDarkMode()" class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+                    <i data-lucide="moon" id="dark-icon" class="h-4 w-4"></i>
+                    תצוגה
+                </button>
+                <button onclick="window.location.href='axes.html'" class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-600 transition hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:hover:bg-blue-900/30">
+                    <i data-lucide="layout-grid" class="h-4 w-4"></i>
+                    לכל הצירים
+                </button>
+                <button onclick="handleLogout()" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-red-600 transition hover:bg-red-100 dark:bg-red-900/20 dark:text-red-300 dark:hover:bg-red-900/30">
+                    <i data-lucide="log-out" class="h-4 w-4"></i>
+                    התנתקות
+                </button>
+            </div>
+        </header>
+
+        <section class="flex flex-1 items-center justify-center">
+            <div class="w-full rounded-[2.25rem] border border-white/70 bg-white/90 p-6 text-center shadow-2xl backdrop-blur sm:p-10 dark:border-slate-700/70 dark:bg-slate-900/85">
+                <div class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    <i data-lucide="stethoscope" class="h-12 w-12"></i>
+                </div>
+                <h2 class="mb-3 text-3xl font-black">ציר שגרה</h2>
+                <p class="mx-auto mb-8 max-w-xl text-base font-medium leading-7 text-slate-500 dark:text-slate-400">פתחנו לציר הזה קובץ נפרד, אבל כרגע הוא עדיין בבנייה. ברגע שיוסף תוכן חדש הוא יופיע כאן ישירות.</p>
+                <div class="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                    <button onclick="window.location.href='axes.html'" class="rounded-2xl bg-slate-900 px-6 py-4 text-lg font-black text-white transition hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-700">חזרה לבחירת ציר</button>
+                    <button onclick="window.location.href='resuscitation.html'" class="rounded-2xl border border-slate-300 bg-white px-6 py-4 text-lg font-bold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">מעבר לציר החייאה</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { ensureInitialAuth, onUserChanged, signOutUser, setLastAxis } from './firebase-common.js';
+
+        function applyDarkMode() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('dark-icon').setAttribute('data-lucide', 'sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('dark-icon').setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+        }
+
+        window.toggleDarkMode = () => {
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            applyDarkMode();
+        };
+
+        window.handleLogout = async () => {
+            if (confirm('האם להתנתק?')) {
+                await signOutUser();
+                window.location.replace('login.html');
+            }
+        };
+
+        function hideLoader() {
+            const loader = document.getElementById('page-loader');
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 250);
+        }
+
+        applyDarkMode();
+        await ensureInitialAuth();
+
+        onUserChanged(async (user) => {
+            if (!user) {
+                window.location.replace('login.html');
+                return;
+            }
+            await setLastAxis(user.uid, 'routine');
+            document.getElementById('user-line').textContent = `שלום, ${user.displayName || 'משתמש'}. בינתיים אפשר לחזור לבחירת הצירים או להמשיך לציר ההחייאה.`;
+            hideLoader();
+        });
+    </script>
+</body>
+</html>

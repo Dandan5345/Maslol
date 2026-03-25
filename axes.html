@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>קורס חובשים - בחירת ציר</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen overflow-x-hidden bg-slate-100 text-slate-800 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-10 left-1/2 h-52 w-52 -translate-x-1/2 rounded-full bg-cyan-300/20 blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-blue-400/20 blur-3xl"></div>
+        <div class="absolute top-16 right-5 text-7xl opacity-15">🚑</div>
+    </div>
+
+    <div id="page-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm">
+        <div class="text-center">
+            <div class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600 dark:border-slate-700 dark:border-t-blue-400"></div>
+            <p class="font-bold text-slate-500 dark:text-slate-400">טוען את הצירים שלך...</p>
+        </div>
+    </div>
+
+    <main class="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-6 sm:py-8">
+        <header class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[2rem] border border-white/70 bg-white/85 p-4 shadow-lg backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/85">
+            <div>
+                <p class="text-sm font-bold text-blue-600 dark:text-blue-300">בחירת ציר</p>
+                <h1 class="text-2xl font-black sm:text-3xl">בחרו מאיפה להמשיך ללמוד</h1>
+                <p id="axes-subtitle" class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">הציר האחרון שלכם יודגש אוטומטית.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleDarkMode()" class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+                    <i data-lucide="moon" id="dark-icon" class="h-4 w-4"></i>
+                    תצוגה
+                </button>
+                <button onclick="handleLogout()" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-red-600 transition hover:bg-red-100 dark:bg-red-900/20 dark:text-red-300 dark:hover:bg-red-900/30">
+                    <i data-lucide="log-out" class="h-4 w-4"></i>
+                    התנתקות
+                </button>
+            </div>
+        </header>
+
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <button data-axis-card="resuscitation" onclick="openAxis('resuscitation')" class="group flex min-h-[210px] flex-col rounded-[2rem] border border-blue-200 bg-gradient-to-br from-blue-600 to-cyan-500 p-5 text-right text-white shadow-xl shadow-blue-500/20 transition hover:-translate-y-1">
+                <div class="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15"><i data-lucide="heart-pulse" class="h-7 w-7"></i></div>
+                <div class="mb-2 text-2xl font-black">ציר החייאה</div>
+                <p class="text-sm font-medium leading-6 text-blue-50/95">הציר הפעיל כרגע - עם כרטיסיות, תרגול ומבחן מסכם.</p>
+                <div class="mt-auto flex items-center justify-between pt-6 text-sm font-bold">
+                    <span class="rounded-full bg-white/15 px-3 py-1">זמין עכשיו</span>
+                    <span class="inline-flex items-center gap-1">כניסה <i data-lucide="chevron-left" class="h-4 w-4"></i></span>
+                </div>
+            </button>
+
+            <button data-axis-card="trauma" onclick="openAxis('trauma')" class="group flex min-h-[210px] flex-col rounded-[2rem] border border-white/70 bg-white/90 p-5 text-right shadow-lg transition hover:-translate-y-1 dark:border-slate-700/70 dark:bg-slate-900/85">
+                <div class="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-300"><i data-lucide="shield-plus" class="h-7 w-7"></i></div>
+                <div class="mb-2 text-2xl font-black">ציר טראומה</div>
+                <p class="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">קובץ ייעודי נפתח וכרגע מסומן בבנייה.</p>
+                <div class="mt-auto pt-6 text-sm font-bold text-red-500 dark:text-red-300">בבנייה</div>
+            </button>
+
+            <button data-axis-card="routine" onclick="openAxis('routine')" class="group flex min-h-[210px] flex-col rounded-[2rem] border border-white/70 bg-white/90 p-5 text-right shadow-lg transition hover:-translate-y-1 dark:border-slate-700/70 dark:bg-slate-900/85">
+                <div class="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300"><i data-lucide="stethoscope" class="h-7 w-7"></i></div>
+                <div class="mb-2 text-2xl font-black">ציר שגרה</div>
+                <p class="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">מוכן כעמוד נפרד להמשך פיתוח עתידי.</p>
+                <div class="mt-auto pt-6 text-sm font-bold text-emerald-500 dark:text-emerald-300">בבנייה</div>
+            </button>
+
+            <button data-axis-card="anamnesis" onclick="openAxis('anamnesis')" class="group flex min-h-[210px] flex-col rounded-[2rem] border border-white/70 bg-white/90 p-5 text-right shadow-lg transition hover:-translate-y-1 dark:border-slate-700/70 dark:bg-slate-900/85">
+                <div class="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300"><i data-lucide="clipboard-list" class="h-7 w-7"></i></div>
+                <div class="mb-2 text-2xl font-black">ציר אנמנזה</div>
+                <p class="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">עמוד מוכן להצגת התוכן העתידי.</p>
+                <div class="mt-auto pt-6 text-sm font-bold text-amber-500 dark:text-amber-300">בבנייה</div>
+            </button>
+
+            <button data-axis-card="mental-health" onclick="openAxis('mental-health')" class="group flex min-h-[210px] flex-col rounded-[2rem] border border-white/70 bg-white/90 p-5 text-right shadow-lg transition hover:-translate-y-1 dark:border-slate-700/70 dark:bg-slate-900/85 sm:col-span-2 xl:col-span-1">
+                <div class="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-900/30 dark:text-fuchsia-300"><i data-lucide="brain" class="h-7 w-7"></i></div>
+                <div class="mb-2 text-2xl font-black">ציר בריאות הנפש</div>
+                <p class="text-sm font-medium leading-6 text-slate-500 dark:text-slate-400">נבנה כעמוד נפרד, מוכן להרחבה בהמשך.</p>
+                <div class="mt-auto pt-6 text-sm font-bold text-fuchsia-500 dark:text-fuchsia-300">בבנייה</div>
+            </button>
+        </section>
+    </main>
+
+    <script type="module">
+        import { ensureInitialAuth, onUserChanged, signOutUser, loadUserPreferences, setLastAxis, getAxisHref } from './firebase-common.js';
+
+        const loader = document.getElementById('page-loader');
+        let currentUser = null;
+
+        function applyDarkMode() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('dark-icon').setAttribute('data-lucide', 'sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('dark-icon').setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+        }
+
+        window.toggleDarkMode = () => {
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            applyDarkMode();
+        };
+
+        window.handleLogout = async () => {
+            if (confirm('האם להתנתק?')) {
+                await signOutUser();
+                window.location.replace('login.html');
+            }
+        };
+
+        function hideLoader() {
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 250);
+        }
+
+        function highlightAxis(axisId) {
+            document.querySelectorAll('[data-axis-card]').forEach(card => {
+                card.classList.remove('ring-4', 'ring-offset-4', 'ring-blue-300', 'dark:ring-blue-500', 'dark:ring-offset-slate-950');
+            });
+            const activeCard = document.querySelector(`[data-axis-card="${axisId}"]`);
+            if (activeCard) {
+                activeCard.classList.add('ring-4', 'ring-offset-4', 'ring-blue-300', 'dark:ring-blue-500', 'dark:ring-offset-slate-950');
+            }
+        }
+
+        window.openAxis = async (axisId) => {
+            if (!currentUser) {
+                window.location.replace('login.html');
+                return;
+            }
+            await setLastAxis(currentUser.uid, axisId);
+            window.location.href = getAxisHref(axisId);
+        };
+
+        applyDarkMode();
+        await ensureInitialAuth();
+
+        onUserChanged(async (user) => {
+            if (!user) {
+                window.location.replace('login.html');
+                return;
+            }
+
+            currentUser = user;
+            const preferences = await loadUserPreferences(user.uid);
+            if (preferences.lastAxis) {
+                document.getElementById('axes-subtitle').textContent = `הציר האחרון שלך: ${document.querySelector(`[data-axis-card="${preferences.lastAxis}"]`)?.querySelector('div.mb-2')?.textContent || 'לא נבחר עדיין'}`;
+                highlightAxis(preferences.lastAxis);
+            }
+            hideLoader();
+        });
+    </script>
+</body>
+</html>
