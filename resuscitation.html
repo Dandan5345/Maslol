@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>קורס חובשים - ציר החייאה</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'] },
+                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Custom Styles & Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #475569; }
+        
+        .preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        
+        /* Hide screens by default */
+        .screen { display: none; opacity: 0; transition: opacity 0.3s ease; }
+        .screen.active { display: flex; opacity: 1; }
+
+        /* Loader */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
+        .dark .loader { border: 4px solid #334155; border-top: 4px solid #60a5fa; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        body {
+            background:
+                radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 26%),
+                radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.16), transparent 24%),
+                linear-gradient(135deg, #f8fbff 0%, #eff6ff 46%, #f8fafc 100%);
+        }
+        .dark body {
+            background:
+                radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 26%),
+                radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.12), transparent 24%),
+                linear-gradient(135deg, #020617 0%, #0f172a 46%, #111827 100%);
+        }
+    </style>
+</head>
+<body class="text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-300 overflow-x-hidden">
+
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-8 right-2 text-7xl opacity-15">🚑</div>
+        <div class="absolute top-1/4 left-[-2rem] h-44 w-44 rounded-full bg-blue-300/20 blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 h-52 w-52 rounded-full bg-cyan-300/20 blur-3xl"></div>
+    </div>
+
+    <!-- Global Fullscreen Loader -->
+    <div id="global-loader" class="fixed inset-0 bg-white dark:bg-slate-900 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="loader mb-4"></div>
+        <p class="text-slate-500 dark:text-slate-400 font-bold animate-pulse">טוען נתונים...</p>
+    </div>
+
+    <!-- Header -->
+    <header id="app-header" class="hidden bg-white/85 dark:bg-slate-800/90 shadow-sm border-b border-slate-200 dark:border-slate-700 z-40 relative backdrop-blur">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('home')">
+                <div class="bg-blue-600 dark:bg-blue-500 p-2 rounded-xl text-white shadow-md">
+                    <i data-lucide="activity" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-black text-slate-800 dark:text-white tracking-tight leading-tight">
+                        קורס חובשים <span class="bg-clip-text text-transparent bg-gradient-to-l from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">ציר החייאה</span>
+                    </h1>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 sm:gap-4 mr-auto sm:mr-0">
+                <div id="user-greeting" class="hidden sm:block text-sm font-bold text-slate-600 dark:text-slate-300"></div>
+
+                <button onclick="window.location.href='axes.html'" class="hidden sm:flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i> <span>בחירת ציר</span>
+                </button>
+                
+                <button onclick="toggleDarkMode()" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-400 rounded-full transition-colors" title="מצב כהה/בהיר">
+                    <i data-lucide="moon" id="dark-icon" class="w-5 h-5"></i>
+                </button>
+                
+                <button id="btn-back-menu" onclick="navigate('home')" class="hidden sm:flex items-center gap-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors">
+                    <i data-lucide="home" class="w-4 h-4"></i> <span class="hidden sm:inline">תפריט ראשי</span>
+                </button>
+
+                <button onclick="handleLogout()" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 rounded-full transition-colors" title="התנתק">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col relative">
+
+        <!-- SCREEN: HOME -->
+        <div id="screen-home" class="screen flex-col max-w-4xl mx-auto w-full p-4 py-6 sm:p-6 sm:py-10 flex-1 overflow-y-auto custom-scrollbar">
+            <div class="text-center mb-10 sm:mb-12">
+                <h2 id="home-greeting" class="text-3xl sm:text-5xl font-black text-slate-800 dark:text-white mb-4 tracking-tight"></h2>
+                <p class="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-xl mx-auto">בחר את שיטת הלמידה שמתאימה לך כעת. המערכת שומרת את ההתקדמות שלך בענן ומערבבת את אפשרויות התשובה בכל פעם מחדש.</p>
+            </div>
+
+            <div class="mb-6 flex justify-center">
+                <button onclick="window.location.href='axes.html'" class="inline-flex items-center gap-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 px-5 py-3 text-sm font-bold text-blue-700 dark:text-blue-300 shadow-sm border border-blue-100 dark:border-slate-700">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                    מעבר לבחירת ציר
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Flashcards Card -->
+                <button onclick="navigate('flashcards')" class="group text-right bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start relative overflow-hidden">
+                    <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="book-open" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-2">כרטיסיות למידה</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">למידה והיכרות מעמיקה עם המושגים. כולל אפשרות לסינון ולמידה חכמה.</p>
+                    
+                    <div class="mt-auto w-full">
+                        <div class="flex justify-between text-xs font-bold text-slate-400 dark:text-slate-500 mb-2">
+                            <span>התקדמות כללית</span> <span id="home-progress-text">0%</span>
+                        </div>
+                        <div class="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden w-full">
+                            <div id="home-progress-bar" class="h-full bg-blue-500 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- Practice Card -->
+                <button onclick="navigate('practice')" class="group text-right bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-orange-400 dark:hover:border-orange-500 p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start">
+                    <div class="w-16 h-16 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="list" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-2">שאלות אמריקאיות</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">מצב תרגול אינסופי עם תשובות מבלבלות והסברים רפואיים מפורטים לכל שאלה.</p>
+                    <span class="mt-auto inline-flex items-center gap-1.5 text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-900/30 px-4 py-2 rounded-xl transition-colors">
+                        התחל לתרגל <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </span>
+                </button>
+
+                <!-- Test Card -->
+                <button onclick="navigate('test')" class="group text-right bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-800 hover:border-indigo-400 p-8 rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-start text-white">
+                    <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="target" class="w-8 h-8 text-indigo-300"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-2">מבחן מסכם</h3>
+                    <p class="text-slate-400 font-medium mb-8">בוחן פתע! 25 שאלות רנדומליות על זמן וציון סופי בסיום. בחן את השליטה שלך.</p>
+                    <span class="mt-auto inline-flex items-center gap-1.5 text-slate-900 font-black bg-indigo-400 px-4 py-2 rounded-xl group-hover:bg-white transition-colors">
+                        התחל מבחן <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN: FLASHCARDS -->
+        <div id="screen-flashcards" class="screen flex-col w-full items-center p-4 transition-colors duration-300 flex-1 overflow-hidden">
+            
+            <div class="w-full max-w-lg flex justify-between items-center mb-6 z-10">
+                <button onclick="toggleSettings()" class="bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 font-bold text-sm flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                    <i data-lucide="settings" class="w-4 h-4"></i> הגדרות
+                </button>
+                <div id="fc-counter" class="bg-white dark:bg-slate-800 font-bold text-slate-500 dark:text-slate-400 text-sm px-4 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                    כרטיס 1 / 49
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="fc-empty" class="hidden bg-white dark:bg-slate-800 rounded-[2rem] p-10 text-center shadow-xl border border-slate-100 dark:border-slate-700 max-w-lg w-full flex-col items-center mt-12 z-10">
+                <div class="w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6 text-green-600 dark:text-green-400">
+                    <i data-lucide="check" class="w-12 h-12"></i>
+                </div>
+                <h2 class="text-2xl font-black text-slate-800 dark:text-white mb-2">אין כרטיסיות להצגה!</h2>
+                <p class="text-slate-500 dark:text-slate-400 mb-8 font-medium">כל הכרטיסיות בסינון הנוכחי טופלו, או שסיננת הכל החוצה.</p>
+                <button onclick="resetFilters()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold w-full shadow-lg transition-colors">נקה סינונים והצג הכל</button>
+            </div>
+
+            <!-- Card Area -->
+            <div id="fc-container" class="max-w-lg w-full flex-1 flex flex-col items-center">
+                <div id="fc-card-wrapper" class="z-10 w-full h-[400px] sm:h-[450px] cursor-grab active:cursor-grabbing select-none flex-shrink-0 relative preserve-3d transition-transform duration-500 ease-out" onclick="flipCard()">
+                    
+                    <!-- Front -->
+                    <div id="fc-front" class="absolute inset-0 bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col p-8 text-center justify-center items-center backface-hidden">
+                        <span id="fc-status-badge" class="absolute top-6 text-xs font-bold px-3 py-1 rounded-full hidden"></span>
+                        <h2 id="fc-question" class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white mt-4 leading-tight">שאלה</h2>
+                        <div class="absolute bottom-6 text-slate-400 dark:text-slate-500 text-sm flex items-center gap-2 animate-pulse">
+                            <i data-lucide="rotate-cw" class="w-4 h-4"></i> לחץ כדי להפוך
+                        </div>
+                    </div>
+
+                    <!-- Back -->
+                    <div id="fc-back" class="absolute inset-0 bg-gradient-to-b from-blue-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-[2rem] shadow-xl border border-blue-200 dark:border-slate-700 flex flex-col p-6 overflow-hidden backface-hidden rotate-y-180">
+                        <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-center text-right">
+                            <h3 class="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-2">
+                                <i data-lucide="check" class="w-4 h-4"></i> תשובה:
+                            </h3>
+                            <p id="fc-answer" class="text-xl font-bold text-slate-800 dark:text-white leading-snug mb-4">תשובה</p>
+                            <hr class="border-blue-100 dark:border-slate-700 my-4" />
+                            <div class="bg-blue-100/60 dark:bg-slate-700/50 rounded-2xl p-4 border border-blue-200 dark:border-slate-600">
+                                <h3 class="text-xs font-black text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-1.5 uppercase">
+                                    <i data-lucide="info" class="w-3.5 h-3.5"></i> הסבר:
+                                </h3>
+                                <p id="fc-explanation" class="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">הסבר</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex w-full gap-4 mt-8 z-10 pb-8 select-none">
+                    <button onclick="markCard('learning')" class="flex-1 bg-white dark:bg-slate-800 border-2 border-orange-100 dark:border-orange-900/50 text-orange-600 dark:text-orange-500 font-bold py-4 rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 hover:bg-orange-50 dark:hover:bg-slate-700 transition-colors">
+                        <i data-lucide="x" class="w-6 h-6"></i> <span class="text-sm">צריך חזרה</span>
+                    </button>
+                    <button onclick="markCard('known')" class="flex-1 bg-green-500 dark:bg-green-600 border-2 border-transparent text-white font-bold py-4 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-1 hover:bg-green-600 dark:hover:bg-green-700 transition-colors">
+                        <i data-lucide="check" class="w-6 h-6"></i> <span class="text-sm">יודע היטב</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: PRACTICE -->
+        <div id="screen-practice" class="screen flex-col flex-1 w-full max-w-2xl mx-auto p-4 py-8 overflow-y-auto custom-scrollbar">
+            <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden w-full">
+                <div class="p-6 sm:p-8 bg-slate-800 dark:bg-slate-900 text-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="bg-white/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+                            <i data-lucide="list" class="w-3.5 h-3.5"></i> מצב תרגול
+                        </span>
+                        <span id="prac-type-badge" class="hidden bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full items-center gap-1.5 animate-pulse">
+                            <i data-lucide="check-square" class="w-3.5 h-3.5"></i> שאלת רב-ברירה
+                        </span>
+                    </div>
+                    <h2 id="prac-question" class="text-2xl sm:text-3xl font-black leading-tight">שאלה</h2>
+                </div>
+
+                <div id="prac-options" class="p-6 sm:p-8 space-y-3 flex-1 bg-slate-50 dark:bg-slate-800">
+                    <!-- Options injected here -->
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="prac-feedback" class="hidden p-6 sm:p-8 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <div id="prac-feedback-box" class="flex items-start gap-4 p-4 rounded-2xl mb-6 border">
+                        <i id="prac-feedback-icon" class="w-8 h-8 shrink-0 mt-1"></i>
+                        <div>
+                            <h3 id="prac-feedback-title" class="text-xl font-black mb-1"></h3>
+                            <p class="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed"><span class="font-bold">הסבר: </span><span id="prac-feedback-text"></span></p>
+                        </div>
+                    </div>
+                    <button onclick="nextPractice()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xl py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-colors">
+                        השאלה הבאה <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <!-- Submit Area -->
+                <div id="prac-submit-area" class="p-6 sm:p-8 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <button id="prac-submit-btn" onclick="checkPractice()" class="w-full font-black text-xl py-4 rounded-2xl shadow-lg transition-all bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed">
+                        בדוק תשובה
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN: TEST -->
+        <div id="screen-test" class="screen flex-col flex-1 w-full max-w-2xl mx-auto p-4 py-6 overflow-hidden">
+            
+            <div id="test-active-view" class="flex flex-col h-full w-full hidden">
+                <div class="mb-6 flex items-center justify-between">
+                    <div id="test-counter" class="font-bold text-slate-500 dark:text-slate-400">שאלה 1 מתוך 25</div>
+                    <div class="w-1/2 bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                        <div id="test-progress-bar" class="bg-indigo-600 dark:bg-indigo-500 h-full transition-all" style="width: 4%"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 flex-1 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden relative">
+                    <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-700 flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900">
+                        <span id="test-type-badge" class="hidden inline-flex bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 text-xs font-bold px-3 py-1 rounded-full items-center gap-1.5 mb-4">
+                            <i data-lucide="check-square" class="w-3.5 h-3.5"></i> שאלת בחירה מרובה
+                        </span>
+                        <h2 id="test-question" class="text-2xl sm:text-3xl font-black leading-tight text-slate-800 dark:text-white mb-8">שאלה</h2>
+                        <div id="test-options" class="space-y-3">
+                            <!-- Options -->
+                        </div>
+                    </div>
+                    <div class="p-4 sm:p-6 bg-white dark:bg-slate-800 shrink-0 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                        <button id="test-prev-btn" onclick="prevTest()" class="font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-300 dark:text-slate-600 cursor-not-allowed">
+                            חזור <span class="hidden sm:inline">לשאלה קודמת</span>
+                        </button>
+                        <button id="test-next-btn" onclick="nextTest()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-6 sm:px-8 py-3.5 rounded-xl shadow-lg flex items-center gap-2 transition-colors">
+                            <span id="test-next-text">השאלה הבאה</span> <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Results -->
+            <div id="test-results-view" class="flex-col h-full w-full items-center justify-center hidden">
+                <div class="bg-white dark:bg-slate-800 max-w-lg w-full rounded-[2rem] shadow-2xl p-10 text-center border border-slate-200 dark:border-slate-700 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-white dark:from-indigo-900/20 dark:to-slate-800"></div>
+                    <div class="relative z-10">
+                        <i data-lucide="target" id="test-res-icon" class="mx-auto mb-6 w-16 h-16 text-green-600"></i>
+                        <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-2">סיום המבחן!</h2>
+                        <p id="test-res-msg" class="text-slate-500 dark:text-slate-400 font-medium mb-8 text-lg">כל הכבוד!</p>
+                        
+                        <div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-[2rem] p-8 mb-8">
+                            <div class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">הציון שלך</div>
+                            <div id="test-res-score" class="text-6xl font-black text-green-600 mb-2">100</div>
+                            <div id="test-res-text" class="text-slate-600 dark:text-slate-400 font-bold">25 תשובות נכונות מתוך 25</div>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <button onclick="navigate('home')" class="w-full bg-slate-900 dark:bg-indigo-600 text-white font-black text-lg py-4 rounded-xl hover:bg-slate-800 dark:hover:bg-indigo-700 transition shadow-lg">חזרה לתפריט הראשי</button>
+                            <button onclick="startTest()" class="w-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-lg py-4 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition">מבחן חדש</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="modal-settings" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleSettings()"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-[2rem] shadow-2xl p-6 relative flex flex-col max-h-[90vh] z-10 border border-slate-100 dark:border-slate-700">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black dark:text-white">הגדרות וסינון</h3>
+                <button onclick="toggleSettings()" class="bg-slate-100 dark:bg-slate-700 p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto custom-scrollbar space-y-6 pr-2">
+                <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-slate-800 dark:text-slate-200">הסתר כרטיסיות ידועות</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">הצג רק מושגים שדורשים חזרה.</p>
+                    </div>
+                    <button id="toggle-hide-known" onclick="toggleHideKnown()" class="w-14 h-8 flex items-center rounded-full p-1 transition-colors bg-slate-300 dark:bg-slate-600">
+                        <div id="toggle-hide-known-dot" class="bg-white w-6 h-6 rounded-full shadow-md transform transition-transform -translate-x-6"></div>
+                    </button>
+                </div>
+
+                <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-900/30 flex flex-col">
+                    <h4 class="font-bold text-red-800 dark:text-red-400 mb-1">איפוס נתונים</h4>
+                    <p class="text-xs text-red-600/70 dark:text-red-400/70 mb-3">יאפס את כל ההתקדמות שלך בענן!</p>
+                    <button onclick="resetAllData()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-xl text-sm self-start px-4 flex items-center gap-2 transition-colors">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> איפוס מלא
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { ensureInitialAuth, onUserChanged, signOutUser, loadProgress, saveProgress, setLastAxis } from "./firebase-common.js";
+
+        let currentUser = null;
+        const currentAxis = 'resuscitation';
+
+        // Data State
+        window.appState = {
+            cards: [
+                { id: 1, question: 'כיצד יש לטפל בחסימת נתיב אוויר חלקית אצל מבוגר או ילד?', answer: 'עידוד לשיעול בלבד.', explanation: 'השיעול הוא המנגנון הטבעי והיעיל ביותר להוצאת גוף זר.', status: 'unseen', type: 'single', options: ['עידוד לשיעול בלבד', '5 טפיחות בין השכמות', 'תמרון היימליך מיידי', 'החדרת מנתב אוויר (A.W)'], correctAnswers: ['עידוד לשיעול בלבד'] },
+                { id: 2, question: 'מהו הטיפול בחסימה מלאה במבוגר וילד (תמרון היימליך)?', answer: 'עיסויים באמצעות שתי הידיים ברום הבטן והטיית הגוף לפנים.', explanation: 'הלחיצה ברום הבטן מעלה בפתאומיות את הלחץ בחזה, ויוצרת מעין "שיעול מלאכותי".', status: 'unseen', type: 'single', options: ['עיסויים שתי ידיים ברום הבטן והטיה לפנים', 'מכות חזקות בין השכמות בלבד', 'לחיצות במרכז בית החזה בקצב מהיר', 'פתיחת פה והוצאה ידנית עם אצבע'], correctAnswers: ['עיסויים שתי ידיים ברום הבטן והטיה לפנים'] },
+                { id: 3, question: 'כיצד נטפל בחסימה מלאה אצל נשים בהיריון או מטופלים שמנים?', answer: 'לחיצות חזה (לנשים בהריון - מעל העובר), או דחיקה מול הקיר.', explanation: 'המטרה היא לייצר לחץ בבית החזה מבלי לפגוע בעובר או כאשר לא ניתן להקיף את הבטן.', status: 'unseen', type: 'multiple', options: ['לחיצות חזה בסטרנום', 'דחיקה מול הקיר למרותקים/שמנים', 'לחיצות ברום הבטן (היימליך רגיל)', '5 טפיחות שכמות והנשמה'], correctAnswers: ['לחיצות חזה בסטרנום', 'דחיקה מול הקיר למרותקים/שמנים'] },
+                { id: 4, question: 'כיצד נטפל בחסימה חלקית אצל תינוק?', answer: 'נחזיק את התינוק במנח שנוח לו להוציא החוצה את הגוף הזר.', explanation: 'אנו נמנעים מהתערבות אגרסיבית שעלולה להחמיר את החסימה, ונותנים לרפלקסים לעבוד.', status: 'unseen', type: 'single', options: ['נחזיק במנח שנוח לתינוק להוציא את הגו"ז', 'נבצע מכות גב קלות', 'נכניס אצבע לפה לחפש את החפץ', 'ננשים עם אמבו בייבי'], correctAnswers: ['נחזיק במנח שנוח לתינוק להוציא את הגו"ז'] },
+                { id: 5, question: 'מהו סדר הפעולות לטיפול בחסימה מלאה אצל תינוק?', answer: '5 טפיחות בין שכמות -> 5 עיסויי חזה -> פתיחת פה והתרשמות מנ"א.', explanation: 'לתינוק אי אפשר לבצע היימליך, לכן משלבים מכות גב ולחיצות חזה עד יציאת הגוף או אובדן הכרה.', status: 'unseen', type: 'single', options: ['5 טפיחות בין שכמות, 5 עיסויי חזה, פתיחת פה', 'עיסויי בטן (היימליך תינוקות)', '15 עיסויי חזה ו-2 מכות גב', 'סקשן ולאחר מכן הנשמה'], correctAnswers: ['5 טפיחות בין שכמות, 5 עיסויי חזה, פתיחת פה'] },
+                { id: 6, question: 'מהם הדגשים בהידרדרות מחסימה מלאה להחייאה? (בחר 3 נכונים)', answer: 'לא בודקים דופק, לא מחדירים מנתב אוויר, לפני הנשמה מחפשים ומוציאים גו"ז.', explanation: 'הלב עצר מחנק ולכן אין טעם לבדוק דופק. המנתב ידחוף את הגוף הזר פנימה.', status: 'unseen', type: 'multiple', options: ['אין צורך לבדוק דופק לפני ההחייאה', 'חובה להחדיר מנתב אוויר (A.W) כדי לאבטח נתיב', 'יש לחפש גוף זר לפני כל ניסיון הנשמה', 'החייאה רציפה ללא בדיקת דופק עד הגעת נט"ן', 'בודקים דופק כל שתי דקות'], correctAnswers: ['אין צורך לבדוק דופק לפני ההחייאה', 'יש לחפש גוף זר לפני כל ניסיון הנשמה', 'החייאה רציפה ללא בדיקת דופק עד הגעת נט"ן'] },
+                { id: 7, question: 'כיצד מוגדר "מוות קליני"?', answer: 'היעדר פעילות לבבית ונשימתית, מצב הפיך.', explanation: 'המוח טרם מת מחוסר חמצן, והתחלת החייאה מידית יכולה להציל חיים.', status: 'unseen', type: 'single', options: ['היעדר דופק ונשימה, מצב הפיך', 'היעדר דופק ונשימה, מצב בלתי הפיך', 'חוסר הכרה עמוק עם נשימות אגונאליות', 'פגיעת ראש קשה שאינה מאפשרת חזרה להכרה'], correctAnswers: ['היעדר דופק ונשימה, מצב הפיך'] },
+                { id: 8, question: 'כיצד מוגדר "מוות מוחי"?', answer: 'היעדר פעילות לבבית ונשימתית, מצב בלתי הפיך.', explanation: 'תאי המוח עברו תהליך נקרוזיס עקב חוסר חמצן ממושך. החייאה לא תועיל.', status: 'unseen', type: 'single', options: ['היעדר דופק ונשימה, מצב בלתי הפיך', 'היעדר דופק ונשימה, מצב הפיך', 'מצב בו הלב עובד אך הפצוע לא נושם עקב פגיעה מוחית', 'הרס של גזע המוח המלווה בנשימות אגונאליות'], correctAnswers: ['היעדר דופק ונשימה, מצב בלתי הפיך'] },
+                { id: 9, question: 'מהי ההגדרה המדויקת של "החייאה"?', answer: 'אוסף פעולות מלאכותיות הנעשות על מנת לחקות את פעולת הלב והריאות למטופל חסר דופק ונשימה.', explanation: 'מטרת ההחייאה היא לספק זרימת דם מחומצן למוח עד להגעת שוק/תרופות.', status: 'unseen', type: 'single', options: ['פעולות לחקות את הלב והריאות למטופל ללא דופק ונשימה', 'החזרת המטופל להכרה מלאה לאחר דום לב', 'שימוש בדפיברילטור ואמבו במטרה לאפס את קצב הלב', 'טיפול במטופל מחוסר הכרה שאינו מגיב לכאב'], correctAnswers: ['פעולות לחקות את הלב והריאות למטופל ללא דופק ונשימה'] },
+                { id: 10, question: 'באילו מקרי טראומה *כן* נבצע החייאה?', answer: 'תלייה, טביעה, התחשמלות ומכת ברק.', explanation: 'במקרים אלו הדם לא יצא מכליו אלא הייתה פגיעה מערכתית/נשימתית ולכן לעיסויים יש סיכוי רב.', status: 'unseen', type: 'multiple', options: ['תלייה', 'קטיעת גפיים משמעותית', 'טביעה והתחשמלות', 'פגיעת ראש פתוחה'], correctAnswers: ['תלייה', 'טביעה והתחשמלות'] },
+                { id: 11, question: 'כיצד מוגדרת "החייאה מוצלחת"?', answer: 'מטופל אשר יצא מבית החולים ללא נזק נוירולוגי משמעותי.', explanation: 'המדד האמיתי הוא שמירת תפקוד המוח והחזרה לשגרה, לא רק חזרת דופק בשטח.', status: 'unseen', type: 'single', options: ['יציאה מבית החולים ללא נזק נוירולוגי משמעותי', 'חזרת דופק ונשימה ספונטניים בשטח (ROSC)', 'הגעה לחדר הלם בבית החולים עם דופק יציב', 'קבלת שוק בהצלחה מהדפיברילטור'], correctAnswers: ['יציאה מבית החולים ללא נזק נוירולוגי משמעותי'] },
+                { id: 12, question: 'מהי הגדרת "מבוגר" לצורך החייאה?', answer: 'גברים - משלב הופעת שיער בבית השחי. נשים - משלב הופעת שדיים.', explanation: 'האנטומיה קובעת את עומק העיסויים ונפח ההנשמה שיש לספק.', status: 'unseen', type: 'single', options: ['גברים: שיער בבית שחי, נשים: שדיים', 'מעל גיל 8 לשני המינים', 'מעל גיל 12 או משקל של 40 ק"ג', 'גברים: הופעת זקן, נשים: גיל ההתבגרות'], correctAnswers: ['גברים: שיער בבית שחי, נשים: שדיים'] },
+                { id: 13, question: 'מה כולל שלב S (Safety - בטיחות) בסכמת ההחייאה? (בחר את כולם)', answer: '1. שמירה על ביטחוננו האישי 2. הרחקת המטופל 3. קריאה לכוחות נוספים.', explanation: 'מטפל פצוע לא יכול לטפל באחרים. בטיחות קודמת לכל.', status: 'unseen', type: 'multiple', options: ['שמירה על ביטחוננו האישי', 'הרחקת המטופל מאזור הסכנה', 'קריאה לכוחות נוספים', 'בדיקת הכרה מהירה'], correctAnswers: ['שמירה על ביטחוננו האישי', 'הרחקת המטופל מאזור הסכנה', 'קריאה לכוחות נוספים'] },
+                { id: 14, question: 'באיזה שלב בסרגל AVPU מצוי מטופל הדורש החייאה?', answer: 'U - Unresponsive (לא מגיב כלל).', explanation: 'אם הוא מגיב לכאב, יש לו פריפוזיה מוחית (כלומר, יש דופק ולחץ דם). אנו נבצע החייאה רק ל-U.', status: 'unseen', type: 'single', options: ['U (Unresponsive - מחוסר הכרה)', 'P (Pain - מגיב לכאב)', 'V (Voice - מגיב לקול)', 'A (Alert - ערני)'], correctAnswers: ['U (Unresponsive - מחוסר הכרה)'] },
+                { id: 15, question: 'כיצד נבדוק נשימה, ומה המשמעות של נשימות "אגונאליות"?', answer: 'שיטת ל.ל.ל ל-10 שניות. נשימות אגונאליות נחשבות למצב של "לא נושם" (מעבר ישיר לעיסויים).', explanation: 'נשימות אגונאליות אינן מכניסות חמצן (זהו רפלקס גוסס).', status: 'unseen', type: 'single', options: ['ל.ל.ל ל-10 שניות, אגונאליות מחייבות מעבר לעיסויים ישירות', 'ל.ל.ל ל-5 שניות, אגונאליות דורשות הנשמה באמבו', 'הסתכלות על בית החזה, אגונאליות נחשבות לנשימה תקינה', 'ל.ל.ל ל-10 שניות, אגונאליות מחייבות סקשן מיידי'], correctAnswers: ['ל.ל.ל ל-10 שניות, אגונאליות מחייבות מעבר לעיסויים ישירות'] },
+                { id: 16, question: 'כיצד בודקים דופק במבוגר מחוסר הכרה?', answer: 'בעורק הקרוטידי למשך 10 שניות.', explanation: 'עורק מרכזי גדול שיורגש בו דופק גם כשלחץ הדם נמוך מאוד.', status: 'unseen', type: 'single', options: ['בעורק הקרוטידי בצוואר למשך כ-10 שניות', 'בעורק הרדיאלי ביד למשך כ-10 שניות', 'בעורק הברכיאלי בזרוע למשך 5 שניות', 'שמים אוזן על לב המטופל למשך 10 שניות'], correctAnswers: ['בעורק הקרוטידי בצוואר למשך כ-10 שניות'] },
+                { id: 17, question: 'מהם הדגשים הקריטיים לביצוע עיסויים איכותיים? (בחר 3)', answer: 'מרכז הסטרנום, עומק לפחות 5 ס"מ, חזרה מלאה של החזה (קצב 100-120).', explanation: 'ביצוע מדויק לוחץ את הלב ומייצר תפוקת לב (Cardic Output) שתספק דם למוח.', status: 'unseen', type: 'multiple', options: ['מרכז הסטרנום ועל מצע קשיח', 'עומק של לפחות 5 ס"מ', 'קצב של 100-120 בדקה תוך חזרה מלאה של החזה', 'עיסויים עד שבירת צלעות מבוקרת', 'עצירת עיסויים כל דקה כדי להעריך מצב'], correctAnswers: ['מרכז הסטרנום ועל מצע קשיח', 'עומק של לפחות 5 ס"מ', 'קצב של 100-120 בדקה תוך חזרה מלאה של החזה'] },
+                { id: 18, question: 'מהם שלבי הטיפול ב-A ו-B במטופל ש*יש לו דופק* אך אינו נושם?', answer: 'סילוק הפרשות -> פתיחת נתיב אוויר -> הנשמה כל 5 שניות, ובדיקת דופק כל 2 דקות.', explanation: 'מצב זה נקרא Respiratory Arrest (דום נשימה). אם לא ננשים, המטופל ידרדר מהר לדום לב.', status: 'unseen', type: 'single', options: ['סילוק הפרשות, נ"א, הנשמה כל 5 שניות, בדיקת דופק כל 2 דק', 'סילוק הפרשות והמתנה שיחזור לנשום, אין להנשים שיש דופק', 'החדרת מנתב אוויר והנשמה מהירה של כל 2 שניות', 'מעבר לביצוע עיסויים מונעים ביחס של 15:2'], correctAnswers: ['סילוק הפרשות, נ"א, הנשמה כל 5 שניות, בדיקת דופק כל 2 דק'] },
+                { id: 19, question: 'מה תפקידו של הדפיברילטור (AED)?', answer: 'לתת שוק חשמלי במקרה של הפרעות קצב ספציפיות כדי להחזיר את הלב לקצב תקין.', explanation: 'שוק מאפס פרפור חדרים ונותן לקוצב הטבעי בלב הזדמנות לשלוט בחזרה.', status: 'unseen', type: 'single', options: ['לתת שוק להפרעות קצב ספציפיות ולהחזיר קצב תקין', 'להתניע מחדש לב שעצר לחלוטין מפעולה (Asystole)', 'להחליף את העיסויים ולייצר פעימות מלאכותיות עצמאיות', 'למדוד את רמת החמצן והדופק של המטופל'], correctAnswers: ['לתת שוק להפרעות קצב ספציפיות ולהחזיר קצב תקין'] },
+                { id: 20, question: 'מה יש לעשות *מיד* לאחר שוק או אבחון של הדפיברילטור?', answer: 'המשך עיסויים באופן מיידי וללא בדיקת דופק.', explanation: 'הלב "המום" אחרי השוק החשמלי ולוקח לו זמן לייצר דופק אפקטיבי. עיסויים יעזרו לו במחזורי הדם הראשונים.', status: 'unseen', type: 'single', options: ['התחלת עיסויים מיידית וללא בדיקת דופק', 'לבדוק דופק בקרוטיד במשך 10 שניות', 'להמתין להוראה קולית מהמכשיר האם יש דופק', 'לתת 2 הנשמות לפני חזרה לעיסויים'], correctAnswers: ['התחלת עיסויים מיידית וללא בדיקת דופק'] },
+                { id: 21, question: 'מהו תפקידו המרכזי של החובש בתור ראש צוות (BLS)?', answer: 'ניהול, חלוקת עבודה, מתן פידבקים לעיסויים, ואחריות על הנשמות.', explanation: 'ניהול נכון מונע כאוס ומבטיח טיפול מציל חיים רציף ואיכותי.', status: 'unseen', type: 'multiple', options: ['ניהול וחלוקת עבודה', 'אחראי על הנשמת המטופל', 'מתן פידבקים לעיסויים והחלפת מעסים', 'החלטה על מתן תרופות ALS'], correctAnswers: ['ניהול וחלוקת עבודה', 'אחראי על הנשמת המטופל', 'מתן פידבקים לעיסויים והחלפת מעסים'] },
+                { id: 22, question: 'מה ההגדרה ל"נוכח" וכיצד ניעזר בו?', answer: 'אדם שאינו איש רפואה המזדמן לאירוע. נבקש ממנו להזעיק עזרה ולסייע בעיסויים.', explanation: 'ידיים נוספות בעיסויים מונעות התעייפות המטפל, וקריאה מוקדמת לכוחות תשפר את סיכויי ההישרדות.', status: 'unseen', type: 'single', options: ['אדם ללא הכשרה. נעזר בו להזעקת עזרה ולעיסויים פשוטים', 'מטפל בכיר יותר. נעביר לו מיד את הפיקוד', 'אזרח בלתי מעורב. נבקש ממנו להתרחק ולא להתערב', 'חובש בהכשרתו שעבר במקרה. ינהל את ההנשמה והתרופות'], correctAnswers: ['אדם ללא הכשרה. נעזר בו להזעקת עזרה ולעיסויים פשוטים'] },
+                { id: 23, question: 'אילו פעולות קריטיות יותר בהחייאה על רקע טביעה? (בחר 2)', answer: 'סילוק הפרשות (מים) והנשמות אפקטיביות.', explanation: 'בניגוד לדום לב לבבי, בטביעה הלב עצר בגלל מחסור בחמצן. הנשמה חשובה כאן כמו עיסויים ואף יותר.', status: 'unseen', type: 'multiple', options: ['סילוק הפרשות ופתיחת נתיב אוויר', 'מתן הנשמות אפקטיביות', 'שימוש בדפיברילטור עוד כשהמטופל רטוב', 'החייאה בקצב מהיר יותר (140 לדקה)'], correctAnswers: ['סילוק הפרשות ופתיחת נתיב אוויר', 'מתן הנשמות אפקטיביות'] },
+                { id: 24, question: 'באילו מצבים (התוויות) *נפסיק* החייאה שהתחלנו?', answer: 'המטופל מתנגד להחייאה, או הגעת צוות מתקדם (ALS).', explanation: 'התנגדות שרירית מעידה על חזרת דופק ופעילות מוחית.', status: 'unseen', type: 'single', options: ['המטופל מתנגד להחייאה או בהגעת צוות ALS', 'כאשר המעסה הראשי התעייף ואין מי שיחליפו', 'לאחר 10 דקות של עיסויים ללא תגובה', 'כשהדפיברילטור אומר "אין המלצה לשוק" 3 פעמים ברצף'], correctAnswers: ['המטופל מתנגד להחייאה או בהגעת צוות ALS'] },
+                { id: 25, question: 'מתי *לא נתחיל* כלל החייאה?', answer: 'ניתוק הראש או האגן מהגוף (איבוד צלם אנוש). חובה לקבל אישור.', explanation: 'פציעות שאינן מאפשרות חיים. דורש אישור מגורם רפואי בכיר (מד"א 101/מטפל בכיר ביחידה).', status: 'unseen', type: 'single', options: ['ניתוק ראש/אגן (מצריך קבלת אישור מגורם בכיר)', 'בכל מצב של חוסר הכרה ודימום רב (טראומה)', 'במקרים של טביעה ששהו מעל שעה במים', 'כאשר למטופל יש נשימות אגונאליות ללא דופק'], correctAnswers: ['ניתוק ראש/אגן (מצריך קבלת אישור מגורם בכיר)'] },
+                { id: 26, question: 'מהי שרשרת ההישרדות בהחייאה לפי הסדר? (בחר את השלבים הנכונים)', answer: 'קריאה לעזרה -> החייאה בסיסית -> דפיברילציה -> החייאה מתקדמת -> טיפול נמרץ בבי"ח.', explanation: 'כל שלב בשרשרת קריטי להישרדות המטופל. עיכוב באחד השלבים יפגע דרסטית בסיכוי לחיים.', status: 'unseen', type: 'multiple', options: ['זיהוי וקריאה לעזרה מוקדמת', 'החייאה בסיסית מהירה (BLS)', 'דפיברילציה (מכות חשמל) מוקדמת', 'ניתוח לב פתוח בשטח'], correctAnswers: ['זיהוי וקריאה לעזרה מוקדמת', 'החייאה בסיסית מהירה (BLS)', 'דפיברילציה (מכות חשמל) מוקדמת'] },
+                { id: 27, question: 'מהן הגדרות הגילאים לתינוק וילד?', answer: 'תינוק: 28 יום עד שנה. ילד: שנה ועד בגרות מינית.', explanation: 'חלוקה שמגדירה האם לעסות עם אצבעות, יד אחת או שתיים.', status: 'unseen', type: 'single', options: ['תינוק: 28 יום עד שנה. ילד: שנה עד סימני בגרות מינית', 'תינוק: עד גיל שנתיים. ילד: שנתיים עד 14', 'תינוק: עד 28 יום. ילד: עד 3 שנים', 'תינוק: חצי שנה. ילד: עד סוף גיל ההתבגרות'], correctAnswers: ['תינוק: 28 יום עד שנה. ילד: שנה עד סימני בגרות מינית'] },
+                { id: 28, question: 'מהם הגורמים העיקריים לדום לב בילדים ותינוקות? (בחר 3)', answer: 'בעיות נשימה, מוות בעריסה (SIDS), ומומי לב מולדים.', explanation: 'דום לב בילד נגרם לרוב מחוסר חמצן ולא מאוטם שריר הלב כמו במבוגרים.', status: 'unseen', type: 'multiple', options: ['בעיות נשימה (חנק, אסטמה)', 'מוות עריסה', 'מומי לב מולדים', 'אוטם שריר הלב (התקף לב)', 'פרפור חדרים ספונטני'], correctAnswers: ['בעיות נשימה (חנק, אסטמה)', 'מוות עריסה', 'מומי לב מולדים'] },
+                { id: 29, question: 'כיצד בודקים הכרה ודופק בתינוק?', answer: 'הכרה: מחיאת כף וצביטה ברגל. דופק: עורק ברכיאלי (זרוע).', explanation: 'העורק הברכיאלי בולט ונגיש יותר מצוואר התינוק, שהוא לרוב קצר ושמנמן.', status: 'unseen', type: 'single', options: ['הכרה: רעש/צביטה ברגל. דופק: ברכיאלי (בזרוע)', 'הכרה: צביטה בטרפז. דופק: קרוטידי (בצוואר)', 'הכרה: קריאה בשם התינוק. דופק: רדיאלי (בכף היד)', 'הכרה: מכה על החזה. דופק: פמוראלי (במפשעה)'], correctAnswers: ['הכרה: רעש/צביטה ברגל. דופק: ברכיאלי (בזרוע)'] },
+                { id: 30, question: 'מהם ההבדלים בטכניקת העיסויים בין תינוק לילד?', answer: 'תינוק: 2 אצבעות/אגודלים, לעומק 3 ס"מ. ילד: יד אחת או שתיים, 4-5 ס"מ.', explanation: 'התאמת הכוח והמנח לעצמות הקטנות והרכות.', status: 'unseen', type: 'single', options: ['תינוק: 2 אצבעות (3 ס"מ). ילד: יד/שתיים (4-5 ס"מ)', 'תינוק: יד אחת (3 ס"מ). ילד: 2 ידיים בלבד (6 ס"מ)', 'אין הבדל. שניהם מעוסים עם שתי ידיים במרכז החזה', 'תינוק: עיסוי בטן קלים. ילד: עיסויי חזה עם יד אחת'], correctAnswers: ['תינוק: 2 אצבעות (3 ס"מ). ילד: יד/שתיים (4-5 ס"מ)'] },
+                { id: 31, question: 'מהו יחס ההחייאה (עיסויים:הנשמות) בתינוקות וילדים?', answer: 'מטפל יחיד: 30:2. צוות רפואי (שניים ומעלה): 15:2.', explanation: 'כשיש צוות, מגדילים את תדירות ההנשמות כי חמצן הוא הגורם המכריע בדום לב בילדים.', status: 'unseen', type: 'single', options: ['יחיד: 30:2. צוות: 15:2', 'יחיד: 15:2. צוות: 30:2', 'תמיד 30:2 ללא תלות במספר המטפלים', 'תמיד 15:2 כדי לשפר חמצון'], correctAnswers: ['יחיד: 30:2. צוות: 15:2'] },
+                { id: 32, question: 'מתי בסמכות חובש להשתמש במכשירי החייאה (אמבו/בלון)?', answer: 'רק בעבודה בצוות עם מטפל בכיר (מט"ב) או במרפאה.', explanation: 'אם חובש יעבוד לבדו בשטח ויעסוק בציוד, רצף העיסויים ייפגע דרסטית.', status: 'unseen', type: 'single', options: ['בצוות עם מט"ב או בעבודה במרפאה', 'תמיד. על החובש להשתמש בציוד כדי לשפר חמצון', 'רק בהחייאה על רקע טביעה או מחלה', 'החובש לעולם לא ישתמש בציוד, רק המט"ב'], correctAnswers: ['בצוות עם מט"ב או בעבודה במרפאה'] },
+                { id: 33, question: 'מהן ההתוויות לחיבור מטופל לחמצן? (בחר 3)', answer: 'מצוקה נשימתית, כיחלון פריפרי, שימוש בשרירי עזר.', explanation: 'סימנים אלו מראים שהריאות אינן מצליחות לחמצן את הרקמות, ויש צורך בחמצן מרוכז.', status: 'unseen', type: 'multiple', options: ['נשימה שטחית ומהירה', 'כיחלון (ציאנוזיס) פריפרי או מרכזי', 'שימוש בשרירי עזר (צוואר, צלעות)', 'כאב בטן עז', 'ירידה בלחץ הדם בלבד'], correctAnswers: ['נשימה שטחית ומהירה', 'כיחלון (ציאנוזיס) פריפרי או מרכזי', 'שימוש בשרירי עזר (צוואר, צלעות)'] },
+                { id: 34, question: 'מהי הזרימה (LPM) המותרת לחובש במיכל חמצן ללא מט"ב?', answer: 'זרימה של עד 10 LPM.', explanation: 'סמכות החובש הוגבלה למנוע נזק מחשיפת יתר לחמצן מרוכז במצבים שאינם דורשים זאת.', status: 'unseen', type: 'single', options: ['עד 10 ליטר בדקה (LPM)', 'עד 5 ליטר בדקה', 'מותר לפתוח עד המקסימום (15-25 ליטר בדקה)', 'אסור לחובש לפתוח חמצן ללא הוראת רופא'], correctAnswers: ['עד 10 ליטר בדקה (LPM)'] },
+                { id: 35, question: 'מהו הסד"פ הנכון לפירוק וסת מבלון חמצן?', answer: 'סגירת LPM -> סגירת ברז ראשי -> פריקת לחץ (LPM פתוח) -> פתיחת הבורג המקבע.', explanation: 'פריקת הלחץ מונעת שחרור אלים של הווסת שיכול לפצוע את המטפל.', status: 'unseen', type: 'single', options: ['סגירת LPM -> סגירת ראשי -> פריקת לחץ -> הברגה החוצה', 'הברגה החוצה -> סגירת הברז הראשי -> סגירת ה-LPM', 'סגירת הברז הראשי -> פתיחת הבורג המקבע בזהירות', 'פריקת לחץ -> הוצאת הבורג המקבע -> סגירת ראשי'], correctAnswers: ['סגירת LPM -> סגירת ראשי -> פריקת לחץ -> הברגה החוצה'] },
+                { id: 36, question: 'אילו הוראות בטיחות חלות על שימוש בחמצן? (בחר את כולם)', answer: 'הרחקה משמן ואש, השכבת המיכל לרגלי המטופל, לא לכוון וסת לאנשים.', explanation: 'חמצן מאיץ בעירה, והמיכל עלול להפוך לטיל אם הברז יישבר בנפילה.', status: 'unseen', type: 'multiple', options: ['אין לקרב לאש ולשמן', 'השכבת המכל כשהראש פונה לרגלי המטופל', 'אין לכוון את הווסת כלפי אנשים', 'ניקוי המכל עם חומר אלכוהולי לפני פתיחה'], correctAnswers: ['אין לקרב לאש ולשמן', 'השכבת המכל כשהראש פונה לרגלי המטופל', 'אין לכוון את הווסת כלפי אנשים'] },
+                { id: 37, question: 'למי מותר להחדיר מנתב אוויר (A.W) וכיצד מודדים אותו?', answer: 'רק למטופל שאינו מגיב לכאב. נמדד מתנוך האוזן לזווית הפה.', explanation: 'מטופל המגיב לכאב עלול להקיא מהמנתב ולשאוף קיא לריאות (אספירציה).', status: 'unseen', type: 'single', options: ['מחוסר הכרה עמוק (לא מגיב לכאב). מדידה אוזן-פה', 'לכל מחוסר הכרה. מדידה מהסנטר לצוואר', 'לכל מטופל קשה נשימה. מדידה מקצה האף לאוזן', 'רק למטופל שאין לו דופק. אין צורך במדידה מדויקת'], correctAnswers: ['מחוסר הכרה עמוק (לא מגיב לכאב). מדידה אוזן-פה'] },
+                { id: 38, question: 'מהם 3 תפקידיו של מנתב האוויר? (בחר נכונים)', answer: 'מונע נעילת לסתות, מנתב אוויר לקנה, *מפחית* סכנה לצניחת לשון.', explanation: 'המנתב מסייע אך עדיין חובה להטות את הראש (Head Tilt) כדי לפתוח את הנתיב.', status: 'unseen', type: 'multiple', options: ['מונע נעילת לסתות', 'מנתב את האוויר ישירות לקנה', 'מפחית סכנה לצניחת בסיס הלשון', 'מונע צניחת לשון ב-100% ואין צורך בהטיית ראש', 'מעשיר את כמות החמצן הנכנסת לריאות'], correctAnswers: ['מונע נעילת לסתות', 'מנתב את האוויר ישירות לקנה', 'מפחית סכנה לצניחת בסיס הלשון'] },
+                { id: 39, question: 'מהם הנפחים של מפוחי ההנשמה (אמבו)?', answer: 'מבוגר: 1000 סמ"ק. בייבי: 400 סמ"ק.', explanation: 'שימוש במפוח מבוגר על תינוק יגרום לקריעת הריאות מלחץ יתר (ברוטראומה).', status: 'unseen', type: 'single', options: ['מבוגר 1000 סמ"ק, בייבי 400 סמ"ק', 'מבוגר 2000 סמ"ק, בייבי 1000 סמ"ק', 'מבוגר 500 סמ"ק, בייבי 200 סמ"ק', 'אין הבדל בנפחים, ההבדל הוא רק בגודל המסכה'], correctAnswers: ['מבוגר 1000 סמ"ק, בייבי 400 סמ"ק'] },
+                { id: 40, question: 'כיצד בודקים את שלמות מפוח האמבו ואת השסתום האחורי?', answer: 'שלמות: אוטמים חור אחורי -> המפוח מתכווץ ולא מתנפח שוב. שסתום: אוטמים יציאה לפצוע -> המפוח מסרב להיסחט.', explanation: 'מוודאים שהמפוח לא קרוע ושהשסתום החד כיווני מזרים אוויר רק למטופל.', status: 'unseen', type: 'single', options: ['אוטמים פתח אחורי (שלמות) ואוטמים יציאה קדמית (שסתום)', 'מנפחים מים בתוך האמבו ובודקים דליפות', 'מחברים לחמצן ומקשיבים לשריקות אוויר מהשקית', 'מנשימים פצוע דמה ובודקים אם החזה עולה'], correctAnswers: ['אוטמים פתח אחורי (שלמות) ואוטמים יציאה קדמית (שסתום)'] },
+                { id: 41, question: 'כמה אחוז חמצן מספק אמבו עם ובלי שקית העשרה?', answer: 'חיבור ישיר: 60-80%. עם שקית העשרה: 85-100%.', explanation: 'שקית ההעשרה משמשת כמאגר אוויר נקי ב-100% חמצן שמונע שאיבת אוויר חדר רגיל (21%) לתוך המפוח.', status: 'unseen', type: 'single', options: ['בלי שקית: 60-80%, עם שקית: 85-100%', 'בלי שקית: 21% (אוויר חדר), עם שקית: 50%', 'בלי שקית 100%, השקית מיועדת רק לאגירת פחמן דו חמצני', 'תלוי בזרימה שמכוונים ב-LPM ולא בשקית'], correctAnswers: ['בלי שקית: 60-80%, עם שקית: 85-100%'] },
+                { id: 42, question: 'מהם הדגשים להנשמה נכונה עם אמבו? (בחר 3)', answer: 'מנתב אוויר, חיבור מסנן ויראלי (פילטר), חובש אוטם ונוכח סוחט (2 אנשים).', explanation: 'אטימת המסכה בשתי ידיים (C-E grip) של החובש קריטית למניעת דליפות אוויר.', status: 'unseen', type: 'multiple', options: ['להשתמש במנתב אוויר', 'להרכיב מסנן ויראלי', 'החובש אוטם והנוכח סוחט (הנשמה בשניים)', 'לסחוט את האמבו בחוזקה ומהירות עד הסוף', 'להנשים ללא הטיית ראש לאחור'], correctAnswers: ['להשתמש במנתב אוויר', 'להרכיב מסנן ויראלי', 'החובש אוטם והנוכח סוחט (הנשמה בשניים)'] },
+                { id: 43, question: 'מהו קצב ההנשמה התקין לפי מצב המטופל?', answer: 'לא נושם/איטי: כל 5 שניות. נשימות מהירות: כל 5 שניות *בתיאום עם המטופל*.', explanation: 'הנשמה נגד נשימות המטופל תדחף אוויר לקיבה ותגרום להקאות וחנק מחודש.', status: 'unseen', type: 'single', options: ['הנשמה כל 5 שניות (במהירות - בסינכרון עם הפצוע)', 'הנשמה פעם ב-10 שניות לכל המטופלים ללא יוצא מן הכלל', 'אם הוא נושם לאט - לא מנשימים. לא נושם - כל 3 שניות', 'הנשמה מהירה של 20 בדקה עד שהפצוע מתעורר'], correctAnswers: ['הנשמה כל 5 שניות (במהירות - בסינכרון עם הפצוע)'] },
+                { id: 44, question: 'מה נעשה אם בית החזה לא מתרומם בהנשמה? (בחר פעולות אפשריות)', answer: 'שיפור קיבוע ראש, שיפור אטימה, הגדלת נפח, ושלילת חסימה של גוף זר בפה.', explanation: 'הבעיה לרוב טכנית (מסכה לא אטומה/הראש לא מוטה נכון). רק בסוף מחפשים חסימה אמיתית.', status: 'unseen', type: 'multiple', options: ['שיפור קיבוע ראש (Head Tilt)', 'שיפור אטימת המסיכה', 'הגדלת נפח ההנשמה באמבו', 'ביצוע סקשן עמוק ישר לקנה הנשימה', 'מתן מכות חזקות בחזה (Precordial Thump)'], correctAnswers: ['שיפור קיבוע ראש (Head Tilt)', 'שיפור אטימת המסיכה', 'הגדלת נפח ההנשמה באמבו'] },
+                { id: 45, question: 'מהם שלבי בדיקת התקינות של מכשיר הסקשן?', answer: 'שלמות מכל והימצאות גולה -> תקינות בוכנה -> אטימת קטטר ובדיקת ואקום -> שאיבה ממימיה.', explanation: 'מטרת הבדיקה לוודא שברגע האמת הסקשן באמת ישאב נוזלים סמיכים ולא ייתקע.', status: 'unseen', type: 'single', options: ['שלמות, בוכנה, בדיקת ואקום, ושאיבת מים ממימייה', 'חיבור לחשמל, שמיעת זמזום מנוע ושאיבת מים ממימייה', 'דחיפת הקטטר לפה פצוע דמה ובדיקת התנגדות הבוכנה', 'אין צורך בבדיקה, יש לסמוך על תקינות המכשיר מהאפסנאות'], correctAnswers: ['שלמות, בוכנה, בדיקת ואקום, ושאיבת מים ממימייה'] },
+                { id: 46, question: 'מה תפקידו של הפאלס אוקסימטר ומה נחשב לתקין?', answer: 'מזהה אחוז רוויון החמצן בדם ומודד דופק. סטורציה תקינה: 95%-100%.', explanation: 'מאפשר זיהוי מוקדם של הידרדרות נשימתית עוד לפני שמופיע כיחלון בשפתיים.', status: 'unseen', type: 'single', options: ['מודד רוויון חמצן בדם ודופק. תקין: 95%-100%', 'מודד לחץ דם וחמצן. תקין: 90%-100%', 'בודק את כמות ההמוגלובין בדם. תקין: מעל 80%', 'מודד ריכוז CO2 בנשיפה (קפנוגרף). תקין: 35-45%'], correctAnswers: ['מודד רוויון חמצן בדם ודופק. תקין: 95%-100%'] },
+                { id: 47, question: 'אילו גורמים מפריעים (מגבלות) למדידת פאלס אוקסימטר? (בחר 3)', answer: 'אור חזק, לק בציפורניים/לכלוך, כיווץ כלי דם (בקור), והרעלת CO.', explanation: 'המכשיר עובד על אור, ולכן לק, לכלוך או שמש יסנוורו אותו. כלי דם מכווצים לא מזררימים מספיק דם למדידה.', status: 'unseen', type: 'multiple', options: ['חשיפה לאור שמש חזק', 'רעד המטופל', 'צבע לק או ציפורן מלוכלכת', 'לחץ דם גבוה מדי (מעל 180)', 'עור שחום'], correctAnswers: ['חשיפה לאור שמש חזק', 'רעד המטופל', 'צבע לק או ציפורן מלוכלכת'] },
+                { id: 48, question: 'מדוע שאיפת עשן (CO) מטעה את הפאלס אוקסימטר?', answer: 'המכשיר מזהה את ה-CO שקשור לדם כחמצן, וייתן קריאה גבוהה (ותקינה שקרית) אף על פי שהמטופל נחנק.', explanation: 'גז CO נקשר להמוגלובין בצבע דומה לחמצן, והמכשיר הפשוט לא מבדיל ביניהם.', status: 'unseen', type: 'single', options: ['ה-CO נראה למכשיר כמו חמצן, ולכן הסטורציה תיראה גבוהה ותקינה', 'ה-CO חוסם את החיישן ולכן המכשיר מראה כל הזמן 0%', 'שאיפת עשן גורמת לכוויות שממיסות את פלסטיק המכשיר', 'העשן חוסם את מעבר האור מהאצבע למכשיר ולכן יהיה צפצוף שגיאה'], correctAnswers: ['ה-CO נראה למכשיר כמו חמצן, ולכן הסטורציה תיראה גבוהה ותקינה'] },
+                { id: 49, question: 'כיצד נוודא שהקריאה בפאלס אוקסימטר אמינה?', answer: 'נשווה בין הדופק שמופיע במכשיר לדופק שהרגשנו ידנית. אם הם זהים, הקריאה אמינה.', explanation: 'אם המכשיר מזייף בדופק הפשוט, הוא כנראה מזייף גם באחוזי החמצן המורכבים יותר.', status: 'unseen', type: 'single', options: ['נשווה את קצב הדופק במכשיר לדופק שהרגשנו ידנית (בקרוטיד/רדיאלי)', 'נחבר את המכשיר לשתי אצבעות שונות בו זמנית ונהשווה', 'ננשום עמוק בעצמנו ונוודא שהמכשיר מגיב נכון למטפל', 'נסמוך עליו תמיד, אלא אם מופיע סמל של סוללה חלשה'], correctAnswers: ['נשווה את קצב הדופק במכשיר לדופק שהרגשנו ידנית (בקרוטיד/רדיאלי)'] }
+            ],
+            hideKnown: false
+        };
+
+        // UI Initialization
+        lucide.createIcons();
+        applyDarkMode();
+
+        // --- Firebase Auth & DB Logic ---
+        await ensureInitialAuth();
+
+        onUserChanged(async (user) => {
+            currentUser = user;
+            if (user) {
+                document.getElementById('user-greeting').innerText = `שלום, ${user.displayName || 'משתמש'}`;
+                document.getElementById('home-greeting').innerHTML = `שלום <span class="text-blue-600 dark:text-blue-400">${user.displayName || 'לוחם'}</span>,<br>מוכן לתרגל <span class="bg-clip-text text-transparent bg-gradient-to-l from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">רפואת חירום</span>?`;
+                document.getElementById('app-header').classList.remove('hidden');
+                
+                window.appState.cards = await loadProgress(user.uid, window.appState.cards);
+                await setLastAxis(user.uid, currentAxis);
+                updateHomeProgress();
+                
+                document.getElementById('global-loader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('global-loader').style.display = 'none';
+                    window.navigate('home');
+                }, 300);
+            } else {
+                document.getElementById('app-header').classList.add('hidden');
+                document.getElementById('global-loader').style.display = 'none';
+                window.location.replace('login.html');
+            }
+        });
+
+        window.handleLogout = async () => {
+            if(confirm("האם אתה בטוח שברצונך להתנתק?")) {
+                await signOutUser();
+                window.location.replace('login.html');
+            }
+        };
+
+        const persistProgress = async () => {
+            if (!currentUser) return;
+            updateHomeProgress();
+            await saveProgress(currentUser.uid, window.appState.cards);
+        };
+
+        window.resetAllData = async () => {
+            if(confirm("האם אתה בטוח שברצונך לאפס את הכל? הפעולה לא ניתנת לביטול.")) {
+                window.appState.cards = window.appState.cards.map(c => ({...c, status: 'unseen'}));
+                window.appState.hideKnown = false;
+                await persistProgress();
+                toggleSettings();
+                initFlashcards();
+            }
+        };
+
+        // --- Navigation Logic ---
+        let currentScreen = 'home';
+        window.navigate = (screen) => {
+            if (!currentUser) {
+                window.location.replace('login.html');
+                return;
+            }
+            
+            document.querySelectorAll('.screen').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById(`screen-${screen}`).classList.add('active');
+            currentScreen = screen;
+
+            const backBtn = document.getElementById('btn-back-menu');
+            if(screen === 'home') backBtn.classList.add('hidden');
+            else backBtn.classList.remove('hidden');
+
+            if (screen === 'flashcards') initFlashcards();
+            if (screen === 'practice') initPractice();
+            if (screen === 'test') initTest();
+        };
+
+        // --- Dark Mode ---
+        function applyDarkMode() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('dark-icon').setAttribute('data-lucide', 'sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('dark-icon').setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+        }
+        window.toggleDarkMode = () => {
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.theme = 'light';
+            } else {
+                localStorage.theme = 'dark';
+            }
+            applyDarkMode();
+        };
+
+        // --- Home Logic ---
+        function updateHomeProgress() {
+            const known = window.appState.cards.filter(c => c.status === 'known').length;
+            const total = window.appState.cards.length;
+            const progress = Math.round((known / total) * 100) || 0;
+            document.getElementById('home-progress-text').innerText = `${progress}%`;
+            document.getElementById('home-progress-bar').style.width = `${progress}%`;
+        }
+
+        function shuffleArray(items) {
+            const copy = [...items];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function uniqueOptions(items) {
+            return [...new Set(items.filter(Boolean).map(item => item.trim()))];
+        }
+
+        function cleanQuestionPrompt(question) {
+            return question.replace(/\s*\((?:בחר|בחירה)[^)]+\)\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
+        }
+
+        function collectDistractors(card) {
+            return uniqueOptions(window.appState.cards.flatMap(other => {
+                if (other.id === card.id) return [];
+                return [...(other.options || []), other.answer, ...(other.correctAnswers || [])];
+            })).filter(option => !card.correctAnswers.includes(option) && option !== card.answer);
+        }
+
+        function buildSingleChoiceQuestion(card) {
+            const distractors = shuffleArray(collectDistractors(card)).slice(0, 3);
+            return {
+                quizId: `single-${card.id}`,
+                sourceId: card.id,
+                question: cleanQuestionPrompt(card.question),
+                explanation: card.explanation,
+                answer: card.answer,
+                type: 'single',
+                options: shuffleArray(uniqueOptions([card.answer, ...distractors])),
+                correctAnswers: [card.answer]
+            };
+        }
+
+        function buildExtendedMultipleQuestion(card) {
+            const baseOptions = uniqueOptions([...(card.options || []), ...card.correctAnswers]);
+            const distractors = shuffleArray(collectDistractors(card));
+            const desiredOptionCount = Math.max(6, baseOptions.length + Math.min(2, distractors.length));
+            const extraOptions = distractors.slice(0, Math.max(0, desiredOptionCount - baseOptions.length));
+
+            return {
+                quizId: `multiple-${card.id}`,
+                sourceId: card.id,
+                question: card.question.includes('בחר') ? card.question : `${card.question} (בחר את כל התשובות הנכונות)`,
+                explanation: card.explanation,
+                answer: card.answer,
+                type: 'multiple',
+                options: shuffleArray(uniqueOptions([...baseOptions, ...extraOptions])),
+                correctAnswers: [...card.correctAnswers]
+            };
+        }
+
+        function buildQuizSet(sourceCards, desiredMultiCount) {
+            const shuffledCards = shuffleArray(sourceCards);
+            const multiIds = new Set(
+                shuffledCards
+                    .filter(card => card.type === 'multiple')
+                    .slice(0, desiredMultiCount)
+                    .map(card => card.id)
+            );
+
+            return shuffledCards.map(card => multiIds.has(card.id) ? buildExtendedMultipleQuestion(card) : buildSingleChoiceQuestion(card));
+        }
+
+        // --- Flashcards Logic ---
+        let fcList = [];
+        let fcIndex = 0;
+        let fcFlipped = false;
+
+        window.initFlashcards = () => {
+            fcList = window.appState.cards.filter(c => !window.appState.hideKnown || c.status !== 'known');
+            fcIndex = 0;
+            fcFlipped = false;
+            renderFlashcard();
+        };
+
+        function renderFlashcard() {
+            const container = document.getElementById('fc-container');
+            const emptyState = document.getElementById('fc-empty');
+            
+            document.getElementById('toggle-hide-known-dot').classList.toggle('translate-x-0', window.appState.hideKnown);
+            document.getElementById('toggle-hide-known').classList.toggle('bg-green-500', window.appState.hideKnown);
+
+            if (fcList.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                document.getElementById('fc-counter').innerText = `0 / 0`;
+                return;
+            }
+            
+            container.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+            
+            const card = fcList[fcIndex];
+            document.getElementById('fc-counter').innerText = `כרטיס ${fcIndex + 1} / ${fcList.length}`;
+            document.getElementById('fc-question').innerText = card.question;
+            document.getElementById('fc-answer').innerText = card.answer;
+            document.getElementById('fc-explanation').innerText = card.explanation;
+
+            const badge = document.getElementById('fc-status-badge');
+            if (card.status === 'known') {
+                badge.innerText = 'ידוע';
+                badge.className = 'absolute top-6 text-xs font-bold px-3 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+            } else if (card.status === 'learning') {
+                badge.innerText = 'צריך חזרה';
+                badge.className = 'absolute top-6 text-xs font-bold px-3 py-1 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
+            } else {
+                badge.className = 'hidden';
+            }
+
+            const wrapper = document.getElementById('fc-card-wrapper');
+            wrapper.style.transform = `rotateY(${fcFlipped ? 180 : 0}deg)`;
+        }
+
+        window.flipCard = () => {
+            if(window.isDraggingCard) return; // Prevent flip on swipe
+            fcFlipped = !fcFlipped;
+            document.getElementById('fc-card-wrapper').style.transform = `rotateY(${fcFlipped ? 180 : 0}deg)`;
+        };
+
+        window.markCard = async (status) => {
+            if (fcList.length === 0) return;
+            const currentId = fcList[fcIndex].id;
+            
+            // Update local state
+            window.appState.cards = window.appState.cards.map(c => c.id === currentId ? { ...c, status } : c);
+            
+            // Background save
+            persistProgress(); 
+
+            fcFlipped = false;
+            document.getElementById('fc-card-wrapper').style.transform = `rotateY(0deg)`;
+            
+            setTimeout(() => {
+                if (fcIndex + 1 >= fcList.length) {
+                    // Rebuild list if needed
+                    const newList = window.appState.cards.filter(c => !window.appState.hideKnown || c.status !== 'known');
+                    if(newList.length === 0 && !window.appState.hideKnown && window.appState.cards.some(c=>c.status==='learning')) {
+                        alert('סיימת סבב! עוברים רק לכרטיסיות שצריכות חזרה.');
+                        window.appState.hideKnown = true;
+                        initFlashcards();
+                    } else {
+                        initFlashcards();
+                    }
+                } else {
+                    fcIndex++;
+                    renderFlashcard();
+                }
+            }, 200);
+        };
+
+        window.toggleSettings = () => {
+            document.getElementById('modal-settings').classList.toggle('hidden');
+        };
+        window.toggleHideKnown = () => {
+            window.appState.hideKnown = !window.appState.hideKnown;
+            initFlashcards();
+        };
+        window.resetFilters = () => {
+            window.appState.hideKnown = false;
+            initFlashcards();
+        };
+
+        // Swipe logic for flashcards
+        const cardEl = document.getElementById('fc-card-wrapper');
+        let startX = 0;
+        let currentX = 0;
+        window.isDraggingCard = false;
+
+        cardEl.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            window.isDraggingCard = true;
+            cardEl.style.transition = 'none';
+        }, {passive: true});
+
+        cardEl.addEventListener('touchmove', (e) => {
+            if (!window.isDraggingCard) return;
+            currentX = e.touches[0].clientX - startX;
+            cardEl.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg) rotateY(${fcFlipped ? 180 : 0}deg)`;
+        }, {passive: true});
+
+        cardEl.addEventListener('touchend', (e) => {
+            if (!window.isDraggingCard) return;
+            window.isDraggingCard = false;
+            cardEl.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            
+            if (currentX > 100) {
+                markCard('known');
+            } else if (currentX < -100) {
+                markCard('learning');
+            } else {
+                cardEl.style.transform = `rotateY(${fcFlipped ? 180 : 0}deg)`;
+            }
+            currentX = 0;
+        });
+
+        // Keyboard Support
+        window.addEventListener('keydown', (e) => {
+            if (currentScreen !== 'flashcards' || document.getElementById('modal-settings').classList.contains('hidden') === false) return;
+            if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+            if (e.key === 'ArrowRight') markCard('known');
+            if (e.key === 'ArrowLeft') markCard('learning');
+        });
+
+        // --- Practice Logic ---
+        let pracList = [];
+        let pracIndex = 0;
+        let pracSelected = [];
+        let pracChecked = false;
+
+        window.initPractice = () => {
+            const desiredMultiCount = Math.max(1, Math.round(window.appState.cards.length * 0.08));
+            pracList = buildQuizSet(window.appState.cards, desiredMultiCount);
+            pracIndex = 0;
+            renderPractice();
+        };
+
+        function renderPractice() {
+            pracSelected = [];
+            pracChecked = false;
+            const q = pracList[pracIndex];
+            
+            document.getElementById('prac-question').innerText = q.question;
+            const badge = document.getElementById('prac-type-badge');
+            if(q.type === 'multiple') { badge.classList.remove('hidden'); badge.classList.add('inline-flex'); }
+            else { badge.classList.add('hidden'); badge.classList.remove('inline-flex'); }
+
+            document.getElementById('prac-feedback').classList.add('hidden');
+            const submitBtn = document.getElementById('prac-submit-btn');
+            submitBtn.parentNode.classList.remove('hidden');
+            submitBtn.className = "w-full font-black text-xl py-4 rounded-2xl shadow-lg transition-all bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed";
+
+            renderPracticeOptions();
+        }
+
+        function renderPracticeOptions() {
+            const q = pracList[pracIndex];
+            const container = document.getElementById('prac-options');
+            container.innerHTML = '';
+
+            q.options.forEach(opt => {
+                const isSelected = pracSelected.includes(opt);
+                const isCorrect = q.correctAnswers.includes(opt);
+                
+                let style = "bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-blue-300 dark:hover:border-blue-500 cursor-pointer";
+                let iconHtml = `<div class="w-5 h-5 rounded shrink-0 border-2 ${q.type==='single'?'rounded-full':''} ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 dark:border-slate-600'}"></div>`;
+
+                if (pracChecked) {
+                    style = "bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 opacity-60 cursor-default";
+                    iconHtml = `<div class="w-5 h-5 shrink-0"></div>`;
+                    
+                    if (isCorrect) {
+                        style = "bg-green-50 dark:bg-green-900/20 border-2 border-green-500 text-green-900 dark:text-green-300 shadow-sm cursor-default opacity-100";
+                        iconHtml = `<i data-lucide="check" class="text-green-600 dark:text-green-400 w-6 h-6 shrink-0"></i>`;
+                    } else if (isSelected && !isCorrect) {
+                        style = "bg-red-50 dark:bg-red-900/20 border-2 border-red-400 text-red-900 dark:text-red-300 cursor-default opacity-100";
+                        iconHtml = `<i data-lucide="x" class="text-red-500 w-6 h-6 shrink-0"></i>`;
+                    }
+                } else if (isSelected) {
+                    style = "bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-500 text-blue-900 dark:text-blue-300 shadow-sm cursor-pointer";
+                }
+
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-2xl flex items-center gap-4 transition-all ${style}`;
+                div.innerHTML = `${iconHtml}<span class="font-bold text-lg leading-tight">${opt}</span>`;
+                div.onclick = () => handlePracticeOption(opt);
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        window.handlePracticeOption = (opt) => {
+            if (pracChecked) return;
+            const q = pracList[pracIndex];
+            
+            if (q.type === 'multiple') {
+                if (pracSelected.includes(opt)) pracSelected = pracSelected.filter(o => o !== opt);
+                else pracSelected.push(opt);
+            } else {
+                pracSelected = [opt];
+            }
+            
+            renderPracticeOptions();
+            
+            const btn = document.getElementById('prac-submit-btn');
+            if (pracSelected.length > 0) {
+                btn.className = "w-full font-black text-xl py-4 rounded-2xl shadow-lg transition-all bg-slate-900 dark:bg-blue-600 text-white hover:bg-slate-800 dark:hover:bg-blue-700 hover:-translate-y-1";
+            } else {
+                btn.className = "w-full font-black text-xl py-4 rounded-2xl shadow-lg transition-all bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed";
+            }
+        };
+
+        window.checkPractice = () => {
+            if (pracSelected.length === 0) return;
+            pracChecked = true;
+            renderPracticeOptions();
+
+            const q = pracList[pracIndex];
+            const isFullyCorrect = pracSelected.length === q.correctAnswers.length && pracSelected.every(opt => q.correctAnswers.includes(opt));
+            
+            document.getElementById('prac-submit-btn').parentNode.classList.add('hidden');
+            
+            const feedbackArea = document.getElementById('prac-feedback');
+            const feedbackBox = document.getElementById('prac-feedback-box');
+            const title = document.getElementById('prac-feedback-title');
+            
+            feedbackArea.classList.remove('hidden');
+            
+            if (isFullyCorrect) {
+                feedbackBox.className = "flex items-start gap-4 p-4 rounded-2xl mb-6 border bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800";
+                document.getElementById('prac-feedback-icon').setAttribute('data-lucide', 'check-circle');
+                document.getElementById('prac-feedback-icon').classList.replace('text-red-600', 'text-green-600');
+                title.innerText = 'מעולה! תשובה נכונה.';
+                title.className = 'text-xl font-black mb-1 text-green-800 dark:text-green-400';
+            } else {
+                feedbackBox.className = "flex items-start gap-4 p-4 rounded-2xl mb-6 border bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800";
+                document.getElementById('prac-feedback-icon').setAttribute('data-lucide', 'alert-circle');
+                document.getElementById('prac-feedback-icon').classList.replace('text-green-600', 'text-red-600');
+                title.innerText = 'טעות הפעם.';
+                title.className = 'text-xl font-black mb-1 text-red-800 dark:text-red-400';
+            }
+            document.getElementById('prac-feedback-text').innerText = q.explanation;
+            lucide.createIcons();
+        };
+
+        window.nextPractice = () => {
+            pracIndex = (pracIndex + 1) % pracList.length;
+            renderPractice();
+        };
+
+        // --- Test Logic ---
+        let testList = [];
+        let testAnswers = {};
+        let testIdx = 0;
+
+        window.startTest = () => initTest();
+
+        window.initTest = () => {
+            const selectedCards = shuffleArray(window.appState.cards).slice(0, 25);
+            const desiredMultiCount = Math.max(1, Math.round(selectedCards.length * 0.12));
+            testList = buildQuizSet(selectedCards, desiredMultiCount);
+            testAnswers = {};
+            testIdx = 0;
+            document.getElementById('test-active-view').classList.remove('hidden');
+            document.getElementById('test-results-view').classList.add('hidden');
+            document.getElementById('test-results-view').classList.remove('flex');
+            renderTest();
+        };
+
+        function renderTest() {
+            const q = testList[testIdx];
+            const selected = testAnswers[q.quizId] || [];
+            
+            document.getElementById('test-counter').innerText = `שאלה ${testIdx + 1} מתוך 25`;
+            document.getElementById('test-progress-bar').style.width = `${((testIdx + 1) / 25) * 100}%`;
+            document.getElementById('test-question').innerText = q.question;
+
+            const badge = document.getElementById('test-type-badge');
+            if(q.type === 'multiple') { badge.classList.remove('hidden'); badge.classList.add('inline-flex'); }
+            else { badge.classList.add('hidden'); badge.classList.remove('inline-flex'); }
+
+            const container = document.getElementById('test-options');
+            container.innerHTML = '';
+
+            q.options.forEach(opt => {
+                const isSelected = selected.includes(opt);
+                const style = isSelected ? "bg-indigo-50 dark:bg-indigo-900/40 border-indigo-500 text-indigo-900 dark:text-indigo-300 shadow-sm" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-500";
+                const iconHtml = `<div class="w-5 h-5 rounded shrink-0 border-2 ${q.type==='single'?'rounded-full':''} ${isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 dark:border-slate-600'}"></div>`;
+
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-2xl border-2 flex items-center gap-4 transition-all cursor-pointer ${style}`;
+                div.innerHTML = `${iconHtml}<span class="font-bold text-lg leading-tight">${opt}</span>`;
+                div.onclick = () => {
+                    if (q.type === 'multiple') {
+                        if (selected.includes(opt)) testAnswers[q.quizId] = selected.filter(o => o !== opt);
+                        else testAnswers[q.quizId] = [...selected, opt];
+                    } else {
+                        testAnswers[q.quizId] = [opt];
+                    }
+                    renderTest();
+                };
+                container.appendChild(div);
+            });
+
+            const prevBtn = document.getElementById('test-prev-btn');
+            if(testIdx === 0) prevBtn.className = "font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-300 dark:text-slate-600 cursor-not-allowed";
+            else prevBtn.className = "font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700";
+
+            document.getElementById('test-next-text').innerText = testIdx === testList.length - 1 ? 'סיים מבחן' : 'השאלה הבאה';
+        }
+
+        window.prevTest = () => {
+            if (testIdx > 0) { testIdx--; renderTest(); }
+        };
+
+        window.nextTest = () => {
+            const q = testList[testIdx];
+            const selected = testAnswers[q.quizId] || [];
+            
+            if (selected.length === 0 && !confirm('לא בחרת תשובה, להמשיך הלאה? תשובה ריקה תיחשב כשגיאה.')) return;
+            
+            if (testIdx < testList.length - 1) {
+                testIdx++;
+                renderTest();
+            } else {
+                finishTest();
+            }
+        };
+
+        function finishTest() {
+            let correctCount = 0;
+            testList.forEach(card => {
+                const userAns = testAnswers[card.quizId] || [];
+                const isCorrect = userAns.length === card.correctAnswers.length && userAns.every(ans => card.correctAnswers.includes(ans));
+                if(isCorrect) correctCount++;
+            });
+            const percent = Math.round((correctCount / testList.length) * 100);
+
+            document.getElementById('test-active-view').classList.add('hidden');
+            document.getElementById('test-results-view').classList.remove('hidden');
+            document.getElementById('test-results-view').classList.add('flex');
+
+            document.getElementById('test-res-score').innerText = percent;
+            document.getElementById('test-res-text').innerText = `${correctCount} תשובות נכונות מתוך ${testList.length}`;
+
+            let msg = "כל הכבוד!";
+            let color = "text-green-600 dark:text-green-400";
+            let icon = "target";
+            
+            if (percent < 70) { msg = "יש צורך בחזרה נוספת."; color = "text-orange-500"; icon = "alert-triangle"; }
+            if (percent < 50) { msg = "מומלץ לעבור על הכרטיסיות מחדש."; color = "text-red-500"; icon = "alert-circle"; }
+
+            document.getElementById('test-res-msg').innerText = msg;
+            document.getElementById('test-res-score').className = `text-6xl font-black mb-2 ${color}`;
+            const iconEl = document.getElementById('test-res-icon');
+            iconEl.setAttribute('data-lucide', icon);
+            iconEl.className = `mx-auto mb-6 w-16 h-16 ${color}`;
+            lucide.createIcons();
+        }
+
+    </script>
+</body>
+</html>
