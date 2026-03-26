@@ -19,11 +19,11 @@ if (typeof __firebase_config !== 'undefined') {
 
 export const AXES = [
     { id: 'resuscitation', label: 'ציר החייאה', href: 'resuscitation.html' },
-    { id: 'resuscitation-schema', label: 'סכמת X-CARE', href: 'resuscitation-schema.html' },
-    { id: 'trauma', label: 'ציר טראומה', href: 'trauma.html' },
-    { id: 'routine', label: 'ציר שגרה', href: 'routine.html' },
-    { id: 'anamnesis', label: 'ציר אנמנזה', href: 'anamnesis.html' },
-    { id: 'mental-health', label: 'ציר בריאות הנפש', href: 'mental-health.html' }
+    { id: 'resuscitation-schema', label: 'ציר סכמת טיפול בפצוע', href: 'resuscitation-schema.html' },
+    { id: 'trauma', label: 'ציר טראומה', href: 'trauma-quiz/index.html' },
+    { id: 'routine', label: 'ציר שגרה', href: 'routine.html', underConstruction: true },
+    { id: 'anamnesis', label: 'ציר אנמנזה', href: 'anamnesis.html', underConstruction: true },
+    { id: 'mental-health', label: 'ציר בריאות הנפש', href: 'mental-health.html', underConstruction: true }
 ];
 
 export const DEFAULT_AXIS = 'resuscitation';
@@ -129,4 +129,8 @@ export function getAxisHref(axisId) {
 
 export function getAxisLabel(axisId) {
     return AXES.find(axis => axis.id === axisId)?.label || 'ציר';
+}
+
+export function isUnderConstruction(axisId) {
+    return AXES.find(axis => axis.id === axisId)?.underConstruction === true;
 }
