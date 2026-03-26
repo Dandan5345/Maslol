@@ -532,7 +532,7 @@
     </div>
 
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, loadProgress, saveProgress, setLastAxis, isAuthorizedUser } from "./firebase-common.js";
+        import { ensureInitialAuth, onUserChanged, signOutUser, loadProgress, saveProgress, isAuthorizedUser } from "./firebase-common.js";
 
         let currentUser = null;
         const currentAxis = 'resuscitation';
@@ -608,7 +608,6 @@
                 document.getElementById('app-header').classList.remove('hidden');
 
                 window.appState.cards = await loadProgress(user.uid, window.appState.cards);
-                await setLastAxis(user.uid, currentAxis);
                 updateHomeProgress();
 
                 // הצגה/הסתרה של כרטיסיית המבחן המסכם לפי הרשאת מייל

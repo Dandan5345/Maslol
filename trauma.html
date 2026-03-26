@@ -135,7 +135,7 @@
             <div>
                 <div class="trauma-kicker">ציר טראומה</div>
                 <h1 id="trauma-view-title">ציר טראומה</h1>
-                <p id="trauma-view-subtitle" class="trauma-subtitle">תרגול ישיר בלי דף בחירת ציר נוסף.</p>
+                <p id="trauma-view-subtitle" class="trauma-subtitle">בחרו מצב תרגול</p>
             </div>
             <div class="trauma-header-actions">
                 <span id="trauma-user-display" class="trauma-user"></span>
@@ -151,9 +151,7 @@
                     style="background: var(--danger-gradient); box-shadow: 0 4px 18px rgba(248, 81, 73, 0.35);">
                     <i data-lucide="shield-plus" class="auth-icon"></i>
                 </div>
-                <h2 style="margin-bottom: 0.75rem;">כניסה ישירה לתרגול טראומה</h2>
-                <p class="subtitle" style="margin-bottom: 0;">בלי מסך בחירת ציר נוסף, בלי תקיעות מיותרות, ועם אותם צבעים
-                    וסגנון מוכר של מסך הטראומה.</p>
+                <h2 style="margin-bottom: 0.75rem;">ציר טראומה</h2>
             </div>
 
             <div class="trauma-actions">
@@ -286,7 +284,7 @@
     <script src="trauma-quiz/data.js"></script>
     <script src="trauma.js"></script>
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, setLastAxis } from './firebase-common.js';
+        import { ensureInitialAuth, onUserChanged, signOutUser } from './firebase-common.js';
 
         function hideLoader() {
             const loader = document.getElementById('page-loader');
@@ -309,7 +307,6 @@
                 return;
             }
 
-            await setLastAxis(user.uid, 'trauma');
             document.getElementById('trauma-user-display').textContent = user.displayName || 'משתמש';
             window.lucide?.createIcons();
             hideLoader();

@@ -81,8 +81,7 @@
                             class="bg-gradient-to-l from-blue-600 to-cyan-500 bg-clip-text text-transparent">מותאם
                             לטלפון, מהיר ומסונכרן</span></h1>
                     <p class="mb-6 text-base font-medium leading-7 text-slate-600 dark:text-slate-300 sm:text-lg">התחברו
-                        פעם אחת עם גוגל, המשיכו בדיוק מהציר האחרון שבו למדתם, ותרגלו מכל מכשיר עם ממשק נקי ונוח גם
-                        בנייד.</p>
+                        פעם אחת עם גוגל, בחרו ציר לימוד ותרגלו מכל מכשיר עם ממשק נקי ונוח גם בנייד.</p>
                     <div class="grid gap-3 sm:grid-cols-3">
                         <div
                             class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/70">
@@ -99,8 +98,7 @@
                                 class="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300">
                                 <i data-lucide="cloud" class="h-5 w-5"></i></div>
                             <div class="font-black">שמירה בענן</div>
-                            <p class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">התקדמות והציר האחרון
-                                נשמרים בפיירבייס לכל משתמש.</p>
+                            <p class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">ההתקדמות נשמרת בפיירבייס לכל משתמש.</p>
                         </div>
                         <div
                             class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/70">
@@ -122,7 +120,7 @@
                     </div>
                     <h2 class="mb-3 text-3xl font-black text-slate-900 dark:text-white">ברוכים הבאים</h2>
                     <p class="mb-8 text-base font-medium leading-7 text-slate-500 dark:text-slate-400">כניסה מהירה עם
-                        Google בלבד. אחרי ההתחברות המערכת תעביר אתכם ישר לציר האחרון שבו הייתם.</p>
+                        Google בלבד. אחרי ההתחברות תועברו למסך בחירת הציר.</p>
                     <button id="google-login-button" onclick="handleGoogleLogin()"
                         class="flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-4 py-4 text-lg font-black text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-blue-500 dark:hover:bg-slate-700">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" aria-hidden="true">
@@ -141,14 +139,14 @@
                         class="mt-4 hidden rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700 dark:border-red-900/60 dark:bg-red-900/20 dark:text-red-300">
                     </p>
                     <p class="mt-6 text-sm font-medium text-slate-400 dark:text-slate-500">אם כבר התחברתם בעבר, נעביר
-                        אתכם אוטומטית למסך המתאים.</p>
+                        אתכם אוטומטית למסך בחירת הציר.</p>
                 </section>
             </div>
         </div>
     </main>
 
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signInWithGoogle, loadUserPreferences, getAxisHref } from './firebase-common.js';
+        import { ensureInitialAuth, onUserChanged, signInWithGoogle } from './firebase-common.js';
 
         const loader = document.getElementById('page-loader');
         const errorBox = document.getElementById('login-error');
@@ -175,11 +173,6 @@
             setTimeout(() => { loader.style.display = 'none'; }, 250);
         }
 
-        async function goToLastAxis(user) {
-            const preferences = await loadUserPreferences(user.uid);
-            window.location.replace(getAxisHref(preferences.lastAxis));
-        }
-
         window.handleGoogleLogin = async () => {
             errorBox.classList.add('hidden');
             loginButton.disabled = true;
@@ -199,7 +192,7 @@
 
         onUserChanged(async (user) => {
             if (user) {
-                await goToLastAxis(user);
+                window.location.replace('axes.html');
                 return;
             }
             hideLoader();
