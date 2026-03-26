@@ -313,7 +313,7 @@
             </div>
 
             <!-- Test Results -->
-            <div id="test-results-view" class="flex-col h-full w-full items-center justify-center hidden">
+            <div id="test-results-view" class="flex-col h-full w-full items-center overflow-y-auto custom-scrollbar hidden py-4">
                 <div class="bg-white dark:bg-slate-800 max-w-lg w-full rounded-[2rem] shadow-2xl p-10 text-center border border-slate-200 dark:border-slate-700 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-white dark:from-indigo-900/20 dark:to-slate-800"></div>
                     <div class="relative z-10">
@@ -328,10 +328,24 @@
                         </div>
 
                         <div class="flex flex-col gap-3">
+                            <button id="test-review-btn" onclick="showTestReview()" class="w-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-bold text-lg py-4 rounded-xl border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition hidden">בדוק טעויות (<span id="test-wrong-count">0</span>)</button>
                             <button onclick="navigate('home')" class="w-full bg-slate-900 dark:bg-indigo-600 text-white font-black text-lg py-4 rounded-xl hover:bg-slate-800 dark:hover:bg-indigo-700 transition shadow-lg">חזרה לתפריט הראשי</button>
                             <button onclick="startTest()" class="w-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-lg py-4 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition">מבחן חדש</button>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Test Review -->
+            <div id="test-review-view" class="flex-col h-full w-full hidden">
+                <div class="flex items-center justify-between mb-5 shrink-0">
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-white">סקירת טעויות</h2>
+                    <button onclick="showTestResults()" class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition text-sm flex items-center gap-1.5">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i> חזרה לתוצאות
+                    </button>
+                </div>
+                <div id="test-review-content" class="flex-1 overflow-y-auto space-y-4 custom-scrollbar pb-4">
+                    <!-- Review items injected here -->
                 </div>
             </div>
 
@@ -952,18 +966,30 @@
             }
         };
 
+        function isQuestionCorrect(q, userAns) {
+            return userAns.length === q.correctAnswers.length && userAns.every(ans => q.correctAnswers.includes(ans));
+        }
+
         function finishTest() {
             let correctCount = 0;
             testList.forEach(card => {
                 const userAns = testAnswers[card.quizId] || [];
-                const isCorrect = userAns.length === card.correctAnswers.length && userAns.every(ans => card.correctAnswers.includes(ans));
-                if(isCorrect) correctCount++;
+                if(isQuestionCorrect(card, userAns)) correctCount++;
             });
             const percent = Math.round((correctCount / testList.length) * 100);
+            const wrongCount = testList.length - correctCount;
 
             document.getElementById('test-active-view').classList.add('hidden');
             document.getElementById('test-results-view').classList.remove('hidden');
             document.getElementById('test-results-view').classList.add('flex');
+
+            const reviewBtn = document.getElementById('test-review-btn');
+            if (wrongCount > 0) {
+                document.getElementById('test-wrong-count').innerText = wrongCount;
+                reviewBtn.classList.remove('hidden');
+            } else {
+                reviewBtn.classList.add('hidden');
+            }
 
             document.getElementById('test-res-score').innerText = percent;
             document.getElementById('test-res-text').innerText = `${correctCount} תשובות נכונות מתוך ${testList.length}`;
@@ -982,6 +1008,68 @@
             iconEl.className = `mx-auto mb-6 w-16 h-16 ${color}`;
             lucide.createIcons();
         }
+
+        window.showTestReview = () => {
+            const reviewContent = document.getElementById('test-review-content');
+            reviewContent.innerHTML = '';
+
+            testList.forEach((q, idx) => {
+                const userAns = testAnswers[q.quizId] || [];
+                if (isQuestionCorrect(q, userAns)) return;
+
+                const item = document.createElement('div');
+                item.className = 'bg-white dark:bg-slate-800 rounded-2xl border-2 border-red-200 dark:border-red-900/50 overflow-hidden shadow-sm';
+
+                let optionsHtml = '';
+                q.options.forEach(opt => {
+                    const isUserSelected = userAns.includes(opt);
+                    const isCorrectAnswer = q.correctAnswers.includes(opt);
+                    let style, iconHtml;
+                    if (isCorrectAnswer) {
+                        style = 'bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-600 text-green-800 dark:text-green-300';
+                        iconHtml = `<div class="w-5 h-5 rounded${q.type === 'single' ? '-full' : ''} shrink-0 border-2 border-green-500 bg-green-500 flex items-center justify-center"><i data-lucide="check" class="w-3 h-3 text-white"></i></div>`;
+                    } else if (isUserSelected) {
+                        style = 'bg-red-50 dark:bg-red-900/20 border-red-400 dark:border-red-600 text-red-800 dark:text-red-300';
+                        iconHtml = `<div class="w-5 h-5 rounded${q.type === 'single' ? '-full' : ''} shrink-0 border-2 border-red-500 bg-red-500 flex items-center justify-center"><i data-lucide="x" class="w-3 h-3 text-white"></i></div>`;
+                    } else {
+                        style = 'bg-slate-50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500';
+                        iconHtml = `<div class="w-5 h-5 rounded${q.type === 'single' ? '-full' : ''} shrink-0 border-2 border-slate-300 dark:border-slate-600"></div>`;
+                    }
+                    optionsHtml += `<div class="p-3 rounded-xl border-2 flex items-center gap-3 ${style}">${iconHtml}<span class="font-medium text-sm leading-snug">${opt}</span></div>`;
+                });
+
+                const typeBadge = q.type === 'multiple' ? `<span class="text-xs font-bold text-orange-500 bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 rounded-full">בחירה מרובה</span>` : '';
+                item.innerHTML = `
+                    <div class="p-4 bg-red-50 dark:bg-red-900/10 border-b border-red-100 dark:border-red-900/30">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xs font-bold text-red-500 bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded-full">שאלה ${idx + 1}</span>${typeBadge}
+                        </div>
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base leading-snug">${q.question}</h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="space-y-2 mb-4">${optionsHtml}</div>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-start gap-2">
+                            <i data-lucide="lightbulb" class="w-4 h-4 text-blue-500 mt-0.5 shrink-0"></i>
+                            <p class="text-sm text-blue-800 dark:text-blue-300 font-medium leading-relaxed">${q.explanation}</p>
+                        </div>
+                    </div>
+                `;
+                reviewContent.appendChild(item);
+            });
+
+            document.getElementById('test-results-view').classList.add('hidden');
+            document.getElementById('test-results-view').classList.remove('flex');
+            document.getElementById('test-review-view').classList.remove('hidden');
+            document.getElementById('test-review-view').classList.add('flex');
+            lucide.createIcons();
+        };
+
+        window.showTestResults = () => {
+            document.getElementById('test-review-view').classList.add('hidden');
+            document.getElementById('test-review-view').classList.remove('flex');
+            document.getElementById('test-results-view').classList.remove('hidden');
+            document.getElementById('test-results-view').classList.add('flex');
+        };
 
     </script>
 <script>
