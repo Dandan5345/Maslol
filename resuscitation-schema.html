@@ -213,7 +213,7 @@
                 </button>
 
                 <!-- Full Schema Test -->
-                <button onclick="navigate('full-test')"
+                <button id="btn-schema-exam" onclick="navigate('full-test')"
                     class="group text-right bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-orange-400 dark:hover:border-orange-500 p-5 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start">
                     <div
                         class="w-12 h-12 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -389,7 +389,7 @@
     </main>
 
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, setLastAxis } from "./firebase-common.js";
+        import { ensureInitialAuth, onUserChanged, signOutUser, setLastAxis, isAuthorizedUser } from "./firebase-common.js";
 
         let currentUser = null;
         const currentAxis = 'resuscitation-schema';
@@ -666,6 +666,13 @@
                 document.getElementById('home-greeting').innerHTML = `שלום <span class="text-red-600 dark:text-red-400">${user.displayName || 'לוחם'}</span>,<br>מוכן ללמוד את <span class="bg-clip-text text-transparent bg-gradient-to-l from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400">הסכמה</span>?`;
                 document.getElementById('app-header').classList.remove('hidden');
                 await setLastAxis(user.uid, currentAxis);
+
+                // הצגה/הסתרה של כרטיסיית מבחן הסכמה המלאה לפי הרשאת מייל
+                const schemaExamBtn = document.getElementById('btn-schema-exam');
+                if (schemaExamBtn) {
+                    schemaExamBtn.style.display = isAuthorizedUser(user) ? '' : 'none';
+                }
+
                 document.getElementById('global-loader').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('global-loader').style.display = 'none';

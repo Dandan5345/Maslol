@@ -200,13 +200,7 @@
     <script src="data.js"></script>
     <script src="app.js"></script>
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, setLastAxis } from "../firebase-common.js";
-
-        // רשימת המיילים המורשים לגישה לשאלות הספציפיות למבחן (מבחן מסכם 39 שאלות)
-        // יש להוסיף כאן את כתובות המייל של המשתמשים המורשים לפני הפריסה
-        // לדוגמה: 'user@example.com'
-        const authorizedEmails = [
-        ];
+        import { ensureInitialAuth, onUserChanged, signOutUser, setLastAxis, isAuthorizedUser } from "../firebase-common.js";
 
         await ensureInitialAuth();
 
@@ -225,7 +219,7 @@
             // הצגה/הסתרה של כרטיסיית השאלות הספציפיות למבחן לפי הרשאה
             const specificExamCard = document.getElementById('start-exam-specific');
             if (specificExamCard) {
-                specificExamCard.style.display = authorizedEmails.includes(email) ? '' : 'none';
+                specificExamCard.style.display = isAuthorizedUser(user) ? '' : 'none';
             }
 
             // מעבר למסך הראשי (showView מוגדר ב-app.js שנטען לפני סקריפט זה)
