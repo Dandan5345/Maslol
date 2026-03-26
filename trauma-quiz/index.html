@@ -14,7 +14,7 @@
     <div id="toast" class="toast hidden"></div>
 
     <div class="app-container">
-        <!-- 1. Login Screen -->
+        <!-- 1. Loading Screen -->
         <section id="login-screen" class="view active-view">
             <div class="glass-card login-card">
                 <div class="icon-container">
@@ -22,12 +22,7 @@
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
                 </div>
-                <h1>התחברות למערכת</h1>
-                <p class="subtitle">הזן את כתובת הדוא"ל המורשית שלך</p>
-                <div class="input-group">
-                    <input type="email" id="email-input" placeholder="דוא&quot;ל" autocomplete="email">
-                </div>
-                <button id="login-btn" class="btn-primary">היכנס למערכת</button>
+                <h1>טוען...</h1>
             </div>
         </section>
 
@@ -204,5 +199,49 @@
 
     <script src="data.js"></script>
     <script src="app.js"></script>
+    <script type="module">
+        import { ensureInitialAuth, onUserChanged, signOutUser, setLastAxis } from "../firebase-common.js";
+
+        // רשימת המיילים המורשים לגישה לשאלות הספציפיות למבחן (מבחן מסכם 39 שאלות)
+        // יש להוסיף כאן את כתובות המייל של המשתמשים המורשים לפני הפריסה
+        // לדוגמה: 'user@example.com'
+        const authorizedEmails = [
+        ];
+
+        await ensureInitialAuth();
+
+        onUserChanged(user => {
+            if (!user) {
+                window.location.href = '../login.html';
+                return;
+            }
+
+            const email = (user.email || '').toLowerCase();
+
+            // הצגת המייל של המשתמש
+            const emailDisplay = document.getElementById('user-email-display');
+            if (emailDisplay) emailDisplay.textContent = email;
+
+            // הצגה/הסתרה של כרטיסיית השאלות הספציפיות למבחן לפי הרשאה
+            const specificExamCard = document.getElementById('start-exam-specific');
+            if (specificExamCard) {
+                specificExamCard.style.display = authorizedEmails.includes(email) ? '' : 'none';
+            }
+
+            // מעבר למסך הראשי (showView מוגדר ב-app.js שנטען לפני סקריפט זה)
+            if (window.showView) window.showView('dashboard-screen');
+
+            // שמירת הציר האחרון שנכנסו אליו
+            setLastAxis(user.uid, 'trauma');
+        });
+
+        // כפתור התנתקות - משתמש ב-Firebase Auth
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                signOutUser();
+            });
+        }
+    </script>
 </body>
 </html>
