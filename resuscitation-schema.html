@@ -389,7 +389,7 @@
     </main>
 
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, setLastAxis, isAuthorizedUser } from "./firebase-common.js";
+        import { ensureInitialAuth, onUserChanged, signOutUser, isAuthorizedUser } from "./firebase-common.js";
 
         let currentUser = null;
         const currentAxis = 'resuscitation-schema';
@@ -665,7 +665,6 @@
                 document.getElementById('user-greeting').innerText = `שלום, ${user.displayName || 'משתמש'}`;
                 document.getElementById('home-greeting').innerHTML = `שלום <span class="text-red-600 dark:text-red-400">${user.displayName || 'לוחם'}</span>,<br>מוכן ללמוד את <span class="bg-clip-text text-transparent bg-gradient-to-l from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400">הסכמה</span>?`;
                 document.getElementById('app-header').classList.remove('hidden');
-                await setLastAxis(user.uid, currentAxis);
 
                 // הצגה/הסתרה של כרטיסיית מבחן הסכמה המלאה לפי הרשאת מייל
                 const schemaExamBtn = document.getElementById('btn-schema-exam');
