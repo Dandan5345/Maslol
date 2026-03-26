@@ -23,14 +23,39 @@
         }
     </script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-6px); }
+        .card-hover:active { transform: translateY(-2px); }
+        .construction-card { position: relative; overflow: hidden; }
+        .construction-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,0,0,0.02) 10px,
+                rgba(0,0,0,0.02) 20px
+            );
+            pointer-events: none;
+            border-radius: inherit;
+        }
+    </style>
 </head>
 
 <body
-    class="min-h-screen overflow-x-hidden bg-slate-100 text-slate-800 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+    class="min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 text-slate-800 transition-colors duration-300 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-100">
+
     <div class="fixed inset-0 pointer-events-none overflow-hidden">
-        <div class="absolute -top-10 left-1/2 h-52 w-52 -translate-x-1/2 rounded-full bg-cyan-300/10 blur-3xl"></div>
-        <div class="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-blue-400/10 blur-3xl"></div>
-        <div class="absolute top-16 right-5 text-7xl opacity-15">🚑</div>
+        <div class="absolute -top-20 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-blue-400/10 blur-[100px]"></div>
+        <div class="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-cyan-400/10 blur-[100px]"></div>
+        <div class="absolute top-1/3 left-0 h-64 w-64 rounded-full bg-purple-400/5 blur-[80px]"></div>
     </div>
 
     <div id="page-loader"
@@ -43,106 +68,163 @@
         </div>
     </div>
 
-    <main class="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-6 sm:py-8">
+    <!-- Under Construction Modal -->
+    <div id="modal-construction" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeConstructionModal()"></div>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2rem] shadow-2xl p-8 relative z-10 border border-slate-100 dark:border-slate-700 text-center animate-fade-in">
+            <div class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-amber-100 dark:bg-amber-900/30">
+                <i data-lucide="hard-hat" class="h-10 w-10 text-amber-600 dark:text-amber-300"></i>
+            </div>
+            <h3 class="text-2xl font-black mb-2 dark:text-white">הציר בבנייה 🚧</h3>
+            <p id="modal-construction-text" class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">ציר זה נמצא כרגע בשלבי בנייה ועדיין לא זמין. ברגע שיהיה מוכן תוכלו להיכנס!</p>
+            <button onclick="closeConstructionModal()"
+                class="w-full rounded-2xl bg-slate-900 px-6 py-3.5 text-base font-black text-white transition hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-700">
+                הבנתי, חזרה לבחירת ציר
+            </button>
+        </div>
+    </div>
+
+    <main class="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-6 sm:px-6 sm:py-10">
+
         <header
-            class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[2rem] border border-white/70 bg-white/85 p-4 shadow-lg backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/85">
+            class="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-white/80 bg-white/90 p-5 sm:p-6 shadow-lg shadow-slate-200/50 backdrop-blur-xl dark:border-slate-700/70 dark:bg-slate-900/90 dark:shadow-slate-900/50 animate-slide-up">
             <div>
-                <p class="text-sm font-bold text-blue-600 dark:text-blue-300">בחירת ציר</p>
+                <div class="mb-1 inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                    <i data-lucide="compass" class="h-3.5 w-3.5"></i>
+                    בחירת ציר לימוד
+                </div>
                 <h1 class="text-2xl font-black sm:text-3xl">בחרו מאיפה להמשיך ללמוד</h1>
-                <p id="axes-subtitle" class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">הציר האחרון
+                <p id="axes-subtitle" class="mt-1.5 text-sm font-medium text-slate-500 dark:text-slate-400">הציר האחרון
                     שלכם יודגש אוטומטית.</p>
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="toggleDarkMode()"
-                    class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+                    class="inline-flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
                     <i data-lucide="moon" id="dark-icon" class="h-4 w-4"></i>
                     תצוגה
                 </button>
                 <button onclick="handleLogout()"
-                    class="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-red-600 transition hover:bg-red-100 dark:bg-red-900/20 dark:text-red-300 dark:hover:bg-red-900/30">
+                    class="inline-flex items-center gap-2 rounded-2xl bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600 transition hover:bg-red-100 dark:bg-red-900/20 dark:text-red-300 dark:hover:bg-red-900/30">
                     <i data-lucide="log-out" class="h-4 w-4"></i>
                     התנתקות
                 </button>
             </div>
         </header>
 
-        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <!-- Available Axes Label -->
+        <div class="mb-4 flex items-center gap-2 px-1 animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="h-2 w-2 rounded-full bg-green-500"></div>
+            <span class="text-sm font-bold text-slate-600 dark:text-slate-400">צירים פעילים</span>
+            <div class="flex-1 border-t border-slate-200 dark:border-slate-700/50"></div>
+        </div>
+
+        <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+
+            <!-- Resuscitation Axis -->
             <button data-axis-card="resuscitation" onclick="openAxis('resuscitation')"
-                class="group flex min-h-[160px] flex-col rounded-[2rem] border border-blue-200 bg-gradient-to-br from-blue-600 to-cyan-500 p-4 text-right text-white shadow-xl shadow-blue-500/20 transition hover:-translate-y-1">
-                <div class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15"><i
-                        data-lucide="heart-pulse" class="h-6 w-6"></i></div>
-                <div class="mb-2 text-xl font-black">ציר החייאה</div>
-                <p class="text-xs font-medium leading-5 text-blue-50/95">הציר הפעיל כרגע - עם כרטיסיות, תרגול ומבחן
-                    מסכם.</p>
-                <div class="mt-auto flex items-center justify-between pt-4 text-sm font-bold">
-                    <span class="rounded-full bg-white/15 px-3 py-1">זמין עכשיו</span>
-                    <span class="inline-flex items-center gap-1">כניסה <i data-lucide="chevron-left"
-                            class="h-4 w-4"></i></span>
+                class="card-hover group flex min-h-[200px] flex-col rounded-[2rem] border-2 border-blue-300/50 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 p-5 text-right text-white shadow-xl shadow-blue-500/20 animate-slide-up" style="animation-delay: 0.15s;">
+                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
+                    <i data-lucide="heart-pulse" class="h-7 w-7"></i>
+                </div>
+                <div class="mb-2 text-xl font-black leading-tight">ציר החייאה</div>
+                <p class="text-sm font-medium leading-relaxed text-blue-50/90">כרטיסיות למידה, תרגול ומבחן מסכם.</p>
+                <div class="mt-auto flex items-center justify-between pt-5 text-sm font-bold">
+                    <span class="rounded-full bg-white/20 backdrop-blur-sm px-3 py-1.5 text-xs">✓ זמין</span>
+                    <span class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">כניסה <i data-lucide="chevron-left" class="h-4 w-4"></i></span>
                 </div>
             </button>
 
+            <!-- Schema Axis (renamed) -->
             <button data-axis-card="resuscitation-schema" onclick="openAxis('resuscitation-schema')"
-                class="group flex min-h-[160px] flex-col rounded-[2rem] border border-orange-200 bg-gradient-to-br from-orange-600 to-red-500 p-4 text-right text-white shadow-xl shadow-orange-500/20 transition hover:-translate-y-1">
-                <div class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15"><i
-                        data-lucide="file-text" class="h-6 w-6"></i></div>
-                <div class="mb-2 text-xl font-black">סכמת X-CARE</div>
-                <p class="text-xs font-medium leading-5 text-orange-50/95">למידה וכרטיסיות של הסכמה, מבחן סכמה מילה
-                    במילה, מבחן לפי שלבים וחידון אמריקאי.</p>
-                <div class="mt-auto flex items-center justify-between pt-4 text-sm font-bold">
-                    <span class="rounded-full bg-white/15 px-3 py-1">זמין עכשיו</span>
-                    <span class="inline-flex items-center gap-1">כניסה <i data-lucide="chevron-left"
-                            class="h-4 w-4"></i></span>
+                class="card-hover group flex min-h-[200px] flex-col rounded-[2rem] border-2 border-orange-300/50 bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 p-5 text-right text-white shadow-xl shadow-orange-500/20 animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
+                    <i data-lucide="file-text" class="h-7 w-7"></i>
+                </div>
+                <div class="mb-2 text-xl font-black leading-tight">ציר סכמת טיפול בפצוע</div>
+                <p class="text-sm font-medium leading-relaxed text-orange-50/90">למידה, מבחן מילה במילה, מבחן לפי שלבים וחידון.</p>
+                <div class="mt-auto flex items-center justify-between pt-5 text-sm font-bold">
+                    <span class="rounded-full bg-white/20 backdrop-blur-sm px-3 py-1.5 text-xs">✓ זמין</span>
+                    <span class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">כניסה <i data-lucide="chevron-left" class="h-4 w-4"></i></span>
                 </div>
             </button>
 
+            <!-- Trauma Axis (now active!) -->
             <button data-axis-card="trauma" onclick="openAxis('trauma')"
-                class="group flex min-h-[160px] flex-col rounded-[2rem] border border-white/70 bg-white/90 p-4 text-right shadow-lg transition hover:-translate-y-1 dark:border-slate-700/70 dark:bg-slate-900/85">
-                <div
-                    class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-300">
-                    <i data-lucide="shield-plus" class="h-6 w-6"></i></div>
-                <div class="mb-2 text-xl font-black">ציר טראומה</div>
-                <p class="text-xs font-medium leading-5 text-slate-500 dark:text-slate-400">קובץ ייעודי נפתח וכרגע מסומן
-                    בבנייה.</p>
-                <div class="mt-auto pt-4 text-sm font-bold text-red-500 dark:text-red-300">בבנייה</div>
-            </button>
-
-            <button data-axis-card="routine" onclick="openAxis('routine')"
-                class="group flex min-h-[160px] flex-col rounded-[2rem] border border-white/70 bg-white/90 p-4 text-right shadow-lg transition hover:-translate-y-1 dark:border-slate-700/70 dark:bg-slate-900/85">
-                <div
-                    class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">
-                    <i data-lucide="stethoscope" class="h-6 w-6"></i></div>
-                <div class="mb-2 text-xl font-black">ציר שגרה</div>
-                <p class="text-xs font-medium leading-5 text-slate-500 dark:text-slate-400">מוכן כעמוד נפרד להמשך פיתוח
-                    עתידי.</p>
-                <div class="mt-auto pt-4 text-sm font-bold text-emerald-500 dark:text-emerald-300">בבנייה</div>
-            </button>
-
-            <button data-axis-card="anamnesis" onclick="openAxis('anamnesis')"
-                class="group flex min-h-[160px] flex-col rounded-[2rem] border border-white/70 bg-white/90 p-4 text-right shadow-lg transition hover:-translate-y-1 dark:border-slate-700/70 dark:bg-slate-900/85">
-                <div
-                    class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
-                    <i data-lucide="clipboard-list" class="h-6 w-6"></i></div>
-                <div class="mb-2 text-xl font-black">ציר אנמנזה</div>
-                <p class="text-xs font-medium leading-5 text-slate-500 dark:text-slate-400">עמוד מוכן להצגת התוכן
-                    העתידי.</p>
-                <div class="mt-auto pt-4 text-sm font-bold text-amber-500 dark:text-amber-300">בבנייה</div>
-            </button>
-
-            <button data-axis-card="mental-health" onclick="openAxis('mental-health')"
-                class="group flex min-h-[160px] flex-col rounded-[2rem] border border-white/70 bg-white/90 p-4 text-right shadow-lg transition hover:-translate-y-1 dark:border-slate-700/70 dark:bg-slate-900/85 sm:col-span-2 xl:col-span-1">
-                <div
-                    class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-900/30 dark:text-fuchsia-300">
-                    <i data-lucide="brain" class="h-6 w-6"></i></div>
-                <div class="mb-2 text-xl font-black">ציר בריאות הנפש</div>
-                <p class="text-xs font-medium leading-5 text-slate-500 dark:text-slate-400">נבנה כעמוד נפרד, מוכן להרחבה
-                    בהמשך.</p>
-                <div class="mt-auto pt-4 text-sm font-bold text-fuchsia-500 dark:text-fuchsia-300">בבנייה</div>
+                class="card-hover group flex min-h-[200px] flex-col rounded-[2rem] border-2 border-red-300/50 bg-gradient-to-br from-red-600 via-red-500 to-rose-500 p-5 text-right text-white shadow-xl shadow-red-500/20 animate-slide-up" style="animation-delay: 0.25s;">
+                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
+                    <i data-lucide="shield-plus" class="h-7 w-7"></i>
+                </div>
+                <div class="mb-2 text-xl font-black leading-tight">ציר טראומה</div>
+                <p class="text-sm font-medium leading-relaxed text-red-50/90">חידון שאלות בנושאי טראומה וטיפול בפציעות.</p>
+                <div class="mt-auto flex items-center justify-between pt-5 text-sm font-bold">
+                    <span class="rounded-full bg-white/20 backdrop-blur-sm px-3 py-1.5 text-xs">✓ זמין</span>
+                    <span class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">כניסה <i data-lucide="chevron-left" class="h-4 w-4"></i></span>
+                </div>
             </button>
         </section>
+
+        <!-- Under Construction Axes Label -->
+        <div class="mb-4 flex items-center gap-2 px-1 animate-slide-up" style="animation-delay: 0.3s;">
+            <div class="h-2 w-2 rounded-full bg-amber-500"></div>
+            <span class="text-sm font-bold text-slate-600 dark:text-slate-400">צירים בבנייה</span>
+            <div class="flex-1 border-t border-slate-200 dark:border-slate-700/50"></div>
+        </div>
+
+        <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+            <!-- Routine Axis (under construction) -->
+            <button data-axis-card="routine" onclick="openAxis('routine')"
+                class="card-hover construction-card group flex min-h-[180px] flex-col rounded-[2rem] border-2 border-slate-200/80 bg-white/90 p-5 text-right shadow-lg shadow-slate-200/30 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 dark:shadow-slate-900/30 animate-slide-up" style="animation-delay: 0.35s;">
+                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    <i data-lucide="stethoscope" class="h-7 w-7"></i>
+                </div>
+                <div class="mb-2 text-xl font-black">ציר שגרה</div>
+                <p class="text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">ציר זה יכלול תוכן בנושא רפואת שגרה.</p>
+                <div class="mt-auto flex items-center justify-between pt-4">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        <i data-lucide="hard-hat" class="h-3.5 w-3.5"></i> בבנייה
+                    </span>
+                </div>
+            </button>
+
+            <!-- Anamnesis Axis (under construction) -->
+            <button data-axis-card="anamnesis" onclick="openAxis('anamnesis')"
+                class="card-hover construction-card group flex min-h-[180px] flex-col rounded-[2rem] border-2 border-slate-200/80 bg-white/90 p-5 text-right shadow-lg shadow-slate-200/30 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 dark:shadow-slate-900/30 animate-slide-up" style="animation-delay: 0.4s;">
+                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
+                    <i data-lucide="clipboard-list" class="h-7 w-7"></i>
+                </div>
+                <div class="mb-2 text-xl font-black">ציר אנמנזה</div>
+                <p class="text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">ציר זה יכלול תוכן בנושא נטילת אנמנזה.</p>
+                <div class="mt-auto flex items-center justify-between pt-4">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        <i data-lucide="hard-hat" class="h-3.5 w-3.5"></i> בבנייה
+                    </span>
+                </div>
+            </button>
+
+            <!-- Mental Health Axis (under construction) -->
+            <button data-axis-card="mental-health" onclick="openAxis('mental-health')"
+                class="card-hover construction-card group flex min-h-[180px] flex-col rounded-[2rem] border-2 border-slate-200/80 bg-white/90 p-5 text-right shadow-lg shadow-slate-200/30 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 dark:shadow-slate-900/30 animate-slide-up" style="animation-delay: 0.45s;">
+                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-900/30 dark:text-fuchsia-300">
+                    <i data-lucide="brain" class="h-7 w-7"></i>
+                </div>
+                <div class="mb-2 text-xl font-black">ציר בריאות הנפש</div>
+                <p class="text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">ציר זה יכלול תוכן בנושא בריאות הנפש.</p>
+                <div class="mt-auto flex items-center justify-between pt-4">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        <i data-lucide="hard-hat" class="h-3.5 w-3.5"></i> בבנייה
+                    </span>
+                </div>
+            </button>
+        </section>
+
+        <footer class="mt-auto pt-8 pb-4 text-center">
+            <p class="text-xs font-medium text-slate-400 dark:text-slate-600">שאלות חובשים &copy; 2025</p>
+        </footer>
     </main>
 
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, loadUserPreferences, setLastAxis, getAxisHref } from './firebase-common.js';
+        import { ensureInitialAuth, onUserChanged, signOutUser, loadUserPreferences, setLastAxis, getAxisHref, isUnderConstruction } from './firebase-common.js';
 
         const loader = document.getElementById('page-loader');
         let currentUser = null;
@@ -190,8 +272,29 @@
                 window.location.replace('login.html');
                 return;
             }
+            if (isUnderConstruction(axisId)) {
+                showConstructionModal(axisId);
+                return;
+            }
             await setLastAxis(currentUser.uid, axisId);
             window.location.href = getAxisHref(axisId);
+        };
+
+        window.showConstructionModal = (axisId) => {
+            const axisNames = {
+                'routine': 'ציר שגרה',
+                'anamnesis': 'ציר אנמנזה',
+                'mental-health': 'ציר בריאות הנפש'
+            };
+            const name = axisNames[axisId] || 'ציר זה';
+            document.getElementById('modal-construction-text').textContent =
+                `${name} נמצא כרגע בשלבי בנייה ועדיין לא זמין. ברגע שיהיה מוכן תוכלו להיכנס!`;
+            document.getElementById('modal-construction').classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.closeConstructionModal = () => {
+            document.getElementById('modal-construction').classList.add('hidden');
         };
 
         applyDarkMode();
@@ -206,7 +309,7 @@
             currentUser = user;
             const preferences = await loadUserPreferences(user.uid);
             if (preferences.lastAxis) {
-                document.getElementById('axes-subtitle').textContent = `הציר האחרון שלך: ${document.querySelector(`[data-axis-card="${preferences.lastAxis}"]`)?.querySelector('div.mb-2')?.textContent || 'לא נבחר עדיין'}`;
+                document.getElementById('axes-subtitle').textContent = `הציר האחרון שלך: ${document.querySelector(`[data-axis-card="${preferences.lastAxis}"]`)?.querySelector('.text-xl')?.textContent || 'לא נבחר עדיין'}`;
                 highlightAxis(preferences.lastAxis);
             }
             hideLoader();
