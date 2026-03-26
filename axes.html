@@ -24,164 +24,81 @@
     </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --axes-bg: #0b0f19;
-            --axes-card: rgba(255, 255, 255, 0.06);
-            --axes-border: rgba(255, 255, 255, 0.12);
-            --axes-text: #f8fafc;
-            --axes-muted: rgba(226, 232, 240, 0.72);
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
-        body {
-            background-color: var(--axes-bg);
-            background-image:
-                radial-gradient(circle at 15% 20%, rgba(79, 172, 254, 0.16), transparent 24%),
-                radial-gradient(circle at 85% 10%, rgba(0, 242, 254, 0.1), transparent 22%),
-                radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.12), transparent 30%);
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .axes-panel {
-            background: rgba(15, 23, 42, 0.72);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 24px 60px rgba(2, 6, 23, 0.42);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
         }
 
-        .axes-hero {
+        .animate-slide-up {
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-6px);
+        }
+
+        .card-hover:active {
+            transform: translateY(-2px);
+        }
+
+        .card-active {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35), 0 18px 40px rgba(15, 23, 42, 0.18);
+        }
+
+        .construction-card {
             position: relative;
             overflow: hidden;
         }
 
-        .axes-hero::after {
+        .construction-card::after {
             content: '';
             position: absolute;
-            inset: auto -20% -45% auto;
-            width: 240px;
-            height: 240px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            filter: blur(16px);
-        }
-
-        .axis-card {
-            position: relative;
-            overflow: hidden;
-            border-radius: 1.75rem;
-            padding: 1.35rem;
-            border: 1px solid var(--axes-border);
-            background: var(--axes-card);
-            color: var(--axes-text);
-            box-shadow: 0 18px 40px rgba(2, 6, 23, 0.26);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-            min-height: 210px;
-        }
-
-        .axis-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.38);
-        }
-
-        .axis-card.is-active {
-            border-color: rgba(255, 255, 255, 0.78);
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2), 0 24px 48px rgba(15, 23, 42, 0.42);
-        }
-
-        .axis-card__icon {
-            width: 3.2rem;
-            height: 3.2rem;
-            border-radius: 1.15rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.14);
-            margin-bottom: 1rem;
-        }
-
-        .axis-card__title {
-            font-size: 1.35rem;
-            font-weight: 900;
-            margin-bottom: 0.5rem;
-        }
-
-        .axis-card__description {
-            color: rgba(255, 255, 255, 0.88);
-            font-size: 0.95rem;
-            line-height: 1.65;
-        }
-
-        .axis-card__footer {
-            margin-top: auto;
-            padding-top: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.75rem;
-            font-size: 0.9rem;
-            font-weight: 800;
-        }
-
-        .axis-card--light {
-            color: #e2e8f0;
-        }
-
-        .axis-card--white {
-            background: rgba(255, 255, 255, 0.95);
-            color: #0f172a;
-            border-color: rgba(148, 163, 184, 0.24);
-        }
-
-        .axis-card--white .axis-card__icon {
-            background: rgba(15, 23, 42, 0.06);
-        }
-
-        .axis-card--white .axis-card__description {
-            color: #475569;
-        }
-
-        .axis-card--resuscitation {
-            background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
-        }
-
-        .axis-card--schema {
-            background: linear-gradient(135deg, #ea580c 0%, #ef4444 100%);
-        }
-
-        .axis-card--trauma {
-            background: linear-gradient(135deg, #b91c1c 0%, #ef4444 100%);
-        }
-
-        .axis-card--routine {
-            background: linear-gradient(135deg, #047857 0%, #10b981 100%);
-        }
-
-        .axis-card--anamnesis {
-            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
-        }
-
-        .axis-card--mental {
-            background: linear-gradient(135deg, #a21caf 0%, #d946ef 100%);
-        }
-
-        .axes-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.12);
-            padding: 0.35rem 0.8rem;
-            font-size: 0.78rem;
-            font-weight: 800;
+            inset: 0;
+            background: repeating-linear-gradient(-45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(0, 0, 0, 0.02) 10px,
+                    rgba(0, 0, 0, 0.02) 20px);
+            pointer-events: none;
+            border-radius: inherit;
         }
     </style>
 </head>
 
 <body
-    class="min-h-screen overflow-x-hidden text-slate-100 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+    class="min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 text-slate-800 transition-colors duration-300 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-100">
     <div class="fixed inset-0 pointer-events-none overflow-hidden">
-        <div class="absolute -top-10 left-1/2 h-52 w-52 -translate-x-1/2 rounded-full bg-cyan-300/10 blur-3xl"></div>
-        <div class="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-blue-400/10 blur-3xl"></div>
-        <div class="absolute top-16 right-5 text-7xl opacity-15">🚑</div>
+        <div class="absolute -top-20 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-blue-400/10 blur-[100px]">
+        </div>
+        <div class="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-cyan-400/10 blur-[100px]"></div>
+        <div class="absolute top-1/3 left-0 h-64 w-64 rounded-full bg-purple-400/5 blur-[80px]"></div>
     </div>
 
     <div id="page-loader"
@@ -194,107 +111,180 @@
         </div>
     </div>
 
-    <main class="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-6 sm:py-8">
+    <div id="modal-construction" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeConstructionModal()"></div>
+        <div
+            class="relative z-10 w-full max-w-sm rounded-[2rem] border border-slate-100 bg-white p-8 text-center shadow-2xl dark:border-slate-700 dark:bg-slate-800 animate-fade-in">
+            <div
+                class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-amber-100 dark:bg-amber-900/30">
+                <i data-lucide="hard-hat" class="h-10 w-10 text-amber-600 dark:text-amber-300"></i>
+            </div>
+            <h3 class="mb-2 text-2xl font-black dark:text-white">הציר בבנייה 🚧</h3>
+            <p id="modal-construction-text"
+                class="mb-6 text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">ציר זה נמצא כרגע
+                בשלבי בנייה ועדיין לא זמין. ברגע שיהיה מוכן תוכלו להיכנס!</p>
+            <button onclick="closeConstructionModal()"
+                class="w-full rounded-2xl bg-slate-900 px-6 py-3.5 text-base font-black text-white transition hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-700">
+                הבנתי, חזרה לבחירת ציר
+            </button>
+        </div>
+    </div>
+
+    <main class="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-6 sm:px-6 sm:py-10">
         <header
-            class="axes-panel axes-hero mb-6 flex flex-wrap items-center justify-between gap-4 rounded-[2rem] p-5 sm:p-6">
+            class="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-white/80 bg-white/90 p-5 shadow-lg shadow-slate-200/50 backdrop-blur-xl dark:border-slate-700/70 dark:bg-slate-900/90 dark:shadow-slate-900/50 animate-slide-up sm:p-6">
             <div>
-                <p class="mb-2 text-sm font-black text-cyan-300">בחירת ציר</p>
-                <h1 class="text-3xl font-black sm:text-4xl">בחרו מאיפה להמשיך ללמוד</h1>
-                <p id="axes-subtitle" class="mt-2 max-w-2xl text-sm font-medium text-slate-300">הציר האחרון שלכם יודגש
-                    אוטומטית, וכל כרטיס מוביל ישירות למסך הרלוונטי.</p>
+                <div
+                    class="mb-1 inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                    <i data-lucide="compass" class="h-3.5 w-3.5"></i>
+                    בחירת ציר לימוד
+                </div>
+                <h1 class="text-2xl font-black sm:text-3xl">בחרו מאיפה להמשיך ללמוד</h1>
+                <p id="axes-subtitle" class="mt-1.5 text-sm font-medium text-slate-500 dark:text-slate-400">הציר האחרון
+                    שלכם יודגש אוטומטית.</p>
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="toggleDarkMode()"
-                    class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-bold text-slate-100 transition hover:bg-white/15">
+                    class="inline-flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
                     <i data-lucide="moon" id="dark-icon" class="h-4 w-4"></i>
                     תצוגה
                 </button>
                 <button onclick="handleLogout()"
-                    class="inline-flex items-center gap-2 rounded-full bg-red-500/15 px-4 py-2 text-sm font-bold text-red-100 transition hover:bg-red-500/25">
+                    class="inline-flex items-center gap-2 rounded-2xl bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600 transition hover:bg-red-100 dark:bg-red-900/20 dark:text-red-300 dark:hover:bg-red-900/30">
                     <i data-lucide="log-out" class="h-4 w-4"></i>
                     התנתקות
                 </button>
             </div>
         </header>
 
-        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div class="mb-4 flex items-center gap-2 px-1 animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="h-2 w-2 rounded-full bg-green-500"></div>
+            <span class="text-sm font-bold text-slate-600 dark:text-slate-400">צירים פעילים</span>
+            <div class="flex-1 border-t border-slate-200 dark:border-slate-700/50"></div>
+        </div>
+
+        <section class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <button data-axis-card="resuscitation" onclick="openAxis('resuscitation')"
-                class="axis-card axis-card--resuscitation group flex flex-col text-right">
-                <div class="axis-card__icon"><i data-lucide="heart-pulse" class="h-6 w-6"></i></div>
-                <div class="axis-card__title">ציר החייאה</div>
-                <p class="axis-card__description">כרטיסיות, תרגול אינסופי ומבחן מסכם עם שמירת התקדמות בענן.</p>
-                <div class="axis-card__footer">
-                    <span class="axes-chip">מוכן עכשיו</span>
-                    <span class="inline-flex items-center gap-1">כניסה <i data-lucide="chevron-left"
-                            class="h-4 w-4"></i></span>
+                class="card-hover group flex flex-col rounded-2xl border border-blue-300/40 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 p-4 text-right text-white shadow-lg shadow-blue-500/20 animate-slide-up"
+                style="animation-delay: 0.15s;">
+                <div
+                    class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+                    <i data-lucide="heart-pulse" class="h-5 w-5"></i>
+                </div>
+                <div class="mb-1 text-base font-black leading-tight" data-axis-title>ציר החייאה</div>
+                <p class="mb-3 text-xs font-medium leading-relaxed text-blue-50/85">כרטיסיות למידה, תרגול ומבחן מסכם.
+                </p>
+                <div class="mt-auto flex items-center justify-between text-xs font-bold">
+                    <span class="rounded-full bg-white/20 px-2.5 py-1 backdrop-blur-sm">✓ זמין</span>
+                    <span class="inline-flex items-center gap-0.5 opacity-75 transition group-hover:opacity-100">כניסה
+                        <i data-lucide="chevron-left" class="h-3.5 w-3.5"></i></span>
                 </div>
             </button>
 
             <button data-axis-card="resuscitation-schema" onclick="openAxis('resuscitation-schema')"
-                class="axis-card axis-card--schema group flex flex-col text-right">
-                <div class="axis-card__icon"><i data-lucide="file-text" class="h-6 w-6"></i></div>
-                <div class="axis-card__title">סכמת X-CARE</div>
-                <p class="axis-card__description">למידה לפי שלבים, מבחן סכמה מילה במילה וחידון אמריקאי במקום אחד.</p>
-                <div class="axis-card__footer">
-                    <span class="axes-chip">מוכן עכשיו</span>
-                    <span class="inline-flex items-center gap-1">כניסה <i data-lucide="chevron-left"
-                            class="h-4 w-4"></i></span>
+                class="card-hover group flex flex-col rounded-2xl border border-orange-300/40 bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 p-4 text-right text-white shadow-lg shadow-orange-500/20 animate-slide-up"
+                style="animation-delay: 0.2s;">
+                <div
+                    class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+                    <i data-lucide="file-text" class="h-5 w-5"></i>
+                </div>
+                <div class="mb-1 text-base font-black leading-tight" data-axis-title>ציר סכמת טיפול בפצוע</div>
+                <p class="mb-3 text-xs font-medium leading-relaxed text-orange-50/85">למידה, מבחן מילה במילה, מבחן לפי
+                    שלבים וחידון.</p>
+                <div class="mt-auto flex items-center justify-between text-xs font-bold">
+                    <span class="rounded-full bg-white/20 px-2.5 py-1 backdrop-blur-sm">✓ זמין</span>
+                    <span class="inline-flex items-center gap-0.5 opacity-75 transition group-hover:opacity-100">כניסה
+                        <i data-lucide="chevron-left" class="h-3.5 w-3.5"></i></span>
                 </div>
             </button>
 
             <button data-axis-card="trauma" onclick="openAxis('trauma')"
-                class="axis-card axis-card--trauma group flex flex-col text-right">
-                <div class="axis-card__icon"><i data-lucide="shield-plus" class="h-6 w-6"></i></div>
-                <div class="axis-card__title">ציר טראומה</div>
-                <p class="axis-card__description">כניסה ישירה למסך טראומה עם מבחן 39, מבחן 100 וכרטיסיות בלי דף ביניים.
-                </p>
-                <div class="axis-card__footer">
-                    <span class="axes-chip">ישיר למסך טראומה</span>
-                    <span class="inline-flex items-center gap-1">כניסה <i data-lucide="chevron-left"
-                            class="h-4 w-4"></i></span>
+                class="card-hover group flex flex-col rounded-2xl border border-red-300/40 bg-gradient-to-br from-red-600 via-red-500 to-rose-500 p-4 text-right text-white shadow-lg shadow-red-500/20 animate-slide-up"
+                style="animation-delay: 0.25s;">
+                <div
+                    class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+                    <i data-lucide="shield-plus" class="h-5 w-5"></i>
+                </div>
+                <div class="mb-1 text-base font-black leading-tight" data-axis-title>ציר טראומה</div>
+                <p class="mb-3 text-xs font-medium leading-relaxed text-red-50/85">כניסה ישירה למסך טראומה עם מבחן 39,
+                    מבחן 100 וכרטיסיות.</p>
+                <div class="mt-auto flex items-center justify-between text-xs font-bold">
+                    <span class="rounded-full bg-white/20 px-2.5 py-1 backdrop-blur-sm">✓ זמין</span>
+                    <span class="inline-flex items-center gap-0.5 opacity-75 transition group-hover:opacity-100">כניסה
+                        <i data-lucide="chevron-left" class="h-3.5 w-3.5"></i></span>
                 </div>
             </button>
+        </section>
 
+        <div class="mb-3 flex items-center gap-2 px-1 animate-slide-up" style="animation-delay: 0.3s;">
+            <div class="h-2 w-2 rounded-full bg-amber-500"></div>
+            <span class="text-sm font-bold text-slate-600 dark:text-slate-400">צירים בבנייה</span>
+            <div class="flex-1 border-t border-slate-200 dark:border-slate-700/50"></div>
+        </div>
+
+        <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <button data-axis-card="routine" onclick="openAxis('routine')"
-                class="axis-card axis-card--routine group flex flex-col text-right">
-                <div class="axis-card__icon"><i data-lucide="stethoscope" class="h-6 w-6"></i></div>
-                <div class="axis-card__title">ציר שגרה</div>
-                <p class="axis-card__description">עמוד נפרד להמשך הרחבה, עם ניווט אחיד וכפתורי בית וחזרה.</p>
-                <div class="axis-card__footer">
-                    <span class="axes-chip">מוכן להרחבה</span>
-                    <span class="inline-flex items-center gap-1">כניסה <i data-lucide="chevron-left"
-                            class="h-4 w-4"></i></span>
+                class="card-hover construction-card group flex flex-col rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-right shadow-sm backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 animate-slide-up"
+                style="animation-delay: 0.35s;">
+                <div
+                    class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    <i data-lucide="stethoscope" class="h-5 w-5"></i>
+                </div>
+                <div class="mb-1 text-base font-black" data-axis-title>ציר שגרה</div>
+                <p class="mb-3 text-xs font-medium leading-relaxed text-slate-500 dark:text-slate-400">ציר זה יכלול תוכן
+                    בנושא רפואת שגרה.</p>
+                <div class="mt-auto">
+                    <span
+                        class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        <i data-lucide="hard-hat" class="h-3 w-3"></i> בבנייה
+                    </span>
                 </div>
             </button>
 
             <button data-axis-card="anamnesis" onclick="openAxis('anamnesis')"
-                class="axis-card axis-card--anamnesis group flex flex-col text-right">
-                <div class="axis-card__icon"><i data-lucide="clipboard-list" class="h-6 w-6"></i></div>
-                <div class="axis-card__title">ציר אנמנזה</div>
-                <p class="axis-card__description">מסך ייעודי לתוכן עתידי, עכשיו עם פריסה תואמת לשאר האפליקציה.</p>
-                <div class="axis-card__footer">
-                    <span class="axes-chip">זמין</span>
-                    <span class="inline-flex items-center gap-1">כניסה <i data-lucide="chevron-left"
-                            class="h-4 w-4"></i></span>
+                class="card-hover construction-card group flex flex-col rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-right shadow-sm backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 animate-slide-up"
+                style="animation-delay: 0.4s;">
+                <div
+                    class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
+                    <i data-lucide="clipboard-list" class="h-5 w-5"></i>
+                </div>
+                <div class="mb-1 text-base font-black" data-axis-title>ציר אנמנזה</div>
+                <p class="mb-3 text-xs font-medium leading-relaxed text-slate-500 dark:text-slate-400">ציר זה יכלול תוכן
+                    בנושא נטילת אנמנזה.</p>
+                <div class="mt-auto">
+                    <span
+                        class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        <i data-lucide="hard-hat" class="h-3 w-3"></i> בבנייה
+                    </span>
                 </div>
             </button>
 
             <button data-axis-card="mental-health" onclick="openAxis('mental-health')"
-                class="axis-card axis-card--mental group flex flex-col text-right sm:col-span-2 xl:col-span-1">
-                <div class="axis-card__icon"><i data-lucide="brain" class="h-6 w-6"></i></div>
-                <div class="axis-card__title">ציר בריאות הנפש</div>
-                <p class="axis-card__description">מסך עצמאי להמשך פיתוח, עם אותו ניווט חדש וכפתורים קבועים.</p>
-                <div class="axis-card__footer">
-                    <span class="axes-chip">זמין</span>
-                    <span class="inline-flex items-center gap-1">כניסה <i data-lucide="chevron-left"
-                            class="h-4 w-4"></i></span>
+                class="card-hover construction-card group flex flex-col rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-right shadow-sm backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 animate-slide-up"
+                style="animation-delay: 0.45s;">
+                <div
+                    class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-900/30 dark:text-fuchsia-300">
+                    <i data-lucide="brain" class="h-5 w-5"></i>
+                </div>
+                <div class="mb-1 text-base font-black" data-axis-title>ציר בריאות הנפש</div>
+                <p class="mb-3 text-xs font-medium leading-relaxed text-slate-500 dark:text-slate-400">ציר זה יכלול תוכן
+                    בנושא בריאות הנפש.</p>
+                <div class="mt-auto">
+                    <span
+                        class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        <i data-lucide="hard-hat" class="h-3 w-3"></i> בבנייה
+                    </span>
                 </div>
             </button>
         </section>
+
+        <footer class="mt-auto pb-4 pt-8 text-center">
+            <p class="text-xs font-medium text-slate-400 dark:text-slate-600">שאלות חובשים &copy; 2025</p>
+        </footer>
     </main>
 
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, loadUserPreferences, setLastAxis, getAxisHref } from './firebase-common.js';
+        import { ensureInitialAuth, onUserChanged, signOutUser, loadUserPreferences, setLastAxis, getAxisHref, getAxisLabel, isUnderConstruction } from './firebase-common.js';
 
         const loader = document.getElementById('page-loader');
         let currentUser = null;
@@ -329,11 +319,11 @@
 
         function highlightAxis(axisId) {
             document.querySelectorAll('[data-axis-card]').forEach(card => {
-                card.classList.remove('is-active');
+                card.classList.remove('card-active');
             });
             const activeCard = document.querySelector(`[data-axis-card="${axisId}"]`);
             if (activeCard) {
-                activeCard.classList.add('is-active');
+                activeCard.classList.add('card-active');
             }
         }
 
@@ -342,8 +332,28 @@
                 window.location.replace('login.html');
                 return;
             }
+
+            if (isUnderConstruction(axisId)) {
+                showConstructionModal(axisId);
+                return;
+            }
+
             await setLastAxis(currentUser.uid, axisId);
             window.location.href = getAxisHref(axisId);
+        };
+
+        window.showConstructionModal = (axisId) => {
+            document.getElementById('modal-construction-text').textContent = `${getAxisLabel(axisId)} נמצא כרגע בשלבי בנייה ועדיין לא זמין. ברגע שיהיה מוכן תוכלו להיכנס!`;
+            const modal = document.getElementById('modal-construction');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        };
+
+        window.closeConstructionModal = () => {
+            const modal = document.getElementById('modal-construction');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         };
 
         applyDarkMode();
@@ -358,7 +368,7 @@
             currentUser = user;
             const preferences = await loadUserPreferences(user.uid);
             if (preferences.lastAxis) {
-                document.getElementById('axes-subtitle').textContent = `הציר האחרון שלך: ${document.querySelector(`[data-axis-card="${preferences.lastAxis}"]`)?.querySelector('.axis-card__title')?.textContent || 'לא נבחר עדיין'}`;
+                document.getElementById('axes-subtitle').textContent = `הציר האחרון שלך: ${getAxisLabel(preferences.lastAxis)}`;
                 highlightAxis(preferences.lastAxis);
             }
             hideLoader();

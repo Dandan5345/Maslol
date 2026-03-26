@@ -238,7 +238,7 @@
                 </button>
 
                 <!-- Test Card -->
-                <button onclick="navigate('test')"
+                <button id="btn-resuscitation-exam" onclick="navigate('test')"
                     class="group text-right bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-800 hover:border-indigo-400 p-5 rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-start text-white">
                     <div
                         class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -532,7 +532,7 @@
     </div>
 
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, loadProgress, saveProgress, setLastAxis } from "./firebase-common.js";
+        import { ensureInitialAuth, onUserChanged, signOutUser, loadProgress, saveProgress, setLastAxis, isAuthorizedUser } from "./firebase-common.js";
 
         let currentUser = null;
         const currentAxis = 'resuscitation';
@@ -610,6 +610,12 @@
                 window.appState.cards = await loadProgress(user.uid, window.appState.cards);
                 await setLastAxis(user.uid, currentAxis);
                 updateHomeProgress();
+
+                // הצגה/הסתרה של כרטיסיית המבחן המסכם לפי הרשאת מייל
+                const examBtn = document.getElementById('btn-resuscitation-exam');
+                if (examBtn) {
+                    examBtn.style.display = isAuthorizedUser(user) ? '' : 'none';
+                }
 
                 document.getElementById('global-loader').style.opacity = '0';
                 setTimeout(() => {
