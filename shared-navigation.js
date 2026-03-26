@@ -24,7 +24,7 @@
             .global-floating-nav {
                 position: fixed;
                 left: 1rem;
-                bottom: max(1rem, env(safe-area-inset-bottom));
+                top: max(1rem, env(safe-area-inset-top));
                 z-index: 70;
                 display: flex;
                 gap: 0.75rem;
@@ -35,22 +35,23 @@
                 pointer-events: auto;
                 width: 3.25rem;
                 height: 3.25rem;
-                border: 1px solid rgba(255, 255, 255, 0.18);
+                border: 1px solid var(--card-border, rgba(148, 163, 184, 0.28));
                 border-radius: 999px;
-                background: rgba(15, 23, 42, 0.88);
-                color: #fff;
+                background: var(--card-bg, rgba(255, 255, 255, 0.92));
+                color: var(--text-primary, #0f172a);
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 16px 40px rgba(15, 23, 42, 0.28);
+                box-shadow: var(--shadow-sm, 0 12px 30px rgba(15, 23, 42, 0.16));
                 backdrop-filter: blur(14px);
                 -webkit-backdrop-filter: blur(14px);
-                transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+                transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
             }
 
             .global-floating-nav__btn:hover {
                 transform: translateY(-2px);
-                background: rgba(30, 41, 59, 0.96);
+                background: var(--secondary-color, rgba(241, 245, 249, 0.96));
+                border-color: var(--primary-color, #2563eb);
             }
 
             .global-floating-nav__btn:active {
@@ -70,7 +71,7 @@
             @media (max-width: 640px) {
                 .global-floating-nav {
                     left: 0.75rem;
-                    bottom: max(0.75rem, env(safe-area-inset-bottom));
+                    top: max(0.75rem, env(safe-area-inset-top));
                 }
 
                 .global-floating-nav__btn {
