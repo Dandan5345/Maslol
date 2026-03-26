@@ -60,8 +60,10 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .card-hover:hover {
-            transform: translateY(-6px);
+        @media (hover: hover) {
+            .card-hover:hover {
+                transform: translateY(-6px);
+            }
         }
 
         .card-hover:active {
@@ -88,6 +90,27 @@
                     rgba(0, 0, 0, 0.02) 20px);
             pointer-events: none;
             border-radius: inherit;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.92) translateY(12px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes modalBgIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        #modal-construction.modal-open > div:first-child {
+            animation: modalBgIn 0.25s ease-out both;
+        }
+        #modal-construction.modal-open > div:last-child {
+            animation: modalIn 0.3s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        .loader-fade-out {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
         }
     </style>
 </head>
@@ -311,8 +334,8 @@
         };
 
         function hideLoader() {
-            loader.style.opacity = '0';
-            setTimeout(() => { loader.style.display = 'none'; }, 250);
+            loader.classList.add('loader-fade-out');
+            setTimeout(() => { loader.style.display = 'none'; }, 350);
         }
 
         window.openAxis = async (axisId) => {
@@ -333,15 +356,19 @@
             document.getElementById('modal-construction-text').textContent = `${getAxisLabel(axisId)} נמצא כרגע בשלבי בנייה ועדיין לא זמין. ברגע שיהיה מוכן תוכלו להיכנס!`;
             const modal = document.getElementById('modal-construction');
             modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            modal.classList.add('flex', 'modal-open');
             lucide.createIcons();
         };
 
         window.closeConstructionModal = () => {
             const modal = document.getElementById('modal-construction');
             modal.classList.add('hidden');
-            modal.classList.remove('flex');
+            modal.classList.remove('flex', 'modal-open');
         };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeConstructionModal();
+        });
 
         applyDarkMode();
         await ensureInitialAuth();

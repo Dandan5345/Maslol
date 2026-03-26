@@ -50,6 +50,7 @@
 
         .preserve-3d {
             transform-style: preserve-3d;
+            will-change: transform;
         }
 
         .backface-hidden {
@@ -71,6 +72,12 @@
         .screen.active {
             display: flex;
             opacity: 1;
+            animation: screenFadeIn 0.35s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        @keyframes screenFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         /* Loader */
@@ -616,11 +623,13 @@
                     examBtn.style.display = isAuthorizedUser(user) ? '' : 'none';
                 }
 
-                document.getElementById('global-loader').style.opacity = '0';
+                const gl = document.getElementById('global-loader');
+                gl.style.opacity = '0';
+                gl.style.pointerEvents = 'none';
                 setTimeout(() => {
-                    document.getElementById('global-loader').style.display = 'none';
+                    gl.style.display = 'none';
                     window.navigate('home');
-                }, 300);
+                }, 350);
             } else {
                 document.getElementById('app-header').classList.add('hidden');
                 document.getElementById('global-loader').style.display = 'none';

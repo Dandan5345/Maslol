@@ -29,6 +29,12 @@
                 display: flex;
                 gap: 0.75rem;
                 pointer-events: none;
+                animation: navSlideIn 0.4s cubic-bezier(0.22,1,0.36,1) 0.3s both;
+            }
+
+            @keyframes navSlideIn {
+                from { opacity: 0; transform: translateX(-12px); }
+                to   { opacity: 1; transform: translateX(0); }
             }
 
             .global-floating-nav__btn {

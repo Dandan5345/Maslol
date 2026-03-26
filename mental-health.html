@@ -23,6 +23,15 @@
         }
     </script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+        }
+    </style>
 </head>
 
 <body
@@ -34,7 +43,7 @@
     </div>
 
     <div id="page-loader"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm">
+        class="fixed inset-0 z-50 flex items-center justify-center bg-white/90 dark:bg-slate-950/90 backdrop-blur-sm transition-opacity duration-300">
         <div class="text-center">
             <div
                 class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600 dark:border-slate-700 dark:border-t-blue-400">
@@ -45,7 +54,7 @@
 
     <main class="relative z-10 mx-auto flex min-h-screen w-full max-w-4xl flex-col px-4 py-6 sm:px-6 sm:py-8">
         <header
-            class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-lg backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/85">
+            class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-lg backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/85 animate-fade-in-up">
             <div>
                 <p class="text-sm font-bold text-fuchsia-600 dark:text-fuchsia-300">ציר בריאות הנפש</p>
                 <h1 class="text-2xl font-black sm:text-3xl">העמוד הזה בבנייה</h1>
@@ -73,7 +82,7 @@
 
         <section class="flex flex-1 items-center justify-center">
             <div
-                class="w-full rounded-[2.25rem] border border-white/70 bg-white/90 p-6 text-center shadow-2xl backdrop-blur sm:p-10 dark:border-slate-700/70 dark:bg-slate-900/85">
+                class="w-full rounded-[2.25rem] border border-white/70 bg-white/90 p-6 text-center shadow-2xl backdrop-blur sm:p-10 dark:border-slate-700/70 dark:bg-slate-900/85 animate-fade-in-up" style="animation-delay:0.1s">
                 <div
                     class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-900/30 dark:text-fuchsia-300">
                     <i data-lucide="brain" class="h-12 w-12"></i>
@@ -122,7 +131,8 @@
         function hideLoader() {
             const loader = document.getElementById('page-loader');
             loader.style.opacity = '0';
-            setTimeout(() => { loader.style.display = 'none'; }, 250);
+            loader.style.pointerEvents = 'none';
+            setTimeout(() => { loader.style.display = 'none'; }, 300);
         }
 
         applyDarkMode();

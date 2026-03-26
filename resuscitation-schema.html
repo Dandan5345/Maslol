@@ -51,6 +51,12 @@
         .screen.active {
             display: flex;
             opacity: 1;
+            animation: screenFadeIn 0.35s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        @keyframes screenFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .loader {
@@ -93,6 +99,10 @@
         .step-tab.active-tab {
             transform: scale(1.05);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .step-tab {
+            will-change: transform, box-shadow;
         }
 
         .vertical-text {
@@ -764,11 +774,13 @@
                 document.getElementById('home-greeting').innerHTML = `שלום <span class="text-red-600 dark:text-red-400">${user.displayName || 'לוחם'}</span>,<br>מוכן ללמוד את <span class="bg-clip-text text-transparent bg-gradient-to-l from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400">הסכמה</span>?`;
                 document.getElementById('app-header').classList.remove('hidden');
 
-                document.getElementById('global-loader').style.opacity = '0';
+                const gl = document.getElementById('global-loader');
+                gl.style.opacity = '0';
+                gl.style.pointerEvents = 'none';
                 setTimeout(() => {
-                    document.getElementById('global-loader').style.display = 'none';
+                    gl.style.display = 'none';
                     window.navigate('home');
-                }, 300);
+                }, 350);
             } else {
                 document.getElementById('app-header').classList.add('hidden');
                 document.getElementById('global-loader').style.display = 'none';
