@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="שאלות חובשים">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>שאלות חובשים - סכמת X-CARE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'] },
+                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+
+        .screen {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        .dark .loader {
+            border: 4px solid #334155;
+            border-top: 4px solid #60a5fa;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        body {
+            background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 26%),
+                radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.16), transparent 24%),
+                linear-gradient(135deg, #f8fbff 0%, #eff6ff 46%, #f8fafc 100%);
+        }
+
+        .dark body {
+            background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 26%),
+                radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.12), transparent 24%),
+                linear-gradient(135deg, #020617 0%, #0f172a 46%, #111827 100%);
+        }
+
+        .step-tab.active-tab {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .test-input {
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .test-input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .test-input.correct {
+            border-color: #22c55e !important;
+            background-color: rgba(34, 197, 94, 0.08) !important;
+        }
+
+        .test-input.wrong {
+            border-color: #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.08) !important;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 dark:text-slate-100 h-dvh flex flex-col transition-colors duration-300 overflow-hidden">
+
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-8 right-2 text-7xl opacity-15">🏥</div>
+        <div class="absolute top-1/4 left-[-2rem] h-44 w-44 rounded-full bg-blue-300/20 blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 h-52 w-52 rounded-full bg-cyan-300/20 blur-3xl"></div>
+    </div>
+
+    <!-- Global Loader -->
+    <div id="global-loader"
+        class="fixed inset-0 bg-white dark:bg-slate-900 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="loader mb-4"></div>
+        <p class="text-slate-500 dark:text-slate-400 font-bold animate-pulse">טוען נתונים...</p>
+    </div>
+
+    <!-- Header -->
+    <header id="app-header"
+        class="hidden bg-white/85 dark:bg-slate-800/90 shadow-sm border-b border-slate-200 dark:border-slate-700 z-40 sticky top-0 backdrop-blur">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('home')">
+                <div class="bg-gradient-to-br from-red-600 to-orange-500 p-2 rounded-xl text-white shadow-md">
+                    <i data-lucide="file-text" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                </div>
+                <div>
+                    <h1
+                        class="text-base sm:text-lg font-black text-slate-800 dark:text-white tracking-tight leading-tight">
+                        קורס חובשים <span
+                            class="bg-clip-text text-transparent bg-gradient-to-l from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400">סכמת
+                            X-CARE</span>
+                    </h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-4 mr-auto sm:mr-0">
+                <div id="user-greeting" class="hidden sm:block text-sm font-bold text-slate-600 dark:text-slate-300">
+                </div>
+                <button onclick="window.location.href='axes.html'"
+                    class="hidden sm:flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i> <span>בחירת ציר</span>
+                </button>
+                <button onclick="toggleDarkMode()"
+                    class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-400 rounded-full transition-colors"
+                    title="מצב כהה/בהיר">
+                    <i data-lucide="moon" id="dark-icon" class="w-5 h-5"></i>
+                </button>
+                <button id="btn-back-menu" onclick="navigate('home')"
+                    class="hidden sm:flex items-center gap-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors">
+                    <i data-lucide="home" class="w-4 h-4"></i> <span class="hidden sm:inline">תפריט ראשי</span>
+                </button>
+                <button onclick="handleLogout()"
+                    class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 rounded-full transition-colors"
+                    title="התנתק">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+
+        <!-- SCREEN: HOME -->
+        <div id="screen-home"
+            class="screen flex-col max-w-4xl mx-auto w-full p-4 py-6 sm:p-6 sm:py-10 flex-1 overflow-y-auto custom-scrollbar">
+            <div class="text-center mb-10 sm:mb-12">
+                <h2 id="home-greeting"
+                    class="text-3xl sm:text-5xl font-black text-slate-800 dark:text-white mb-4 tracking-tight"></h2>
+                <p class="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-xl mx-auto">למד את סכמת X-CARE
+                    מילה במילה. בחר שיטת למידה או מבחן.</p>
+            </div>
+
+            <div class="mb-6 flex justify-center gap-3">
+                <button onclick="window.location.href='axes.html'"
+                    class="inline-flex items-center gap-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 px-5 py-3 text-sm font-bold text-blue-700 dark:text-blue-300 shadow-sm border border-blue-100 dark:border-slate-700">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i> מעבר לבחירת ציר
+                </button>
+                <button onclick="window.location.href='resuscitation.html'"
+                    class="inline-flex items-center gap-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 px-5 py-3 text-sm font-bold text-red-700 dark:text-red-300 shadow-sm border border-red-100 dark:border-slate-700">
+                    <i data-lucide="heart-pulse" class="w-4 h-4"></i> ציר החייאה
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Schema Cards -->
+                <button onclick="navigate('schema')"
+                    class="group text-right bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-red-400 dark:hover:border-red-500 p-5 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start">
+                    <div
+                        class="w-12 h-12 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="book-open" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">כרטיסיות סכמה</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">למידה מפורטת של כל שלב בסכמת X-CARE
+                        מילה במילה.</p>
+                    <span
+                        class="mt-auto inline-flex items-center gap-1.5 text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/30 px-4 py-2 rounded-xl">
+                        התחל ללמוד <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </span>
+                </button>
+
+                <!-- Full Schema Test -->
+                <button onclick="navigate('full-test')"
+                    class="group text-right bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-orange-400 dark:hover:border-orange-500 p-5 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start">
+                    <div
+                        class="w-12 h-12 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="file-edit" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">מבחן סכמה מלאה</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">רואים את הטבלה ללא טקסט - רושמים מילה
+                        במילה ובודקים.</p>
+                    <span
+                        class="mt-auto inline-flex items-center gap-1.5 text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-900/30 px-4 py-2 rounded-xl">
+                        התחל מבחן <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </span>
+                </button>
+
+                <!-- Step Test -->
+                <button onclick="navigate('step-test')"
+                    class="group text-right bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-teal-400 dark:hover:border-teal-500 p-5 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start">
+                    <div
+                        class="w-12 h-12 bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="list-checks" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">מבחן לפי שלבים</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">בחר שלב ספציפי ורשום את התוכן שלו
+                        מילה במילה.</p>
+                    <span
+                        class="mt-auto inline-flex items-center gap-1.5 text-teal-600 dark:text-teal-400 font-bold bg-teal-50 dark:bg-teal-900/30 px-4 py-2 rounded-xl">
+                        בחר שלב <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </span>
+                </button>
+
+                <!-- American Quiz -->
+                <button onclick="navigate('quiz')"
+                    class="group text-right bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-800 hover:border-indigo-400 p-5 rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-start text-white">
+                    <div
+                        class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="target" class="w-8 h-8 text-indigo-300"></i>
+                    </div>
+                    <h3 class="text-xl font-black mb-2">חידון אמריקאי</h3>
+                    <p class="text-slate-400 font-medium mb-8">שאלות רב-ברירה על הסכמה. צריך לדעת את הסכמה בעל פה!</p>
+                    <span
+                        class="mt-auto inline-flex items-center gap-1.5 text-slate-900 font-black bg-indigo-400 px-4 py-2 rounded-xl group-hover:bg-white transition-colors">
+                        התחל חידון <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN: SCHEMA TABS -->
+        <div id="screen-schema" class="screen flex-col w-full flex-1 overflow-hidden">
+            <!-- Step tabs bar -->
+            <div
+                class="bg-white/85 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700 px-2 py-3 overflow-x-auto shrink-0">
+                <div id="schema-tabs" class="flex gap-2 min-w-max px-2 max-w-5xl mx-auto"></div>
+            </div>
+            <!-- Step content -->
+            <div id="schema-content" class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6">
+                <div class="max-w-3xl mx-auto" id="schema-content-inner"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN: FULL TEST -->
+        <div id="screen-full-test" class="screen flex-col w-full flex-1 overflow-hidden">
+            <div id="full-test-content" class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6">
+                <div class="max-w-3xl mx-auto" id="full-test-inner"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN: STEP TEST -->
+        <div id="screen-step-test" class="screen flex-col w-full flex-1 overflow-hidden">
+            <div id="step-test-content" class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6">
+                <div class="max-w-3xl mx-auto" id="step-test-inner"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN: QUIZ -->
+        <div id="screen-quiz" class="screen flex-col flex-1 w-full max-w-2xl mx-auto p-4 py-6 overflow-hidden">
+            <div id="quiz-active-view" class="flex flex-col h-full w-full">
+                <div class="mb-6 flex items-center justify-between">
+                    <div id="quiz-counter" class="font-bold text-slate-500 dark:text-slate-400">שאלה 1 מתוך 20</div>
+                    <div class="w-1/2 bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="bg-indigo-600 dark:bg-indigo-500 h-full transition-all"
+                            style="width: 5%"></div>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-800 flex-1 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden relative">
+                    <div
+                        class="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-700 flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900">
+                        <h2 id="quiz-question"
+                            class="text-2xl sm:text-3xl font-black leading-tight text-slate-800 dark:text-white mb-8">
+                            שאלה</h2>
+                        <div id="quiz-options" class="space-y-3"></div>
+                    </div>
+                    <div
+                        class="p-4 sm:p-6 bg-white dark:bg-slate-800 shrink-0 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                        <button id="quiz-prev-btn" onclick="prevQuiz()"
+                            class="font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-300 dark:text-slate-600 cursor-not-allowed">חזור</button>
+                        <button id="quiz-next-btn" onclick="nextQuiz()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-6 sm:px-8 py-3.5 rounded-xl shadow-lg flex items-center gap-2 transition-colors">
+                            <span id="quiz-next-text">השאלה הבאה</span> <i data-lucide="chevron-left"
+                                class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Results -->
+            <div id="quiz-results-view"
+                class="hidden flex-col h-full w-full items-center overflow-y-auto custom-scrollbar py-4">
+                <div
+                    class="bg-white dark:bg-slate-800 max-w-lg w-full rounded-[2rem] shadow-2xl p-10 text-center border border-slate-200 dark:border-slate-700 relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-white dark:from-indigo-900/20 dark:to-slate-800">
+                    </div>
+                    <div class="relative z-10">
+                        <i data-lucide="target" id="quiz-res-icon" class="mx-auto mb-6 w-16 h-16 text-green-600"></i>
+                        <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-2">סיום החידון!</h2>
+                        <p id="quiz-res-msg" class="text-slate-500 dark:text-slate-400 font-medium mb-8 text-lg">כל
+                            הכבוד!</p>
+                        <div
+                            class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-[2rem] p-8 mb-8">
+                            <div class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">הציון שלך</div>
+                            <div id="quiz-res-score" class="text-6xl font-black text-green-600 mb-2">100</div>
+                            <div id="quiz-res-text" class="text-slate-600 dark:text-slate-400 font-bold">20 מתוך 20
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <button id="quiz-review-btn" onclick="showQuizReview()"
+                                class="w-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-bold text-lg py-4 rounded-xl border border-amber-200 dark:border-amber-800 hover:bg-amber-100 transition hidden">בדוק
+                                טעויות (<span id="quiz-wrong-count">0</span>)</button>
+                            <button onclick="navigate('home')"
+                                class="w-full bg-slate-900 dark:bg-indigo-600 text-white font-black text-lg py-4 rounded-xl hover:bg-slate-800 transition shadow-lg">חזרה
+                                לתפריט</button>
+                            <button onclick="startQuiz()"
+                                class="w-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-lg py-4 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-50 transition">חידון
+                                חדש</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Review -->
+            <div id="quiz-review-view" class="hidden flex-col h-full w-full">
+                <div class="flex items-center justify-between mb-5 shrink-0">
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-white">סקירת טעויות</h2>
+                    <button onclick="showQuizResults()"
+                        class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 transition text-sm flex items-center gap-1.5">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i> חזרה לתוצאות
+                    </button>
+                </div>
+                <div id="quiz-review-content" class="flex-1 overflow-y-auto space-y-4 custom-scrollbar pb-4"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module">
+        import { ensureInitialAuth, onUserChanged, signOutUser, setLastAxis } from "./firebase-common.js";
+
+        let currentUser = null;
+        const currentAxis = 'resuscitation-schema';
+
+        // ====== SCHEMA DATA ======
+        const schemaSteps = [
+            {
+                id: 'X', letter: 'X', fullName: 'eXtract', hebrewName: 'חילוץ', time: '30 שניות',
+                icon: 'shield-alert',
+                gradient: 'from-red-600 to-rose-500', lightBg: 'bg-red-50 dark:bg-red-900/20',
+                textColor: 'text-red-600 dark:text-red-400', borderColor: 'border-red-200 dark:border-red-800',
+                ringColor: 'ring-red-400', tabBg: 'bg-red-600', tabText: 'text-white',
+                note: 'הפעולות עצמן יבוצעו על ידי חובשים בלבד בשלב זה',
+                items: [
+                    'ביצוע תרגולת חלץ-טפל או טכניקה קרבית פצוע בכוח',
+                    'הכרזה בשטח ובקשר על פצוע בכוח',
+                    'השגת עליונות באש',
+                    'הגעה למחסה ראשוני ע״י חילוץ עצמי או על ידי כוח שהוגדר לכך',
+                    'עצירת דימום פורץ עצמאית או ע״י לוחם/מטפל סמוך'
+                ]
+            },
+            {
+                id: 'C', letter: 'C', fullName: 'Circulation', hebrewName: 'מחזור דם', time: '30 שניות',
+                icon: 'heart-pulse',
+                gradient: 'from-orange-600 to-amber-500', lightBg: 'bg-orange-50 dark:bg-orange-900/20',
+                textColor: 'text-orange-600 dark:text-orange-400', borderColor: 'border-orange-200 dark:border-orange-800',
+                ringColor: 'ring-orange-400', tabBg: 'bg-orange-600', tabText: 'text-white',
+                note: 'הגעה לסביבה מאובטחת/בטוחה',
+                items: [
+                    'הערכה קלינית: מנגנון הפציעה, בחינה ויזואלית ופניה לפצוע - התרשמות ראשונית מהירה, דחיפות',
+                    'דיווח אגמי - פניה, הזדהות, תיאור האירוע, מיקום, מספר פצועים ודחיפות פינוי',
+                    'וידוא שהדימום נעצר ← במידה ובוצע בדרג קודם עצירת דימום פורץ',
+                    'חיפוש אחר פציעות ומקורות דימום בגו, בגפיים ובאזורים נסתרים',
+                    'ביצוע הפיכה והפשטה - ראש, חזה, עורף, גב, גפיים, בתי שחי, עכוז ומפשעות',
+                    'עצירת דימום שזוהה',
+                    'מדידת לחץ דם',
+                    'מדידת דופק איכותית וכמותית',
+                    'מדידת ריווי חמצן (סטורציה)',
+                    'בדיקת הכרה לפי AVPU',
+                    'בהיעדר נשימה או בהיעדר תגובה לכאב ← ביצוע JT והחדרת AW',
+                    'בטראומה ישירה לנתיב האוויר ← סילוק הפרשות והושבה',
+                    'בהלם עמוק על פי הקריטריונים ← הנחיית הצוות להשגת גישה למחזור הדם והכנת מוצרי דם',
+                    'המשך ביצוע הסכמה על ידי מט״ב'
+                ]
+            },
+            {
+                id: 'A', letter: 'A', fullName: 'Airway', hebrewName: 'נתיב אוויר', time: '60 שניות',
+                icon: 'wind',
+                gradient: 'from-blue-600 to-cyan-500', lightBg: 'bg-blue-50 dark:bg-blue-900/20',
+                textColor: 'text-blue-600 dark:text-blue-400', borderColor: 'border-blue-200 dark:border-blue-800',
+                ringColor: 'ring-blue-400', tabBg: 'bg-blue-600', tabText: 'text-white',
+                items: [
+                    'הערכת נתיב האוויר ומצוקה נשימתית תוך פניה לפצוע והסתכלות',
+                    'שימוש באמצעים בסיסיים לניהול נתיב האוויר:',
+                    'פתיחת פה וסילוק הפרשות',
+                    'הושבה',
+                    'העשרה בחמצן',
+                    'בהיעדר נשימה ← הנשמה באמצעות אמבו ומסיכה',
+                    'בחשד לפגיעה ← שמירה על עמש״צ'
+                ]
+            },
+            {
+                id: 'R', letter: 'R', fullName: 'Respiration & Exposure', hebrewName: 'נשימה וחשיפה', time: '60 שניות',
+                icon: 'stethoscope',
+                gradient: 'from-teal-600 to-emerald-500', lightBg: 'bg-teal-50 dark:bg-teal-900/20',
+                textColor: 'text-teal-600 dark:text-teal-400', borderColor: 'border-teal-200 dark:border-teal-800',
+                ringColor: 'ring-teal-400', tabBg: 'bg-teal-600', tabText: 'text-white',
+                items: [
+                    'חשיפת בית החזה והתרשמות מסימני חבלה',
+                    'וידוא הפשטה מלאה - איתור כלל הפציעות, עצירת דימום במידה וזוהה והפיכה',
+                    'ראש - התרשמות מסימני חבלה',
+                    'עמש״צ - בחשד לפגיעה ← הנחת צווארון',
+                    'אגן - הערכה וביצוע כריכת אגן',
+                    'כיסוי, חימום והעמסת לאלונקה'
+                ]
+            },
+            {
+                id: 'E', letter: 'E', fullName: 'Evacuation', hebrewName: 'פינוי',
+                icon: 'truck',
+                gradient: 'from-purple-600 to-indigo-500', lightBg: 'bg-purple-50 dark:bg-purple-900/20',
+                textColor: 'text-purple-600 dark:text-purple-400', borderColor: 'border-purple-200 dark:border-purple-800',
+                ringColor: 'ring-purple-400', tabBg: 'bg-purple-600', tabText: 'text-white',
+                items: [
+                    'חיתוך מצב - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות',
+                    'וידוא העברת דיווח רפואי והשלמת תיעוד ב-101 דיגיטלי או ידני',
+                    'תחילת פינוי בהתאם למצב המבצעי ויכולת הטיפול בפינוי',
+                    'יש לבצע חיתוך מצב בצוות ולהעביר דיווח רפואי טרם הפינוי',
+                    'השלמת השלבים הבאים במהלך הפינוי'
+                ]
+            },
+            {
+                id: 'EE', letter: 'EE', fullName: 'Everything Else', hebrewName: 'הכל אחר',
+                icon: 'clipboard-list',
+                gradient: 'from-amber-600 to-yellow-500', lightBg: 'bg-amber-50 dark:bg-amber-900/20',
+                textColor: 'text-amber-600 dark:text-amber-400', borderColor: 'border-amber-200 dark:border-amber-800',
+                ringColor: 'ring-amber-400', tabBg: 'bg-amber-600', tabText: 'text-white',
+                items: [
+                    'הערכת כאב וטיפול',
+                    'מניעת זיהומים - שטיפת פצעים, חבישה, טיפול אנטיביוטי',
+                    'הערכת GCS, התרשמות מתנועות ידיים ורגליים ובדיקת אישונים',
+                    'סריקה גופנית מלאה מהקודקוד ועד לבהונות הרגליים - טיפול בכל פציעה המזוהה בדרך',
+                    'קיבוע שברים',
+                    'וידוא כלל הקיבועים',
+                    'השלמת תיעוד ב-101 דיגיטלי או ידני',
+                    'הערכה לקיומה של תגובת דחק/קרב וביצוע התערבות יהלו״ם',
+                    'העברת דיווח רפואי חוזר',
+                    'ניטור ותיעוד הסימנים החיוניים באופן תדיר ומחזורי'
+                ]
+            },
+            {
+                id: 'PFC', letter: 'PFC', fullName: 'Prolonged Field Care', hebrewName: 'טיפול ממושך',
+                icon: 'timer',
+                gradient: 'from-slate-600 to-gray-500', lightBg: 'bg-slate-100 dark:bg-slate-900/40',
+                textColor: 'text-slate-600 dark:text-slate-400', borderColor: 'border-slate-300 dark:border-slate-700',
+                ringColor: 'ring-slate-400', tabBg: 'bg-slate-600', tabText: 'text-white',
+                note: 'יבוצע בנוכחות מט״ב בלבד',
+                items: [
+                    'הערכת הלם חוזרת והמשך החזר נפח לפצועים בהלם עמוק',
+                    'השגת גישה למחזור הדם וקיבוע',
+                    'מתן TXA',
+                    'הערכה חוזרת והמרת חסמי עורקים',
+                    'קיבוע ומתיחה של שבר בירך באמצעות סד תומאס',
+                    'השלמת עירוי פריפרי שני בפצוע שנזקק להחזר נפח',
+                    'הערכה חוזרת של נתיב אוויר וניהול שמרני או ע״י התערבות',
+                    'ניטור מדדים רציף',
+                    'העשרה בחמצן',
+                    'בפצוע מונשם חיבור למנשם והכנת תרופות הרדמה להמשך',
+                    'החדרת נקז חזה לפצוע חזה מונשם במידת הצורך בלבד',
+                    'החדרת נקז חזה לפצוע חזה נושם עצמונית עם הדרדרות נשימתית',
+                    'מתן חוזר של טיפול תרופתי תוך ורידי',
+                    'הכנסת צנתר שתן ובפצוע מונשם הכנסת זונדה לניקוז הקיבה',
+                    'מניעת פצעי לחץ'
+                ]
+            }
+        ];
+
+        // ====== QUIZ QUESTIONS ======
+        const quizQuestions = [
+            {
+                q: 'מהו השלב הראשון בסכמת X-CARE?',
+                options: ['X - חילוץ (eXtract)', 'C - מחזור דם (Circulation)', 'A - נתיב אוויר (Airway)', 'S - בטיחות (Safety)'],
+                correct: 0
+            },
+            {
+                q: 'מהו הסדר הנכון של שלבי הסכמה הבסיסית?',
+                options: ['X → C → A → R → E', 'A → B → C → D → E', 'C → A → R → E → X', 'X → A → C → R → E'],
+                correct: 0
+            },
+            {
+                q: 'כמה זמן מוערך לביצוע שלב X?',
+                options: ['30 שניות', '60 שניות', '90 שניות', '120 שניות'],
+                correct: 0
+            },
+            {
+                q: 'כמה זמן מוערך לביצוע שלב A?',
+                options: ['60 שניות', '30 שניות', '90 שניות', '120 שניות'],
+                correct: 0
+            },
+            {
+                q: 'מי מבצע את הפעולות בשלב X?',
+                options: ['חובשים בלבד', 'מט״ב בלבד', 'רופא בלבד', 'כל חייל'],
+                correct: 0
+            },
+            {
+                q: 'מהי הפעולה הראשונה בשלב X?',
+                options: ['ביצוע תרגולת חלץ-טפל או טכניקה קרבית פצוע בכוח', 'הכרזה בשטח ובקשר', 'השגת עליונות באש', 'עצירת דימום פורץ'],
+                correct: 0
+            },
+            {
+                q: 'מה כולל שלב C (Circulation)?',
+                options: ['הערכה קלינית, דיווח אגמי, חיפוש דימומים ומדידות', 'פתיחת נתיב אוויר והנשמה', 'חשיפת בית החזה וכריכת אגן', 'פינוי הפצוע מהשטח'],
+                correct: 0
+            },
+            {
+                q: 'באיזה שלב מבצעים דיווח אגמי?',
+                options: ['C - Circulation', 'X - eXtract', 'E - Evacuation', 'A - Airway'],
+                correct: 0
+            },
+            {
+                q: 'מהי משמעות האות E בסכמה?',
+                options: ['Evacuation - פינוי', 'Exposure - חשיפה', 'Emergency - חירום', 'Evaluation - הערכה'],
+                correct: 0
+            },
+            {
+                q: 'באיזה שלב מבצעים בדיקת הכרה לפי AVPU?',
+                options: ['C - Circulation', 'A - Airway', 'R - Respiration', 'E - Evacuation'],
+                correct: 0
+            },
+            {
+                q: 'מה עושים בהיעדר נשימה בשלב A?',
+                options: ['הנשמה באמצעות אמבו ומסיכה', 'ביצוע JT והחדרת AW', 'עצירת דימום פורץ', 'פינוי מיידי'],
+                correct: 0
+            },
+            {
+                q: 'באיזה שלב מבצעים הנחת צווארון?',
+                options: ['R - Respiration & Exposure', 'C - Circulation', 'A - Airway', 'E - Evacuation'],
+                correct: 0
+            },
+            {
+                q: 'מה עושים בשלב R בנוגע לאגן?',
+                options: ['הערכה וביצוע כריכת אגן', 'מדידת לחץ דם', 'השגת גישה למחזור הדם', 'הנשמה באמבו'],
+                correct: 0
+            },
+            {
+                q: 'באיזה שלב מבצעים חיתוך מצב וסיכום ממצאים?',
+                options: ['E - Evacuation', 'C - Circulation', 'R - Respiration', 'X - eXtract'],
+                correct: 0
+            },
+            {
+                q: 'מה כולל שלב Everything Else?',
+                options: ['הערכת כאב, מניעת זיהומים, קיבוע שברים, הערכת GCS', 'עצירת דימום והחייאה', 'חילוץ מאזור סכנה', 'הנשמה וחשיפת בית החזה'],
+                correct: 0
+            },
+            {
+                q: 'מהו PFC?',
+                options: ['Prolonged Field Care - טיפול ממושך', 'Primary First Care - טיפול ראשוני', 'Pre-Flight Check - בדיקה לפני טיסה', 'Post-Fracture Care - טיפול אחרי שבר'],
+                correct: 0
+            },
+            {
+                q: 'מי מבצע את שלב ה-PFC?',
+                options: ['מט״ב בלבד', 'חובש בלבד', 'כל חייל', 'רופא יחידתי'],
+                correct: 0
+            },
+            {
+                q: 'באיזה שלב מבצעים הפשטה מלאה של הפצוע?',
+                options: ['C ו-R', 'X בלבד', 'A בלבד', 'E בלבד'],
+                correct: 0
+            },
+            {
+                q: 'מה מבצעים בהלם עמוק בשלב C?',
+                options: ['הנחיית הצוות להשגת גישה למחזור הדם והכנת מוצרי דם', 'עצירת דימום פורץ', 'הנשמה באמבו', 'קיבוע שברים'],
+                correct: 0
+            },
+            {
+                q: 'מהי ההתערבות הנפשית המוזכרת בשלב Everything Else?',
+                options: ['התערבות יהלו״ם', 'התערבות CBT', 'התערבות EMDR', 'התערבות משברית'],
+                correct: 0
+            }
+        ];
+
+        // ====== UTILITY FUNCTIONS ======
+        function normalizeForCompare(text) {
+            return text
+                .replace(/[,.\-–:;!?'"״׳()\[\]{}<>←→«»\/\\]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function compareTexts(expected, actual) {
+            const expNorm = normalizeForCompare(expected);
+            const actNorm = normalizeForCompare(actual);
+            return expNorm === actNorm;
+        }
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        // ====== UI INITIALIZATION ======
+        lucide.createIcons();
+        applyDarkMode();
+
+        await ensureInitialAuth();
+
+        onUserChanged(async (user) => {
+            currentUser = user;
+            if (user) {
+                document.getElementById('user-greeting').innerText = `שלום, ${user.displayName || 'משתמש'}`;
+                document.getElementById('home-greeting').innerHTML = `שלום <span class="text-red-600 dark:text-red-400">${user.displayName || 'לוחם'}</span>,<br>מוכן ללמוד את <span class="bg-clip-text text-transparent bg-gradient-to-l from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400">הסכמה</span>?`;
+                document.getElementById('app-header').classList.remove('hidden');
+                await setLastAxis(user.uid, currentAxis);
+                document.getElementById('global-loader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('global-loader').style.display = 'none';
+                    window.navigate('home');
+                }, 300);
+            } else {
+                document.getElementById('app-header').classList.add('hidden');
+                document.getElementById('global-loader').style.display = 'none';
+                window.location.replace('login.html');
+            }
+        });
+
+        window.handleLogout = async () => {
+            if (confirm("האם אתה בטוח שברצונך להתנתק?")) {
+                await signOutUser();
+                window.location.replace('login.html');
+            }
+        };
+
+        // ====== NAVIGATION ======
+        let currentScreen = 'home';
+        window.navigate = (screen) => {
+            if (!currentUser) { window.location.replace('login.html'); return; }
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById(`screen-${screen}`).classList.add('active');
+            currentScreen = screen;
+            const backBtn = document.getElementById('btn-back-menu');
+            if (screen === 'home') backBtn.classList.add('hidden');
+            else backBtn.classList.remove('hidden');
+
+            if (screen === 'schema') initSchema();
+            if (screen === 'full-test') initFullTest();
+            if (screen === 'step-test') initStepTest();
+            if (screen === 'quiz') startQuiz();
+        };
+
+        // ====== DARK MODE ======
+        function applyDarkMode() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('dark-icon').setAttribute('data-lucide', 'sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('dark-icon').setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+        }
+        window.toggleDarkMode = () => {
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            applyDarkMode();
+        };
+
+        // ====== SCHEMA TABS ======
+        let activeStepId = 'X';
+
+        function initSchema() {
+            renderSchemaTabs();
+            renderSchemaContent();
+        }
+
+        function renderSchemaTabs() {
+            const container = document.getElementById('schema-tabs');
+            container.innerHTML = '';
+            schemaSteps.forEach(step => {
+                const isActive = step.id === activeStepId;
+                const btn = document.createElement('button');
+                btn.className = `step-tab flex items-center gap-2 px-4 py-2.5 rounded-2xl font-black text-sm whitespace-nowrap transition-all duration-200 ${isActive ? step.tabBg + ' ' + step.tabText + ' shadow-lg active-tab' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'}`;
+                btn.innerHTML = `<span class="text-lg">${step.letter}</span><span class="hidden sm:inline">${step.hebrewName}</span>`;
+                btn.onclick = () => { activeStepId = step.id; renderSchemaTabs(); renderSchemaContent(); };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderSchemaContent() {
+            const step = schemaSteps.find(s => s.id === activeStepId);
+            const container = document.getElementById('schema-content-inner');
+
+            let noteHtml = '';
+            if (step.note) {
+                noteHtml = `<div class="mb-4 px-4 py-3 rounded-2xl ${step.lightBg} ${step.borderColor} border flex items-center gap-3">
+                    <i data-lucide="info" class="w-5 h-5 ${step.textColor} shrink-0"></i>
+                    <span class="font-bold text-sm ${step.textColor}">${step.note}</span>
+                </div>`;
+            }
+
+            let timeHtml = '';
+            if (step.time) {
+                timeHtml = `<div class="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-sm font-bold">
+                    <i data-lucide="clock" class="w-4 h-4"></i> ${step.time}
+                </div>`;
+            }
+
+            let itemsHtml = step.items.map((item, idx) => `
+                <div class="flex gap-3 items-start p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br ${step.gradient} text-white flex items-center justify-center font-black text-sm shrink-0 mt-0.5">${idx + 1}</div>
+                    <p class="font-bold text-slate-800 dark:text-white text-base leading-relaxed">${item}</p>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="rounded-[2rem] overflow-hidden shadow-xl border ${step.borderColor} mb-6">
+                    <div class="bg-gradient-to-br ${step.gradient} text-white p-6 sm:p-8">
+                        <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-white/15 rounded-2xl flex items-center justify-center">
+                                    <i data-lucide="${step.icon}" class="w-8 h-8"></i>
+                                </div>
+                                <div>
+                                    <div class="text-white/70 text-sm font-bold uppercase tracking-wider">שלב ${step.letter}</div>
+                                    <h2 class="text-3xl font-black">${step.fullName}</h2>
+                                    <p class="text-white/90 font-bold">${step.hebrewName}</p>
+                                </div>
+                            </div>
+                            ${timeHtml}
+                        </div>
+                    </div>
+                    <div class="p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/50 space-y-3">
+                        ${noteHtml}
+                        ${itemsHtml}
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // ====== FULL SCHEMA TEST ======
+        let fullTestChecked = false;
+
+        function initFullTest() {
+            fullTestChecked = false;
+            const container = document.getElementById('full-test-inner');
+
+            let html = `
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2">מבחן סכמה מלאה</h2>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">רשום את התוכן של כל שלב מילה במילה. פסיקים ונקודות לא נבדקים.</p>
+                </div>
+            `;
+
+            schemaSteps.forEach(step => {
+                let inputsHtml = step.items.map((_, idx) => `
+                    <div class="flex gap-3 items-start">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br ${step.gradient} text-white flex items-center justify-center font-black text-sm shrink-0 mt-2">${idx + 1}</div>
+                        <div class="flex-1">
+                            <input type="text" id="ft-${step.id}-${idx}" class="test-input w-full px-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white font-medium text-base focus:border-blue-500 outline-none" placeholder="נקודה ${idx + 1}..." autocomplete="off" dir="rtl">
+                            <div id="ft-fb-${step.id}-${idx}" class="hidden mt-1 text-sm font-bold px-2"></div>
+                        </div>
+                    </div>
+                `).join('');
+
+                let noteHtml = step.note ? `<div class="text-sm font-bold ${step.textColor} mb-2"><i data-lucide="info" class="w-4 h-4 inline"></i> ${step.note}</div>` : '';
+
+                html += `
+                    <div class="mb-6 rounded-[2rem] overflow-hidden shadow-lg border ${step.borderColor}">
+                        <div class="bg-gradient-to-br ${step.gradient} text-white p-4 sm:p-5 flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center">
+                                <i data-lucide="${step.icon}" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <div class="text-lg font-black">${step.letter} - ${step.fullName}</div>
+                                <div class="text-white/80 text-sm font-bold">${step.hebrewName} ${step.time ? '(' + step.time + ')' : ''} • ${step.items.length} נקודות</div>
+                            </div>
+                        </div>
+                        <div class="p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/50 space-y-3">
+                            ${noteHtml}
+                            ${inputsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                <div id="ft-result" class="hidden mb-6 p-6 rounded-[2rem] shadow-xl border text-center"></div>
+                <div class="flex gap-3 mb-10">
+                    <button id="ft-check-btn" onclick="checkFullTest()" class="flex-1 bg-slate-900 dark:bg-blue-600 text-white font-black text-xl py-4 rounded-2xl shadow-lg hover:bg-slate-800 dark:hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                        <i data-lucide="check-circle" class="w-6 h-6"></i> בדוק מבחן
+                    </button>
+                    <button onclick="initFullTest()" class="bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold px-6 py-4 rounded-2xl border border-slate-300 dark:border-slate-600 hover:bg-slate-50 transition">
+                        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        window.checkFullTest = () => {
+            if (fullTestChecked) return;
+            fullTestChecked = true;
+
+            let totalItems = 0;
+            let correctItems = 0;
+            let wrongDetails = [];
+
+            schemaSteps.forEach(step => {
+                step.items.forEach((expected, idx) => {
+                    totalItems++;
+                    const input = document.getElementById(`ft-${step.id}-${idx}`);
+                    const feedback = document.getElementById(`ft-fb-${step.id}-${idx}`);
+                    const userText = input.value.trim();
+
+                    if (compareTexts(expected, userText)) {
+                        correctItems++;
+                        input.classList.add('correct');
+                        feedback.classList.remove('hidden');
+                        feedback.className = 'mt-1 text-sm font-bold px-2 text-green-600 dark:text-green-400';
+                        feedback.innerHTML = '✓ נכון!';
+                    } else {
+                        input.classList.add('wrong');
+                        input.readOnly = true;
+                        feedback.classList.remove('hidden');
+                        feedback.className = 'mt-1 text-sm font-bold px-2 text-red-500 dark:text-red-400';
+                        feedback.innerHTML = `✗ צריך להיות: <span class="text-slate-700 dark:text-slate-300">${expected}</span>`;
+                        wrongDetails.push({ step: step.letter, idx: idx + 1, expected, got: userText });
+                    }
+                });
+            });
+
+            const score = Math.round((correctItems / totalItems) * 100);
+            const resultDiv = document.getElementById('ft-result');
+            resultDiv.classList.remove('hidden');
+
+            let color = 'text-green-600';
+            let bgColor = 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
+            let msg = 'מדהים! שליטה מלאה בסכמה!';
+            if (score < 100) { msg = 'כמעט מושלם! חזור על הנקודות החסרות.'; }
+            if (score < 80) { msg = 'טוב, אבל יש מה לשפר.'; color = 'text-orange-500'; bgColor = 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'; }
+            if (score < 60) { msg = 'מומלץ לחזור על הסכמה בכרטיסיות.'; color = 'text-red-500'; bgColor = 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'; }
+
+            resultDiv.className = `mb-6 p-6 rounded-[2rem] shadow-xl border text-center ${bgColor}`;
+            resultDiv.innerHTML = `
+                <div class="text-5xl font-black ${color} mb-2">${score}%</div>
+                <div class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">${correctItems} מתוך ${totalItems} נקודות נכונות</div>
+                <p class="text-slate-500 dark:text-slate-400 font-medium">${msg}</p>
+            `;
+
+            document.getElementById('ft-check-btn').className = 'flex-1 bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-500 font-black text-xl py-4 rounded-2xl cursor-not-allowed flex items-center justify-center gap-2';
+
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+
+        // ====== STEP TEST ======
+        let stepTestStep = null;
+        let stepTestChecked = false;
+
+        function initStepTest() {
+            stepTestStep = null;
+            stepTestChecked = false;
+            renderStepTestSelection();
+        }
+
+        function renderStepTestSelection() {
+            const container = document.getElementById('step-test-inner');
+            let html = `
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2">מבחן לפי שלבים</h2>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">בחר שלב ספציפי ורשום את כל הנקודות שלו מילה במילה.</p>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            `;
+
+            schemaSteps.forEach(step => {
+                html += `
+                    <button onclick="selectStepTest('${step.id}')" class="group p-5 rounded-[2rem] bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-transparent shadow-sm hover:shadow-xl transition-all duration-300 text-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br ${step.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="relative z-10">
+                            <div class="w-14 h-14 mx-auto bg-gradient-to-br ${step.gradient} text-white rounded-2xl flex items-center justify-center mb-3 text-2xl font-black group-hover:bg-white/20 transition">${step.letter}</div>
+                            <div class="font-black text-slate-800 dark:text-white group-hover:text-white transition">${step.hebrewName}</div>
+                            <div class="text-xs font-bold text-slate-400 group-hover:text-white/80 transition mt-1">${step.items.length} נקודות</div>
+                        </div>
+                    </button>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        window.selectStepTest = (stepId) => {
+            stepTestStep = schemaSteps.find(s => s.id === stepId);
+            stepTestChecked = false;
+            renderStepTestContent();
+        };
+
+        function renderStepTestContent() {
+            const step = stepTestStep;
+            const container = document.getElementById('step-test-inner');
+
+            let inputsHtml = step.items.map((_, idx) => `
+                <div class="flex gap-3 items-start">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br ${step.gradient} text-white flex items-center justify-center font-black text-sm shrink-0 mt-2">${idx + 1}</div>
+                    <div class="flex-1">
+                        <input type="text" id="st-${step.id}-${idx}" class="test-input w-full px-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white font-medium text-base focus:border-blue-500 outline-none" placeholder="נקודה ${idx + 1}..." autocomplete="off" dir="rtl">
+                        <div id="st-fb-${step.id}-${idx}" class="hidden mt-1 text-sm font-bold px-2"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            let noteHtml = step.note ? `<div class="text-sm font-bold ${step.textColor} mb-3"><i data-lucide="info" class="w-4 h-4 inline"></i> ${step.note}</div>` : '';
+
+            container.innerHTML = `
+                <button onclick="initStepTest()" class="mb-4 flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm hover:text-slate-700 dark:hover:text-slate-200 transition">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i> חזרה לבחירת שלב
+                </button>
+                <div class="rounded-[2rem] overflow-hidden shadow-xl border ${step.borderColor} mb-6">
+                    <div class="bg-gradient-to-br ${step.gradient} text-white p-5 flex items-center gap-4">
+                        <div class="w-14 h-14 bg-white/15 rounded-xl flex items-center justify-center text-2xl font-black">${step.letter}</div>
+                        <div>
+                            <div class="text-xl font-black">${step.fullName}</div>
+                            <div class="text-white/80 font-bold">${step.hebrewName} • ${step.items.length} נקודות</div>
+                        </div>
+                    </div>
+                    <div class="p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/50 space-y-3">
+                        ${noteHtml}
+                        ${inputsHtml}
+                    </div>
+                </div>
+                <div id="st-result" class="hidden mb-6 p-6 rounded-[2rem] shadow-xl border text-center"></div>
+                <div class="flex gap-3 mb-10">
+                    <button id="st-check-btn" onclick="checkStepTest()" class="flex-1 bg-slate-900 dark:bg-blue-600 text-white font-black text-xl py-4 rounded-2xl shadow-lg hover:bg-slate-800 dark:hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                        <i data-lucide="check-circle" class="w-6 h-6"></i> בדוק מבחן
+                    </button>
+                    <button onclick="selectStepTest('${step.id}')" class="bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold px-6 py-4 rounded-2xl border border-slate-300 dark:border-slate-600 hover:bg-slate-50 transition">
+                        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        window.checkStepTest = () => {
+            if (stepTestChecked) return;
+            stepTestChecked = true;
+
+            const step = stepTestStep;
+            let correctItems = 0;
+
+            step.items.forEach((expected, idx) => {
+                const input = document.getElementById(`st-${step.id}-${idx}`);
+                const feedback = document.getElementById(`st-fb-${step.id}-${idx}`);
+                const userText = input.value.trim();
+
+                if (compareTexts(expected, userText)) {
+                    correctItems++;
+                    input.classList.add('correct');
+                    feedback.classList.remove('hidden');
+                    feedback.className = 'mt-1 text-sm font-bold px-2 text-green-600 dark:text-green-400';
+                    feedback.innerHTML = '✓ נכון!';
+                } else {
+                    input.classList.add('wrong');
+                    input.readOnly = true;
+                    feedback.classList.remove('hidden');
+                    feedback.className = 'mt-1 text-sm font-bold px-2 text-red-500 dark:text-red-400';
+                    feedback.innerHTML = `✗ צריך להיות: <span class="text-slate-700 dark:text-slate-300">${expected}</span>`;
+                }
+            });
+
+            const totalItems = step.items.length;
+            const score = Math.round((correctItems / totalItems) * 100);
+            const resultDiv = document.getElementById('st-result');
+            resultDiv.classList.remove('hidden');
+
+            let color = 'text-green-600';
+            let bgColor = 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
+            let msg = 'מושלם! שליטה מלאה בשלב!';
+            if (score < 100) { msg = 'כמעט! חזור על הנקודות שפספסת.'; }
+            if (score < 80) { msg = 'צריך עוד תרגול.'; color = 'text-orange-500'; bgColor = 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'; }
+            if (score < 60) { msg = 'חזור ללמוד את השלב בכרטיסיות.'; color = 'text-red-500'; bgColor = 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'; }
+
+            resultDiv.className = `mb-6 p-6 rounded-[2rem] shadow-xl border text-center ${bgColor}`;
+            resultDiv.innerHTML = `
+                <div class="text-5xl font-black ${color} mb-2">${score}%</div>
+                <div class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">${correctItems} מתוך ${totalItems} נקודות נכונות</div>
+                <p class="text-slate-500 dark:text-slate-400 font-medium">${msg}</p>
+            `;
+
+            document.getElementById('st-check-btn').className = 'flex-1 bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-500 font-black text-xl py-4 rounded-2xl cursor-not-allowed flex items-center justify-center gap-2';
+
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+
+        // ====== AMERICAN QUIZ ======
+        let quizList = [];
+        let quizAnswers = {};
+        let quizIdx = 0;
+
+        window.startQuiz = () => {
+            // Shuffle options for each question while tracking correct answer
+            quizList = quizQuestions.map((q, i) => {
+                const correctText = q.options[q.correct];
+                const shuffled = shuffleArray([...q.options]);
+                return {
+                    ...q,
+                    quizId: i,
+                    options: shuffled,
+                    correctIdx: shuffled.indexOf(correctText)
+                };
+            });
+            quizList = shuffleArray(quizList);
+            quizAnswers = {};
+            quizIdx = 0;
+
+            document.getElementById('quiz-active-view').classList.remove('hidden');
+            document.getElementById('quiz-active-view').classList.add('flex');
+            document.getElementById('quiz-results-view').classList.add('hidden');
+            document.getElementById('quiz-results-view').classList.remove('flex');
+            document.getElementById('quiz-review-view').classList.add('hidden');
+            document.getElementById('quiz-review-view').classList.remove('flex');
+
+            renderQuiz();
+        };
+
+        function renderQuiz() {
+            const q = quizList[quizIdx];
+            const selected = quizAnswers[q.quizId];
+
+            document.getElementById('quiz-counter').innerText = `שאלה ${quizIdx + 1} מתוך ${quizList.length}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((quizIdx + 1) / quizList.length) * 100}%`;
+            document.getElementById('quiz-question').innerText = q.q;
+
+            const container = document.getElementById('quiz-options');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const isSelected = selected === idx;
+                const style = isSelected
+                    ? "bg-indigo-50 dark:bg-indigo-900/40 border-indigo-500 text-indigo-900 dark:text-indigo-300 shadow-sm"
+                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-500";
+                const iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 ${isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 dark:border-slate-600'}"></div>`;
+
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-2xl border-2 flex items-center gap-4 transition-all cursor-pointer ${style}`;
+                div.innerHTML = `${iconHtml}<span class="font-bold text-lg leading-tight">${opt}</span>`;
+                div.onclick = () => {
+                    quizAnswers[q.quizId] = idx;
+                    renderQuiz();
+                };
+                container.appendChild(div);
+            });
+
+            const prevBtn = document.getElementById('quiz-prev-btn');
+            if (quizIdx === 0) prevBtn.className = "font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-300 dark:text-slate-600 cursor-not-allowed";
+            else prevBtn.className = "font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700";
+
+            document.getElementById('quiz-next-text').innerText = quizIdx === quizList.length - 1 ? 'סיים חידון' : 'השאלה הבאה';
+        }
+
+        window.prevQuiz = () => {
+            if (quizIdx > 0) { quizIdx--; renderQuiz(); }
+        };
+
+        window.nextQuiz = () => {
+            const q = quizList[quizIdx];
+            if (quizAnswers[q.quizId] === undefined && !confirm('לא בחרת תשובה, להמשיך?')) return;
+
+            if (quizIdx < quizList.length - 1) {
+                quizIdx++;
+                renderQuiz();
+            } else {
+                finishQuiz();
+            }
+        };
+
+        function finishQuiz() {
+            let correctCount = 0;
+            quizList.forEach(q => {
+                if (quizAnswers[q.quizId] === q.correctIdx) correctCount++;
+            });
+
+            const percent = Math.round((correctCount / quizList.length) * 100);
+            const wrongCount = quizList.length - correctCount;
+
+            document.getElementById('quiz-active-view').classList.add('hidden');
+            document.getElementById('quiz-active-view').classList.remove('flex');
+            document.getElementById('quiz-results-view').classList.remove('hidden');
+            document.getElementById('quiz-results-view').classList.add('flex');
+
+            const reviewBtn = document.getElementById('quiz-review-btn');
+            if (wrongCount > 0) {
+                document.getElementById('quiz-wrong-count').innerText = wrongCount;
+                reviewBtn.classList.remove('hidden');
+            } else {
+                reviewBtn.classList.add('hidden');
+            }
+
+            document.getElementById('quiz-res-score').innerText = percent;
+            document.getElementById('quiz-res-text').innerText = `${correctCount} תשובות נכונות מתוך ${quizList.length}`;
+
+            let msg = "מדהים! שליטה מלאה בסכמה!";
+            let color = "text-green-600 dark:text-green-400";
+            let icon = "target";
+
+            if (percent < 70) { msg = "יש צורך בחזרה נוספת."; color = "text-orange-500"; icon = "alert-triangle"; }
+            if (percent < 50) { msg = "מומלץ ללמוד את הסכמה מחדש."; color = "text-red-500"; icon = "alert-circle"; }
+
+            document.getElementById('quiz-res-msg').innerText = msg;
+            document.getElementById('quiz-res-score').className = `text-6xl font-black mb-2 ${color}`;
+            const iconEl = document.getElementById('quiz-res-icon');
+            iconEl.setAttribute('data-lucide', icon);
+            iconEl.className = `mx-auto mb-6 w-16 h-16 ${color}`;
+            lucide.createIcons();
+        }
+
+        window.showQuizReview = () => {
+            const reviewContent = document.getElementById('quiz-review-content');
+            reviewContent.innerHTML = '';
+
+            quizList.forEach((q, idx) => {
+                const userAnswer = quizAnswers[q.quizId];
+                if (userAnswer === q.correctIdx) return;
+
+                let optionsHtml = '';
+                q.options.forEach((opt, optIdx) => {
+                    const isUserSelected = userAnswer === optIdx;
+                    const isCorrect = optIdx === q.correctIdx;
+                    let style, iconHtml;
+
+                    if (isCorrect) {
+                        style = 'bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-600 text-green-800 dark:text-green-300';
+                        iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 border-green-500 bg-green-500 flex items-center justify-center"><i data-lucide="check" class="w-3 h-3 text-white"></i></div>`;
+                    } else if (isUserSelected) {
+                        style = 'bg-red-50 dark:bg-red-900/20 border-red-400 dark:border-red-600 text-red-800 dark:text-red-300';
+                        iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 border-red-500 bg-red-500 flex items-center justify-center"><i data-lucide="x" class="w-3 h-3 text-white"></i></div>`;
+                    } else {
+                        style = 'bg-slate-50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500';
+                        iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 border-slate-300 dark:border-slate-600"></div>`;
+                    }
+
+                    optionsHtml += `<div class="p-3 rounded-xl border-2 flex items-center gap-3 ${style}">${iconHtml}<span class="font-medium text-sm leading-snug">${opt}</span></div>`;
+                });
+
+                const item = document.createElement('div');
+                item.className = 'bg-white dark:bg-slate-800 rounded-2xl border-2 border-red-200 dark:border-red-900/50 overflow-hidden shadow-sm';
+                item.innerHTML = `
+                    <div class="p-4 bg-red-50 dark:bg-red-900/10 border-b border-red-100 dark:border-red-900/30">
+                        <span class="text-xs font-bold text-red-500 bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded-full mb-2 inline-block">שאלה ${idx + 1}</span>
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base leading-snug">${q.q}</h3>
+                    </div>
+                    <div class="p-4 space-y-2">${optionsHtml}</div>
+                `;
+                reviewContent.appendChild(item);
+            });
+
+            document.getElementById('quiz-results-view').classList.add('hidden');
+            document.getElementById('quiz-results-view').classList.remove('flex');
+            document.getElementById('quiz-review-view').classList.remove('hidden');
+            document.getElementById('quiz-review-view').classList.add('flex');
+            lucide.createIcons();
+        };
+
+        window.showQuizResults = () => {
+            document.getElementById('quiz-review-view').classList.add('hidden');
+            document.getElementById('quiz-review-view').classList.remove('flex');
+            document.getElementById('quiz-results-view').classList.remove('hidden');
+            document.getElementById('quiz-results-view').classList.add('flex');
+        };
+
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => { });
+            });
+        }
+    </script>
+</body>
+
+</html>
