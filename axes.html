@@ -140,8 +140,6 @@
                     בחירת ציר לימוד
                 </div>
                 <h1 class="text-2xl font-black sm:text-3xl">בחרו מאיפה להמשיך ללמוד</h1>
-                <p id="axes-subtitle" class="mt-1.5 text-sm font-medium text-slate-500 dark:text-slate-400">הציר האחרון
-                    שלכם יודגש אוטומטית.</p>
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="toggleDarkMode()"
@@ -284,7 +282,7 @@
     </main>
 
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, loadUserPreferences, setLastAxis, getAxisHref, getAxisLabel, isUnderConstruction } from './firebase-common.js';
+        import { ensureInitialAuth, onUserChanged, signOutUser, getAxisHref, getAxisLabel, isUnderConstruction } from './firebase-common.js';
 
         const loader = document.getElementById('page-loader');
         let currentUser = null;
@@ -317,16 +315,6 @@
             setTimeout(() => { loader.style.display = 'none'; }, 250);
         }
 
-        function highlightAxis(axisId) {
-            document.querySelectorAll('[data-axis-card]').forEach(card => {
-                card.classList.remove('card-active');
-            });
-            const activeCard = document.querySelector(`[data-axis-card="${axisId}"]`);
-            if (activeCard) {
-                activeCard.classList.add('card-active');
-            }
-        }
-
         window.openAxis = async (axisId) => {
             if (!currentUser) {
                 window.location.replace('login.html');
@@ -338,7 +326,6 @@
                 return;
             }
 
-            await setLastAxis(currentUser.uid, axisId);
             window.location.href = getAxisHref(axisId);
         };
 
@@ -366,11 +353,6 @@
             }
 
             currentUser = user;
-            const preferences = await loadUserPreferences(user.uid);
-            if (preferences.lastAxis) {
-                document.getElementById('axes-subtitle').textContent = `הציר האחרון שלך: ${getAxisLabel(preferences.lastAxis)}`;
-                highlightAxis(preferences.lastAxis);
-            }
             hideLoader();
         });
     </script>

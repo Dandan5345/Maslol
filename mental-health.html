@@ -94,7 +94,7 @@
     </main>
 
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, setLastAxis } from './firebase-common.js';
+        import { ensureInitialAuth, onUserChanged, signOutUser } from './firebase-common.js';
 
         function applyDarkMode() {
             if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -133,7 +133,6 @@
                 window.location.replace('login.html');
                 return;
             }
-            await setLastAxis(user.uid, 'mental-health');
             document.getElementById('user-line').textContent = `שלום, ${user.displayName || 'משתמש'}. בינתיים אפשר לחזור לבחירת הצירים או להמשיך לציר ההחייאה.`;
             hideLoader();
         });
