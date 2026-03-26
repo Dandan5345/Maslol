@@ -219,7 +219,7 @@
                         class="w-12 h-12 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <i data-lucide="file-edit" class="w-8 h-8"></i>
                     </div>
-                    <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">מבחן סכמה מלאה</h3>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">מבחן סכמה מלא</h3>
                     <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">רואים את הטבלה ללא טקסט - רושמים מילה
                         במילה ובודקים.</p>
                     <span
@@ -244,18 +244,18 @@
                     </span>
                 </button>
 
-                <!-- American Quiz -->
+                <!-- Review Questions -->
                 <button onclick="navigate('quiz')"
                     class="group text-right bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-800 hover:border-indigo-400 p-5 rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-start text-white">
                     <div
                         class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <i data-lucide="target" class="w-8 h-8 text-indigo-300"></i>
                     </div>
-                    <h3 class="text-xl font-black mb-2">חידון אמריקאי</h3>
-                    <p class="text-slate-400 font-medium mb-8">שאלות רב-ברירה על הסכמה. צריך לדעת את הסכמה בעל פה!</p>
+                    <h3 class="text-xl font-black mb-2">שאלות חזרה</h3>
+                    <p class="text-slate-400 font-medium mb-8">שאלות רב-ברירה מתוך הסכמה, בסדר רנדומלי ועם תשובה מיידית אחרי כל בחירה.</p>
                     <span
                         class="mt-auto inline-flex items-center gap-1.5 text-slate-900 font-black bg-indigo-400 px-4 py-2 rounded-xl group-hover:bg-white transition-colors">
-                        התחל חידון <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        התחל חזרה <i data-lucide="chevron-left" class="w-4 h-4"></i>
                     </span>
                 </button>
             </div>
@@ -292,7 +292,7 @@
         <div id="screen-quiz" class="screen flex-col flex-1 w-full max-w-2xl mx-auto p-4 py-6 overflow-hidden">
             <div id="quiz-active-view" class="flex flex-col h-full w-full">
                 <div class="mb-6 flex items-center justify-between">
-                    <div id="quiz-counter" class="font-bold text-slate-500 dark:text-slate-400">שאלה 1 מתוך 20</div>
+                    <div id="quiz-counter" class="font-bold text-slate-500 dark:text-slate-400">שאלת חזרה 1 מתוך 25</div>
                     <div class="w-1/2 bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
                         <div id="quiz-progress-bar" class="bg-indigo-600 dark:bg-indigo-500 h-full transition-all"
                             style="width: 5%"></div>
@@ -306,14 +306,14 @@
                             class="text-2xl sm:text-3xl font-black leading-tight text-slate-800 dark:text-white mb-8">
                             שאלה</h2>
                         <div id="quiz-options" class="space-y-3"></div>
+                        <div id="quiz-feedback" class="hidden mt-6 rounded-[1.5rem] border px-4 py-4 text-right"></div>
                     </div>
                     <div
-                        class="p-4 sm:p-6 bg-white dark:bg-slate-800 shrink-0 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                        <button id="quiz-prev-btn" onclick="prevQuiz()"
-                            class="font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-300 dark:text-slate-600 cursor-not-allowed">חזור</button>
+                        class="p-4 sm:p-6 bg-white dark:bg-slate-800 shrink-0 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center gap-3">
+                        <div id="quiz-status-hint" class="text-sm font-bold text-slate-500 dark:text-slate-400">בחר תשובה כדי לקבל משוב מיידי</div>
                         <button id="quiz-next-btn" onclick="nextQuiz()"
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-6 sm:px-8 py-3.5 rounded-xl shadow-lg flex items-center gap-2 transition-colors">
-                            <span id="quiz-next-text">השאלה הבאה</span> <i data-lucide="chevron-left"
+                            class="bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-500 font-black px-6 sm:px-8 py-3.5 rounded-xl shadow-lg flex items-center gap-2 transition-colors cursor-not-allowed">
+                            <span id="quiz-next-text">ענה כדי להמשיך</span> <i data-lucide="chevron-left"
                                 class="w-5 h-5"></i>
                         </button>
                     </div>
@@ -330,26 +330,26 @@
                     </div>
                     <div class="relative z-10">
                         <i data-lucide="target" id="quiz-res-icon" class="mx-auto mb-6 w-16 h-16 text-green-600"></i>
-                        <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-2">סיום החידון!</h2>
+                        <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-2">סיום סבב החזרה!</h2>
                         <p id="quiz-res-msg" class="text-slate-500 dark:text-slate-400 font-medium mb-8 text-lg">כל
                             הכבוד!</p>
                         <div
                             class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-[2rem] p-8 mb-8">
-                            <div class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">הציון שלך</div>
+                            <div class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">כמה ענית נכון</div>
                             <div id="quiz-res-score" class="text-6xl font-black text-green-600 mb-2">100</div>
-                            <div id="quiz-res-text" class="text-slate-600 dark:text-slate-400 font-bold">20 מתוך 20
+                            <div id="quiz-res-text" class="text-slate-600 dark:text-slate-400 font-bold">25 מתוך 25
                             </div>
                         </div>
                         <div class="flex flex-col gap-3">
                             <button id="quiz-review-btn" onclick="showQuizReview()"
-                                class="w-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-bold text-lg py-4 rounded-xl border border-amber-200 dark:border-amber-800 hover:bg-amber-100 transition hidden">בדוק
+                                class="hidden w-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-bold text-lg py-4 rounded-xl border border-amber-200 dark:border-amber-800 hover:bg-amber-100 transition">בדוק
                                 טעויות (<span id="quiz-wrong-count">0</span>)</button>
                             <button onclick="navigate('home')"
                                 class="w-full bg-slate-900 dark:bg-indigo-600 text-white font-black text-lg py-4 rounded-xl hover:bg-slate-800 transition shadow-lg">חזרה
                                 לתפריט</button>
                             <button onclick="startQuiz()"
-                                class="w-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-lg py-4 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-50 transition">חידון
-                                חדש</button>
+                                class="w-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-lg py-4 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-50 transition">סבב
+                                שאלות חדש</button>
                         </div>
                     </div>
                 </div>
@@ -389,7 +389,7 @@
     </main>
 
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, isAuthorizedUser } from "./firebase-common.js";
+        import { ensureInitialAuth, onUserChanged, signOutUser } from "./firebase-common.js";
 
         let currentUser = null;
         const currentAxis = 'resuscitation-schema';
@@ -526,110 +526,6 @@
             }
         ];
 
-        // ====== QUIZ QUESTIONS ======
-        const quizQuestions = [
-            {
-                q: 'מהו השלב הראשון בסכמת X-CARE?',
-                options: ['X - חילוץ (eXtract)', 'C - מחזור דם (Circulation)', 'A - נתיב אוויר (Airway)', 'S - בטיחות (Safety)'],
-                correct: 0
-            },
-            {
-                q: 'מהו הסדר הנכון של שלבי הסכמה הבסיסית?',
-                options: ['X → C → A → R → E', 'A → B → C → D → E', 'C → A → R → E → X', 'X → A → C → R → E'],
-                correct: 0
-            },
-            {
-                q: 'כמה זמן מוערך לביצוע שלב X?',
-                options: ['30 שניות', '60 שניות', '90 שניות', '120 שניות'],
-                correct: 0
-            },
-            {
-                q: 'כמה זמן מוערך לביצוע שלב A?',
-                options: ['60 שניות', '30 שניות', '90 שניות', '120 שניות'],
-                correct: 0
-            },
-            {
-                q: 'מי מבצע את הפעולות בשלב X?',
-                options: ['חובשים בלבד', 'מט״ב בלבד', 'רופא בלבד', 'כל חייל'],
-                correct: 0
-            },
-            {
-                q: 'מהי הפעולה הראשונה בשלב X?',
-                options: ['ביצוע תרגולת חלץ-טפל או טכניקה קרבית פצוע בכוח', 'הכרזה בשטח ובקשר', 'השגת עליונות באש', 'עצירת דימום פורץ'],
-                correct: 0
-            },
-            {
-                q: 'מה כולל שלב C (Circulation)?',
-                options: ['הערכה קלינית, דיווח אגמי, חיפוש דימומים ומדידות', 'פתיחת נתיב אוויר והנשמה', 'חשיפת בית החזה וכריכת אגן', 'פינוי הפצוע מהשטח'],
-                correct: 0
-            },
-            {
-                q: 'באיזה שלב מבצעים דיווח אגמי?',
-                options: ['C - Circulation', 'X - eXtract', 'E - Evacuation', 'A - Airway'],
-                correct: 0
-            },
-            {
-                q: 'מהי משמעות האות E בסכמה?',
-                options: ['Evacuation - פינוי', 'Exposure - חשיפה', 'Emergency - חירום', 'Evaluation - הערכה'],
-                correct: 0
-            },
-            {
-                q: 'באיזה שלב מבצעים בדיקת הכרה לפי AVPU?',
-                options: ['C - Circulation', 'A - Airway', 'R - Respiration', 'E - Evacuation'],
-                correct: 0
-            },
-            {
-                q: 'מה עושים בהיעדר נשימה בשלב A?',
-                options: ['הנשמה באמצעות אמבו ומסיכה', 'ביצוע JT והחדרת AW', 'עצירת דימום פורץ', 'פינוי מיידי'],
-                correct: 0
-            },
-            {
-                q: 'באיזה שלב מבצעים הנחת צווארון?',
-                options: ['R - Respiration & Exposure', 'C - Circulation', 'A - Airway', 'E - Evacuation'],
-                correct: 0
-            },
-            {
-                q: 'מה עושים בשלב R בנוגע לאגן?',
-                options: ['הערכה וביצוע כריכת אגן', 'מדידת לחץ דם', 'השגת גישה למחזור הדם', 'הנשמה באמבו'],
-                correct: 0
-            },
-            {
-                q: 'באיזה שלב מבצעים חיתוך מצב וסיכום ממצאים?',
-                options: ['E - Evacuation', 'C - Circulation', 'R - Respiration', 'X - eXtract'],
-                correct: 0
-            },
-            {
-                q: 'מה כולל שלב Everything Else?',
-                options: ['הערכת כאב, מניעת זיהומים, קיבוע שברים, הערכת GCS', 'עצירת דימום והחייאה', 'חילוץ מאזור סכנה', 'הנשמה וחשיפת בית החזה'],
-                correct: 0
-            },
-            {
-                q: 'מהו PFC?',
-                options: ['Prolonged Field Care - טיפול ממושך', 'Primary First Care - טיפול ראשוני', 'Pre-Flight Check - בדיקה לפני טיסה', 'Post-Fracture Care - טיפול אחרי שבר'],
-                correct: 0
-            },
-            {
-                q: 'מי מבצע את שלב ה-PFC?',
-                options: ['מט״ב בלבד', 'חובש בלבד', 'כל חייל', 'רופא יחידתי'],
-                correct: 0
-            },
-            {
-                q: 'באיזה שלב מבצעים הפשטה מלאה של הפצוע?',
-                options: ['C ו-R', 'X בלבד', 'A בלבד', 'E בלבד'],
-                correct: 0
-            },
-            {
-                q: 'מה מבצעים בהלם עמוק בשלב C?',
-                options: ['הנחיית הצוות להשגת גישה למחזור הדם והכנת מוצרי דם', 'עצירת דימום פורץ', 'הנשמה באמבו', 'קיבוע שברים'],
-                correct: 0
-            },
-            {
-                q: 'מהי ההתערבות הנפשית המוזכרת בשלב Everything Else?',
-                options: ['התערבות יהלו״ם', 'התערבות CBT', 'התערבות EMDR', 'התערבות משברית'],
-                correct: 0
-            }
-        ];
-
         // ====== UTILITY FUNCTIONS ======
         function normalizeForCompare(text) {
             return text
@@ -653,6 +549,121 @@
             return copy;
         }
 
+        function getStepLabel(step) {
+            return `${step.letter} - ${step.hebrewName}`;
+        }
+
+        function sampleItems(items, count, excludedItems = []) {
+            const excludedSet = new Set(excludedItems);
+            return shuffleArray(items.filter(item => !excludedSet.has(item))).slice(0, count);
+        }
+
+        function buildReviewQuestion(q, correctText, wrongOptions, explanation) {
+            return { q, correctText, wrongOptions, explanation };
+        }
+
+        function buildQuizQuestionBank() {
+            const stepLabels = schemaSteps.map(step => getStepLabel(step));
+            const allItems = schemaSteps.flatMap(step => step.items);
+            const questionBank = [
+                buildReviewQuestion(
+                    'מהו השלב הראשון בסכמת X-CARE?',
+                    getStepLabel(schemaSteps[0]),
+                    stepLabels.filter(label => label !== getStepLabel(schemaSteps[0])).slice(0, 3),
+                    'שלב X פותח את הסכמה, ורק לאחריו ממשיכים לשלבים הבאים.'
+                ),
+                buildReviewQuestion(
+                    'מהו הסדר הנכון של שלבי הסכמה?',
+                    schemaSteps.map(step => step.letter).join(' → '),
+                    [
+                        'X → A → C → R → E → EE → PFC',
+                        'C → X → A → R → E → EE → PFC',
+                        'X → C → R → A → E → EE → PFC'
+                    ],
+                    'סדר השלבים לפי הסכמה הוא X, אחריו C, אחריו A, אחריו R, אחריו E, ואז EE ולבסוף PFC.'
+                )
+            ];
+
+            schemaSteps.forEach((step, idx) => {
+                if (step.time) {
+                    questionBank.push(buildReviewQuestion(
+                        `כמה זמן מוערך לביצוע שלב ${step.letter}?`,
+                        step.time,
+                        sampleItems(['30 שניות', '60 שניות', '90 שניות', '120 שניות'], 3, [step.time]),
+                        `בשלב ${step.letter} (${step.hebrewName}) הזמן המוערך הוא ${step.time}.`
+                    ));
+                }
+
+                questionBank.push(buildReviewQuestion(
+                    `כמה נקודות יש בשלב ${step.letter} - ${step.hebrewName}?`,
+                    `${step.items.length} נקודות`,
+                    sampleItems(
+                        [...new Set(schemaSteps.map(otherStep => `${otherStep.items.length} נקודות`))],
+                        3,
+                        [`${step.items.length} נקודות`]
+                    ),
+                    `בשלב ${step.letter} יש ${step.items.length} נקודות שונות שצריך לזכור.`
+                ));
+
+                questionBank.push(buildReviewQuestion(
+                    `מהי המשמעות של שלב ${step.letter} בסכמה?`,
+                    `${step.fullName} - ${step.hebrewName}`,
+                    sampleItems(
+                        schemaSteps.map(otherStep => `${otherStep.fullName} - ${otherStep.hebrewName}`),
+                        3,
+                        [`${step.fullName} - ${step.hebrewName}`]
+                    ),
+                    `האות ${step.letter} מייצגת את ${step.fullName} — ${step.hebrewName}.`
+                ));
+
+                if (step.note) {
+                    questionBank.push(buildReviewQuestion(
+                        `איזו הערה מיוחדת שייכת לשלב ${step.letter} - ${step.hebrewName}?`,
+                        step.note,
+                        sampleItems(
+                            schemaSteps.filter(otherStep => otherStep.note).map(otherStep => otherStep.note),
+                            3,
+                            [step.note]
+                        ),
+                        `ההערה המיוחדת של שלב ${step.letter} היא: ${step.note}.`
+                    ));
+                }
+
+                if (idx < schemaSteps.length - 1) {
+                    const nextStep = schemaSteps[idx + 1];
+                    questionBank.push(buildReviewQuestion(
+                        `איזה שלב מגיע מיד אחרי ${step.letter} - ${step.hebrewName}?`,
+                        getStepLabel(nextStep),
+                        sampleItems(stepLabels, 3, [getStepLabel(nextStep)]),
+                        `אחרי ${step.letter} ממשיכים ל-${nextStep.letter} — ${nextStep.hebrewName}.`
+                    ));
+                }
+
+                step.items.forEach(item => {
+                    questionBank.push(buildReviewQuestion(
+                        `באיזה שלב בסכמה מופיעה הפעולה: "${item}"?`,
+                        getStepLabel(step),
+                        sampleItems(stepLabels, 3, [getStepLabel(step)]),
+                        `הפעולה הזו שייכת לשלב ${step.letter} — ${step.hebrewName}.`
+                    ));
+                });
+
+                sampleItems(step.items, Math.min(3, step.items.length)).forEach(item => {
+                    questionBank.push(buildReviewQuestion(
+                        `איזו מהפעולות הבאות שייכת לשלב ${step.letter} - ${step.hebrewName}?`,
+                        item,
+                        sampleItems(allItems, 3, [item, ...step.items]),
+                        `"${item}" מופיעה בשלב ${step.letter} — ${step.hebrewName}.`
+                    ));
+                });
+            });
+
+            return questionBank;
+        }
+
+        const QUIZ_SESSION_LENGTH = 25;
+        const quizQuestionBank = buildQuizQuestionBank();
+
         // ====== UI INITIALIZATION ======
         lucide.createIcons();
         applyDarkMode();
@@ -665,12 +676,6 @@
                 document.getElementById('user-greeting').innerText = `שלום, ${user.displayName || 'משתמש'}`;
                 document.getElementById('home-greeting').innerHTML = `שלום <span class="text-red-600 dark:text-red-400">${user.displayName || 'לוחם'}</span>,<br>מוכן ללמוד את <span class="bg-clip-text text-transparent bg-gradient-to-l from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400">הסכמה</span>?`;
                 document.getElementById('app-header').classList.remove('hidden');
-
-                // הצגה/הסתרה של כרטיסיית מבחן הסכמה המלאה לפי הרשאת מייל
-                const schemaExamBtn = document.getElementById('btn-schema-exam');
-                if (schemaExamBtn) {
-                    schemaExamBtn.style.display = isAuthorizedUser(user) ? '' : 'none';
-                }
 
                 document.getElementById('global-loader').style.opacity = '0';
                 setTimeout(() => {
@@ -813,7 +818,7 @@
 
             let html = `
                 <div class="text-center mb-8">
-                    <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2">מבחן סכמה מלאה</h2>
+                    <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2">מבחן סכמה מלא</h2>
                     <p class="text-slate-500 dark:text-slate-400 font-medium">רשום את התוכן של כל שלב מילה במילה. פסיקים ונקודות לא נבדקים.</p>
                 </div>
             `;
@@ -1094,25 +1099,26 @@
             resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
 
-        // ====== AMERICAN QUIZ ======
+        // ====== REVIEW QUESTIONS ======
         let quizList = [];
         let quizAnswers = {};
+        let quizAnswered = {};
         let quizIdx = 0;
 
         window.startQuiz = () => {
-            // Shuffle options for each question while tracking correct answer
-            quizList = quizQuestions.map((q, i) => {
-                const correctText = q.options[q.correct];
-                const shuffled = shuffleArray([...q.options]);
-                return {
-                    ...q,
-                    quizId: i,
-                    options: shuffled,
-                    correctIdx: shuffled.indexOf(correctText)
-                };
-            });
-            quizList = shuffleArray(quizList);
+            quizList = shuffleArray(quizQuestionBank)
+                .slice(0, Math.min(QUIZ_SESSION_LENGTH, quizQuestionBank.length))
+                .map((question, i) => {
+                    const options = shuffleArray([question.correctText, ...question.wrongOptions]);
+                    return {
+                        ...question,
+                        quizId: i,
+                        options,
+                        correctIdx: options.indexOf(question.correctText)
+                    };
+                });
             quizAnswers = {};
+            quizAnswered = {};
             quizIdx = 0;
 
             document.getElementById('quiz-active-view').classList.remove('hidden');
@@ -1128,8 +1134,9 @@
         function renderQuiz() {
             const q = quizList[quizIdx];
             const selected = quizAnswers[q.quizId];
+            const isAnswered = Boolean(quizAnswered[q.quizId]);
 
-            document.getElementById('quiz-counter').innerText = `שאלה ${quizIdx + 1} מתוך ${quizList.length}`;
+            document.getElementById('quiz-counter').innerText = `שאלת חזרה ${quizIdx + 1} מתוך ${quizList.length}`;
             document.getElementById('quiz-progress-bar').style.width = `${((quizIdx + 1) / quizList.length) * 100}%`;
             document.getElementById('quiz-question').innerText = q.q;
 
@@ -1138,35 +1145,67 @@
 
             q.options.forEach((opt, idx) => {
                 const isSelected = selected === idx;
-                const style = isSelected
-                    ? "bg-indigo-50 dark:bg-indigo-900/40 border-indigo-500 text-indigo-900 dark:text-indigo-300 shadow-sm"
-                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-500";
-                const iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 ${isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 dark:border-slate-600'}"></div>`;
+                const isCorrect = idx === q.correctIdx;
+                let style = "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-500";
+                let iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 border-slate-300 dark:border-slate-600"></div>`;
+
+                if (!isAnswered && isSelected) {
+                    style = "bg-indigo-50 dark:bg-indigo-900/40 border-indigo-500 text-indigo-900 dark:text-indigo-300 shadow-sm";
+                    iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 border-indigo-600 bg-indigo-600"></div>`;
+                }
+
+                if (isAnswered && isCorrect) {
+                    style = "bg-green-50 dark:bg-green-900/20 border-green-500 text-green-900 dark:text-green-300 shadow-sm";
+                    iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 border-green-500 bg-green-500 flex items-center justify-center"><i data-lucide="check" class="w-3 h-3 text-white"></i></div>`;
+                } else if (isAnswered && isSelected) {
+                    style = "bg-red-50 dark:bg-red-900/20 border-red-500 text-red-900 dark:text-red-300 shadow-sm";
+                    iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 border-red-500 bg-red-500 flex items-center justify-center"><i data-lucide="x" class="w-3 h-3 text-white"></i></div>`;
+                } else if (isAnswered) {
+                    style = "bg-slate-50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500";
+                }
 
                 const div = document.createElement('div');
-                div.className = `p-4 rounded-2xl border-2 flex items-center gap-4 transition-all cursor-pointer ${style}`;
+                div.className = `p-4 rounded-2xl border-2 flex items-center gap-4 transition-all ${isAnswered ? 'cursor-default' : 'cursor-pointer'} ${style}`;
                 div.innerHTML = `${iconHtml}<span class="font-bold text-lg leading-tight">${opt}</span>`;
                 div.onclick = () => {
+                    if (quizAnswered[q.quizId]) return;
                     quizAnswers[q.quizId] = idx;
+                    quizAnswered[q.quizId] = true;
                     renderQuiz();
                 };
                 container.appendChild(div);
             });
 
-            const prevBtn = document.getElementById('quiz-prev-btn');
-            if (quizIdx === 0) prevBtn.className = "font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-300 dark:text-slate-600 cursor-not-allowed";
-            else prevBtn.className = "font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700";
+            const feedbackEl = document.getElementById('quiz-feedback');
+            const nextBtn = document.getElementById('quiz-next-btn');
+            const nextText = document.getElementById('quiz-next-text');
+            const statusHint = document.getElementById('quiz-status-hint');
 
-            document.getElementById('quiz-next-text').innerText = quizIdx === quizList.length - 1 ? 'סיים חידון' : 'השאלה הבאה';
+            if (isAnswered) {
+                const answeredCorrectly = selected === q.correctIdx;
+                feedbackEl.classList.remove('hidden');
+                feedbackEl.className = `mt-6 rounded-[1.5rem] border px-4 py-4 text-right ${answeredCorrectly ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'}`;
+                feedbackEl.innerHTML = `
+                    <div class="font-black text-base mb-1">${answeredCorrectly ? 'כל הכבוד, צדקת!' : 'לא מדויק — זאת התשובה הנכונה:'}</div>
+                    <div class="font-bold mb-1">${q.options[q.correctIdx]}</div>
+                    <div class="text-sm font-medium leading-relaxed">${q.explanation}</div>
+                `;
+                statusHint.innerText = answeredCorrectly ? 'ענית נכון — אפשר להמשיך' : 'קיבלת משוב מיידי — אפשר להמשיך';
+                nextBtn.className = 'bg-indigo-600 hover:bg-indigo-700 text-white font-black px-6 sm:px-8 py-3.5 rounded-xl shadow-lg flex items-center gap-2 transition-colors';
+                nextText.innerText = quizIdx === quizList.length - 1 ? 'סיום הסבב' : 'לשאלה הבאה';
+            } else {
+                feedbackEl.classList.add('hidden');
+                statusHint.innerText = 'בחר תשובה כדי לקבל משוב מיידי';
+                nextBtn.className = 'bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-500 font-black px-6 sm:px-8 py-3.5 rounded-xl shadow-lg flex items-center gap-2 transition-colors cursor-not-allowed';
+                nextText.innerText = 'ענה כדי להמשיך';
+            }
+
+            lucide.createIcons();
         }
-
-        window.prevQuiz = () => {
-            if (quizIdx > 0) { quizIdx--; renderQuiz(); }
-        };
 
         window.nextQuiz = () => {
             const q = quizList[quizIdx];
-            if (quizAnswers[q.quizId] === undefined && !confirm('לא בחרת תשובה, להמשיך?')) return;
+            if (!quizAnswered[q.quizId]) return;
 
             if (quizIdx < quizList.length - 1) {
                 quizIdx++;
@@ -1189,24 +1228,25 @@
             document.getElementById('quiz-active-view').classList.remove('flex');
             document.getElementById('quiz-results-view').classList.remove('hidden');
             document.getElementById('quiz-results-view').classList.add('flex');
-
-            const reviewBtn = document.getElementById('quiz-review-btn');
-            if (wrongCount > 0) {
-                document.getElementById('quiz-wrong-count').innerText = wrongCount;
-                reviewBtn.classList.remove('hidden');
-            } else {
-                reviewBtn.classList.add('hidden');
-            }
+            document.getElementById('quiz-review-btn').classList.add('hidden');
 
             document.getElementById('quiz-res-score').innerText = percent;
             document.getElementById('quiz-res-text').innerText = `${correctCount} תשובות נכונות מתוך ${quizList.length}`;
 
-            let msg = "מדהים! שליטה מלאה בסכמה!";
-            let color = "text-green-600 dark:text-green-400";
-            let icon = "target";
+            let msg = 'מעולה! סיימת סבב חזרה חזק.';
+            let color = 'text-green-600 dark:text-green-400';
+            let icon = 'target';
 
-            if (percent < 70) { msg = "יש צורך בחזרה נוספת."; color = "text-orange-500"; icon = "alert-triangle"; }
-            if (percent < 50) { msg = "מומלץ ללמוד את הסכמה מחדש."; color = "text-red-500"; icon = "alert-circle"; }
+            if (wrongCount > 0) {
+                msg = `ענית נכון על ${correctCount} שאלות. אפשר להתחיל מיד סבב חדש עם שאלות אחרות מהמאגר.`;
+                color = 'text-indigo-600 dark:text-indigo-400';
+                icon = 'rotate-ccw';
+            }
+            if (percent < 50) {
+                msg = 'מומלץ לחזור לכרטיסיות או לסכמה המלאה ואז להתחיל סבב נוסף.';
+                color = 'text-red-500';
+                icon = 'alert-circle';
+            }
 
             document.getElementById('quiz-res-msg').innerText = msg;
             document.getElementById('quiz-res-score').className = `text-6xl font-black mb-2 ${color}`;
@@ -1216,59 +1256,8 @@
             lucide.createIcons();
         }
 
-        window.showQuizReview = () => {
-            const reviewContent = document.getElementById('quiz-review-content');
-            reviewContent.innerHTML = '';
-
-            quizList.forEach((q, idx) => {
-                const userAnswer = quizAnswers[q.quizId];
-                if (userAnswer === q.correctIdx) return;
-
-                let optionsHtml = '';
-                q.options.forEach((opt, optIdx) => {
-                    const isUserSelected = userAnswer === optIdx;
-                    const isCorrect = optIdx === q.correctIdx;
-                    let style, iconHtml;
-
-                    if (isCorrect) {
-                        style = 'bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-600 text-green-800 dark:text-green-300';
-                        iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 border-green-500 bg-green-500 flex items-center justify-center"><i data-lucide="check" class="w-3 h-3 text-white"></i></div>`;
-                    } else if (isUserSelected) {
-                        style = 'bg-red-50 dark:bg-red-900/20 border-red-400 dark:border-red-600 text-red-800 dark:text-red-300';
-                        iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 border-red-500 bg-red-500 flex items-center justify-center"><i data-lucide="x" class="w-3 h-3 text-white"></i></div>`;
-                    } else {
-                        style = 'bg-slate-50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500';
-                        iconHtml = `<div class="w-5 h-5 rounded-full shrink-0 border-2 border-slate-300 dark:border-slate-600"></div>`;
-                    }
-
-                    optionsHtml += `<div class="p-3 rounded-xl border-2 flex items-center gap-3 ${style}">${iconHtml}<span class="font-medium text-sm leading-snug">${opt}</span></div>`;
-                });
-
-                const item = document.createElement('div');
-                item.className = 'bg-white dark:bg-slate-800 rounded-2xl border-2 border-red-200 dark:border-red-900/50 overflow-hidden shadow-sm';
-                item.innerHTML = `
-                    <div class="p-4 bg-red-50 dark:bg-red-900/10 border-b border-red-100 dark:border-red-900/30">
-                        <span class="text-xs font-bold text-red-500 bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded-full mb-2 inline-block">שאלה ${idx + 1}</span>
-                        <h3 class="font-bold text-slate-800 dark:text-white text-base leading-snug">${q.q}</h3>
-                    </div>
-                    <div class="p-4 space-y-2">${optionsHtml}</div>
-                `;
-                reviewContent.appendChild(item);
-            });
-
-            document.getElementById('quiz-results-view').classList.add('hidden');
-            document.getElementById('quiz-results-view').classList.remove('flex');
-            document.getElementById('quiz-review-view').classList.remove('hidden');
-            document.getElementById('quiz-review-view').classList.add('flex');
-            lucide.createIcons();
-        };
-
-        window.showQuizResults = () => {
-            document.getElementById('quiz-review-view').classList.add('hidden');
-            document.getElementById('quiz-review-view').classList.remove('flex');
-            document.getElementById('quiz-results-view').classList.remove('hidden');
-            document.getElementById('quiz-results-view').classList.add('flex');
-        };
+        window.showQuizReview = () => { };
+        window.showQuizResults = () => { };
 
     </script>
     <script>
