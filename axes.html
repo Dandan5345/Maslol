@@ -118,101 +118,101 @@
             <div class="flex-1 border-t border-slate-200 dark:border-slate-700/50"></div>
         </div>
 
-        <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mb-6">
 
             <!-- Resuscitation Axis -->
             <button data-axis-card="resuscitation" onclick="openAxis('resuscitation')"
-                class="card-hover group flex min-h-[200px] flex-col rounded-[2rem] border-2 border-blue-300/50 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 p-5 text-right text-white shadow-xl shadow-blue-500/20 animate-slide-up" style="animation-delay: 0.15s;">
-                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
-                    <i data-lucide="heart-pulse" class="h-7 w-7"></i>
+                class="card-hover group flex flex-col rounded-2xl border border-blue-300/40 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500 p-4 text-right text-white shadow-lg shadow-blue-500/20 animate-slide-up" style="animation-delay: 0.15s;">
+                <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+                    <i data-lucide="heart-pulse" class="h-5 w-5"></i>
                 </div>
-                <div class="mb-2 text-xl font-black leading-tight">ציר החייאה</div>
-                <p class="text-sm font-medium leading-relaxed text-blue-50/90">כרטיסיות למידה, תרגול ומבחן מסכם.</p>
-                <div class="mt-auto flex items-center justify-between pt-5 text-sm font-bold">
-                    <span class="rounded-full bg-white/20 backdrop-blur-sm px-3 py-1.5 text-xs">✓ זמין</span>
-                    <span class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">כניסה <i data-lucide="chevron-left" class="h-4 w-4"></i></span>
+                <div class="text-base font-black leading-tight mb-1">ציר החייאה</div>
+                <p class="text-xs font-medium text-blue-50/85 leading-relaxed mb-3">כרטיסיות למידה, תרגול ומבחן מסכם.</p>
+                <div class="mt-auto flex items-center justify-between text-xs font-bold">
+                    <span class="rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1">✓ זמין</span>
+                    <span class="inline-flex items-center gap-0.5 opacity-75 group-hover:opacity-100 transition">כניסה <i data-lucide="chevron-left" class="h-3.5 w-3.5"></i></span>
                 </div>
             </button>
 
-            <!-- Schema Axis (renamed) -->
+            <!-- Schema Axis -->
             <button data-axis-card="resuscitation-schema" onclick="openAxis('resuscitation-schema')"
-                class="card-hover group flex min-h-[200px] flex-col rounded-[2rem] border-2 border-orange-300/50 bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 p-5 text-right text-white shadow-xl shadow-orange-500/20 animate-slide-up" style="animation-delay: 0.2s;">
-                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
-                    <i data-lucide="file-text" class="h-7 w-7"></i>
+                class="card-hover group flex flex-col rounded-2xl border border-orange-300/40 bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 p-4 text-right text-white shadow-lg shadow-orange-500/20 animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+                    <i data-lucide="file-text" class="h-5 w-5"></i>
                 </div>
-                <div class="mb-2 text-xl font-black leading-tight">ציר סכמת טיפול בפצוע</div>
-                <p class="text-sm font-medium leading-relaxed text-orange-50/90">למידה, מבחן מילה במילה, מבחן לפי שלבים וחידון.</p>
-                <div class="mt-auto flex items-center justify-between pt-5 text-sm font-bold">
-                    <span class="rounded-full bg-white/20 backdrop-blur-sm px-3 py-1.5 text-xs">✓ זמין</span>
-                    <span class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">כניסה <i data-lucide="chevron-left" class="h-4 w-4"></i></span>
+                <div class="text-base font-black leading-tight mb-1">ציר סכמת טיפול בפצוע</div>
+                <p class="text-xs font-medium text-orange-50/85 leading-relaxed mb-3">למידה, מבחן מילה במילה, מבחן לפי שלבים וחידון.</p>
+                <div class="mt-auto flex items-center justify-between text-xs font-bold">
+                    <span class="rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1">✓ זמין</span>
+                    <span class="inline-flex items-center gap-0.5 opacity-75 group-hover:opacity-100 transition">כניסה <i data-lucide="chevron-left" class="h-3.5 w-3.5"></i></span>
                 </div>
             </button>
 
-            <!-- Trauma Axis (now active!) -->
+            <!-- Trauma Axis -->
             <button data-axis-card="trauma" onclick="openAxis('trauma')"
-                class="card-hover group flex min-h-[200px] flex-col rounded-[2rem] border-2 border-red-300/50 bg-gradient-to-br from-red-600 via-red-500 to-rose-500 p-5 text-right text-white shadow-xl shadow-red-500/20 animate-slide-up" style="animation-delay: 0.25s;">
-                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
-                    <i data-lucide="shield-plus" class="h-7 w-7"></i>
+                class="card-hover group flex flex-col rounded-2xl border border-red-300/40 bg-gradient-to-br from-red-600 via-red-500 to-rose-500 p-4 text-right text-white shadow-lg shadow-red-500/20 animate-slide-up" style="animation-delay: 0.25s;">
+                <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+                    <i data-lucide="shield-plus" class="h-5 w-5"></i>
                 </div>
-                <div class="mb-2 text-xl font-black leading-tight">ציר טראומה</div>
-                <p class="text-sm font-medium leading-relaxed text-red-50/90">חידון שאלות בנושאי טראומה וטיפול בפציעות.</p>
-                <div class="mt-auto flex items-center justify-between pt-5 text-sm font-bold">
-                    <span class="rounded-full bg-white/20 backdrop-blur-sm px-3 py-1.5 text-xs">✓ זמין</span>
-                    <span class="inline-flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">כניסה <i data-lucide="chevron-left" class="h-4 w-4"></i></span>
+                <div class="text-base font-black leading-tight mb-1">ציר טראומה</div>
+                <p class="text-xs font-medium text-red-50/85 leading-relaxed mb-3">חידון שאלות בנושאי טראומה וטיפול בפציעות.</p>
+                <div class="mt-auto flex items-center justify-between text-xs font-bold">
+                    <span class="rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1">✓ זמין</span>
+                    <span class="inline-flex items-center gap-0.5 opacity-75 group-hover:opacity-100 transition">כניסה <i data-lucide="chevron-left" class="h-3.5 w-3.5"></i></span>
                 </div>
             </button>
         </section>
 
         <!-- Under Construction Axes Label -->
-        <div class="mb-4 flex items-center gap-2 px-1 animate-slide-up" style="animation-delay: 0.3s;">
+        <div class="mb-3 flex items-center gap-2 px-1 animate-slide-up" style="animation-delay: 0.3s;">
             <div class="h-2 w-2 rounded-full bg-amber-500"></div>
             <span class="text-sm font-bold text-slate-600 dark:text-slate-400">צירים בבנייה</span>
             <div class="flex-1 border-t border-slate-200 dark:border-slate-700/50"></div>
         </div>
 
-        <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 
             <!-- Routine Axis (under construction) -->
             <button data-axis-card="routine" onclick="openAxis('routine')"
-                class="card-hover construction-card group flex min-h-[180px] flex-col rounded-[2rem] border-2 border-slate-200/80 bg-white/90 p-5 text-right shadow-lg shadow-slate-200/30 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 dark:shadow-slate-900/30 animate-slide-up" style="animation-delay: 0.35s;">
-                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">
-                    <i data-lucide="stethoscope" class="h-7 w-7"></i>
+                class="card-hover construction-card group flex flex-col rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-right shadow-sm backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 animate-slide-up" style="animation-delay: 0.35s;">
+                <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    <i data-lucide="stethoscope" class="h-5 w-5"></i>
                 </div>
-                <div class="mb-2 text-xl font-black">ציר שגרה</div>
-                <p class="text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">ציר זה יכלול תוכן בנושא רפואת שגרה.</p>
-                <div class="mt-auto flex items-center justify-between pt-4">
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-                        <i data-lucide="hard-hat" class="h-3.5 w-3.5"></i> בבנייה
+                <div class="text-base font-black mb-1">ציר שגרה</div>
+                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed mb-3">ציר זה יכלול תוכן בנושא רפואת שגרה.</p>
+                <div class="mt-auto">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        <i data-lucide="hard-hat" class="h-3 w-3"></i> בבנייה
                     </span>
                 </div>
             </button>
 
             <!-- Anamnesis Axis (under construction) -->
             <button data-axis-card="anamnesis" onclick="openAxis('anamnesis')"
-                class="card-hover construction-card group flex min-h-[180px] flex-col rounded-[2rem] border-2 border-slate-200/80 bg-white/90 p-5 text-right shadow-lg shadow-slate-200/30 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 dark:shadow-slate-900/30 animate-slide-up" style="animation-delay: 0.4s;">
-                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
-                    <i data-lucide="clipboard-list" class="h-7 w-7"></i>
+                class="card-hover construction-card group flex flex-col rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-right shadow-sm backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 animate-slide-up" style="animation-delay: 0.4s;">
+                <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
+                    <i data-lucide="clipboard-list" class="h-5 w-5"></i>
                 </div>
-                <div class="mb-2 text-xl font-black">ציר אנמנזה</div>
-                <p class="text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">ציר זה יכלול תוכן בנושא נטילת אנמנזה.</p>
-                <div class="mt-auto flex items-center justify-between pt-4">
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-                        <i data-lucide="hard-hat" class="h-3.5 w-3.5"></i> בבנייה
+                <div class="text-base font-black mb-1">ציר אנמנזה</div>
+                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed mb-3">ציר זה יכלול תוכן בנושא נטילת אנמנזה.</p>
+                <div class="mt-auto">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        <i data-lucide="hard-hat" class="h-3 w-3"></i> בבנייה
                     </span>
                 </div>
             </button>
 
             <!-- Mental Health Axis (under construction) -->
             <button data-axis-card="mental-health" onclick="openAxis('mental-health')"
-                class="card-hover construction-card group flex min-h-[180px] flex-col rounded-[2rem] border-2 border-slate-200/80 bg-white/90 p-5 text-right shadow-lg shadow-slate-200/30 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 dark:shadow-slate-900/30 animate-slide-up" style="animation-delay: 0.45s;">
-                <div class="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-900/30 dark:text-fuchsia-300">
-                    <i data-lucide="brain" class="h-7 w-7"></i>
+                class="card-hover construction-card group flex flex-col rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-right shadow-sm backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-800/90 animate-slide-up" style="animation-delay: 0.45s;">
+                <div class="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-900/30 dark:text-fuchsia-300">
+                    <i data-lucide="brain" class="h-5 w-5"></i>
                 </div>
-                <div class="mb-2 text-xl font-black">ציר בריאות הנפש</div>
-                <p class="text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">ציר זה יכלול תוכן בנושא בריאות הנפש.</p>
-                <div class="mt-auto flex items-center justify-between pt-4">
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-                        <i data-lucide="hard-hat" class="h-3.5 w-3.5"></i> בבנייה
+                <div class="text-base font-black mb-1">ציר בריאות הנפש</div>
+                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed mb-3">ציר זה יכלול תוכן בנושא בריאות הנפש.</p>
+                <div class="mt-auto">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        <i data-lucide="hard-hat" class="h-3 w-3"></i> בבנייה
                     </span>
                 </div>
             </button>

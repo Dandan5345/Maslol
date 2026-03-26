@@ -184,14 +184,14 @@
                     מילה במילה. בחר שיטת למידה או מבחן.</p>
             </div>
 
-            <div class="mb-6 flex justify-center gap-3">
+            <div class="mb-6 flex justify-center gap-3 gap-y-3 flex-wrap">
                 <button onclick="window.location.href='axes.html'"
-                    class="inline-flex items-center gap-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 px-5 py-3 text-sm font-bold text-blue-700 dark:text-blue-300 shadow-sm border border-blue-100 dark:border-slate-700">
+                    class="inline-flex items-center gap-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 px-5 py-3 text-sm font-bold text-blue-700 dark:text-blue-300 shadow-sm border border-blue-100 dark:border-slate-700 transition hover:bg-blue-50 dark:hover:bg-blue-900/20">
                     <i data-lucide="layout-grid" class="w-4 h-4"></i> מעבר לבחירת ציר
                 </button>
-                <button onclick="window.location.href='resuscitation.html'"
-                    class="inline-flex items-center gap-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 px-5 py-3 text-sm font-bold text-red-700 dark:text-red-300 shadow-sm border border-red-100 dark:border-slate-700">
-                    <i data-lucide="heart-pulse" class="w-4 h-4"></i> ציר החייאה
+                <button onclick="navigate('full-schema')"
+                    class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-l from-orange-500 to-amber-500 px-5 py-3 text-sm font-bold text-white shadow-md hover:shadow-lg border border-orange-400/30 transition hover:from-orange-600 hover:to-amber-600">
+                    <i data-lucide="scroll-text" class="w-4 h-4"></i> צפייה בסכמה המלאה
                 </button>
             </div>
 
@@ -365,6 +365,24 @@
                     </button>
                 </div>
                 <div id="quiz-review-content" class="flex-1 overflow-y-auto space-y-4 custom-scrollbar pb-4"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN: FULL SCHEMA REFERENCE -->
+        <div id="screen-full-schema" class="screen flex-col w-full flex-1 overflow-hidden">
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6">
+                <div class="max-w-3xl mx-auto">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white">סכמת X-CARE המלאה</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">כל שלבי הסכמה במבט אחד — לשינון ולחזרה</p>
+                        </div>
+                        <button onclick="navigate('home')" class="shrink-0 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i> חזרה
+                        </button>
+                    </div>
+                    <div id="full-schema-content" class="space-y-4"></div>
+                </div>
             </div>
         </div>
 
@@ -682,6 +700,7 @@
             if (screen === 'full-test') initFullTest();
             if (screen === 'step-test') initStepTest();
             if (screen === 'quiz') startQuiz();
+            if (screen === 'full-schema') initFullSchema();
         };
 
         // ====== DARK MODE ======
@@ -889,6 +908,38 @@
 
             resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
+
+        // ====== FULL SCHEMA REFERENCE ======
+        function initFullSchema() {
+            const container = document.getElementById('full-schema-content');
+            if (container.dataset.rendered) return; // already rendered
+            container.dataset.rendered = '1';
+            container.innerHTML = schemaSteps.map(step => `
+                <div class="rounded-2xl border-2 overflow-hidden shadow-sm" style="border-color: var(--step-color, #e2e8f0)">
+                    <div class="bg-gradient-to-l ${step.gradient} px-4 py-3 flex items-center gap-3">
+                        <div class="shrink-0 w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center">
+                            <i data-lucide="${step.icon}" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div class="flex-1 text-right">
+                            <div class="text-lg font-black text-white leading-tight">${step.letter} — ${step.hebrewName}</div>
+                            <div class="text-xs font-semibold text-white/75">${step.fullName}${step.time ? ' · ' + step.time : ''}</div>
+                        </div>
+                    </div>
+                    ${step.note ? `<div class="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 px-4 py-2 text-xs font-bold text-amber-700 dark:text-amber-300 text-right flex items-center gap-1.5"><span>⚠️</span> ${step.note}</div>` : ''}
+                    <div class="bg-white dark:bg-slate-800 px-4 py-3">
+                        <ol class="space-y-1.5">
+                            ${step.items.map((item, i) => `
+                                <li class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-300 text-right">
+                                    <span class="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-xs font-black text-slate-500 dark:text-slate-400">${i + 1}</span>
+                                    <span class="leading-relaxed">${item}</span>
+                                </li>
+                            `).join('')}
+                        </ol>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
 
         // ====== STEP TEST ======
         let stepTestStep = null;
