@@ -79,11 +79,22 @@
         const btnFinish = document.getElementById('finish-btn');
 
         const trauma39Data = quiz100Data.slice(0, 39);
+        const homeHref = document.body?.dataset?.homeHref || 'axes.html';
 
-        function updateFloatingNav() {
+        function updateFloatingNav(viewId = 'subcategory-screen') {
             if (typeof window.setFloatingNavState === 'function') {
+                const isHomeView = viewId === 'subcategory-screen';
                 window.setFloatingNavState({
-                    homeAction: () => showView('subcategory-screen')
+                    backAction: () => {
+                        if (isHomeView) {
+                            window.location.href = homeHref;
+                            return;
+                        }
+                        showView('subcategory-screen');
+                    },
+                    homeAction: () => {
+                        window.location.href = homeHref;
+                    }
                 });
             }
         }
@@ -105,7 +116,7 @@
             views.forEach((view) => view.classList.remove('active-view'));
             document.getElementById(viewId)?.classList.add('active-view');
             updateHeader(viewId);
-            updateFloatingNav();
+            updateFloatingNav(viewId);
         }
 
         function showToast(message) {
@@ -307,7 +318,6 @@
         });
 
         showView('subcategory-screen');
-        updateFloatingNav();
     }
 
     if (document.readyState === 'loading') {
