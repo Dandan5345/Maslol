@@ -95,6 +95,41 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
 
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+        }
+        .circle-badge {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: black;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        .schema-content-list li {
+            position: relative;
+            padding-right: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+        .schema-content-list li::before {
+            content: '○';
+            position: absolute;
+            right: 0;
+            top: 0;
+            color: #6b7280;
+            font-weight: bold;
+        }
+        .schema-sub-list li::before {
+            content: '-';
+            color: #9ca3af;
+        }
         .test-input {
             transition: border-color 0.2s, box-shadow 0.2s;
         }
@@ -374,8 +409,8 @@
                 <div class="max-w-3xl mx-auto">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h2 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white">סכמת X-CARE המלאה</h2>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">כל שלבי הסכמה במבט אחד — לשינון ולחזרה</p>
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white">הסכמה האחודה לטיפול בפצוע בודד</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">X-CARE — כל שלבי הסכמה במבט אחד</p>
                         </div>
                         <button onclick="navigate('home')" class="shrink-0 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">
                             <i data-lucide="chevron-right" class="w-4 h-4"></i> חזרה
@@ -397,12 +432,12 @@
         // ====== SCHEMA DATA ======
         const schemaSteps = [
             {
-                id: 'X', letter: 'X', fullName: 'eXtract', hebrewName: 'חילוץ', time: '30 שניות',
+                id: 'X', letter: 'X', fullName: 'Care Under Fire', hebrewName: 'טיפול תחת אש', time: '30 שניות',
+                survey: 'primary',
                 icon: 'shield-alert',
                 gradient: 'from-red-600 to-rose-500', lightBg: 'bg-red-50 dark:bg-red-900/20',
                 textColor: 'text-red-600 dark:text-red-400', borderColor: 'border-red-200 dark:border-red-800',
                 ringColor: 'ring-red-400', tabBg: 'bg-red-600', tabText: 'text-white',
-                note: 'הפעולות עצמן יבוצעו על ידי חובשים בלבד בשלב זה',
                 items: [
                     'ביצוע תרגולת חלץ-טפל או טכניקה קרבית פצוע בכוח',
                     'הכרזה בשטח ובקשר על פצוע בכוח',
@@ -412,80 +447,121 @@
                 ]
             },
             {
-                id: 'C', letter: 'C', fullName: 'Circulation', hebrewName: 'מחזור דם', time: '30 שניות',
-                icon: 'heart-pulse',
-                gradient: 'from-orange-600 to-amber-500', lightBg: 'bg-orange-50 dark:bg-orange-900/20',
-                textColor: 'text-orange-600 dark:text-orange-400', borderColor: 'border-orange-200 dark:border-orange-800',
-                ringColor: 'ring-orange-400', tabBg: 'bg-orange-600', tabText: 'text-white',
-                note: 'הגעה לסביבה מאובטחת/בטוחה',
+                id: 'Extract', letter: 'Extract', fullName: 'Extract', hebrewName: 'סקר ראשוני',
+                survey: 'primary',
+                icon: 'move',
+                gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
+                textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
+                ringColor: 'ring-green-400', tabBg: 'bg-green-600', tabText: 'text-white',
                 items: [
-                    'הערכה קלינית: מנגנון הפציעה, בחינה ויזואלית ופניה לפצוע - התרשמות ראשונית מהירה, דחיפות',
-                    'דיווח אגמי - פניה, הזדהות, תיאור האירוע, מיקום, מספר פצועים ודחיפות פינוי',
-                    'וידוא שהדימום נעצר ← במידה ובוצע בדרג קודם עצירת דימום פורץ',
-                    'חיפוש אחר פציעות ומקורות דימום בגו, בגפיים ובאזורים נסתרים',
-                    'ביצוע הפיכה והפשטה - ראש, חזה, עורף, גב, גפיים, בתי שחי, עכוז ומפשעות',
-                    'עצירת דימום שזוהה',
-                    'מדידת לחץ דם',
-                    'מדידת דופק איכותית וכמותית',
-                    'מדידת ריווי חמצן (סטורציה)',
+                    'הגעה לסביבה מאובטחת/בטוחה',
+                    'התרשמות ראשונית מהירה - מנגנון הפציעה, בחינה ויזואלית ופניה לפצוע, דחיפות',
+                    'דיווח אגמי - פניה, הזדהות, תיאור האירוע, מיקום, מספר פצועים ודחיפות פינוי'
+                ]
+            },
+            {
+                id: 'C', letter: 'C', fullName: 'Circulation', hebrewName: 'מחזור דם', time: '60 שניות',
+                survey: 'primary',
+                icon: 'heart-pulse',
+                gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
+                textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
+                ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
+                note: 'בהלם עמוק על פי הקריטריונים ← הנחיית הצוות להשגת גישה למחזור הדם והכנת מוצרי דם. המשך ביצוע הסכמה על ידי מט״ב. הפעולות עצמן יבוצעו על ידי חובשים בלבד בשלב זה',
+                items: [
+                    'עצירת דימום פורץ. במידה ובוצע בדרג קודם ← וידוא שהדימום נעצר',
+                    'חיפוש אחר פציעות ומקורות דימום בגו, בגפיים ובאזורים נסתרים תוך ביצוע הפיכה והפשטה - ראש, חזה, עורף, בתי שחי, גב, גפיים, עכוז ומפשעות - עצירת דימום שזוהה',
+                    'הערכה קלינית',
                     'בדיקת הכרה לפי AVPU',
                     'בהיעדר נשימה או בהיעדר תגובה לכאב ← ביצוע JT והחדרת AW',
                     'בטראומה ישירה לנתיב האוויר ← סילוק הפרשות והושבה',
-                    'בהלם עמוק על פי הקריטריונים ← הנחיית הצוות להשגת גישה למחזור הדם והכנת מוצרי דם',
-                    'המשך ביצוע הסכמה על ידי מט״ב'
+                    'מדידת לחץ דם',
+                    'מדידת דופק איכותית וכמותית',
+                    'מדידת ריווי חמצן (סטורציה)',
+                    'בהלם עמוק על פי הקריטריונים ← הנחיית הצוות להשגת גישה למחזור הדם והכנת מוצרי דם'
                 ]
             },
             {
-                id: 'A', letter: 'A', fullName: 'Airway', hebrewName: 'נתיב אוויר', time: '60 שניות',
+                id: 'A', letter: 'A', fullName: 'Airway', hebrewName: 'נתיב אוויר', time: '30 שניות',
+                survey: 'primary',
                 icon: 'wind',
-                gradient: 'from-blue-600 to-cyan-500', lightBg: 'bg-blue-50 dark:bg-blue-900/20',
-                textColor: 'text-blue-600 dark:text-blue-400', borderColor: 'border-blue-200 dark:border-blue-800',
-                ringColor: 'ring-blue-400', tabBg: 'bg-blue-600', tabText: 'text-white',
+                gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
+                textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
+                ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
                 items: [
                     'הערכת נתיב האוויר ומצוקה נשימתית תוך פניה לפצוע והסתכלות',
-                    'שימוש באמצעים בסיסיים לניהול נתיב האוויר:',
+                    'שימוש באמצעים בסיסיים לניהול נתיב האוויר',
                     'פתיחת פה וסילוק הפרשות',
                     'הושבה',
-                    'העשרה בחמצן',
-                    'בהיעדר נשימה ← הנשמה באמצעות אמבו ומסיכה',
-                    'בחשד לפגיעה ← שמירה על עמש״צ'
+                    'העשרה בחמצן'
                 ]
             },
             {
-                id: 'R', letter: 'R', fullName: 'Respiration & Exposure', hebrewName: 'נשימה וחשיפה', time: '60 שניות',
+                id: 'R', letter: 'R', fullName: 'Respiration', hebrewName: 'נשימה',
+                survey: 'primary',
                 icon: 'stethoscope',
-                gradient: 'from-teal-600 to-emerald-500', lightBg: 'bg-teal-50 dark:bg-teal-900/20',
-                textColor: 'text-teal-600 dark:text-teal-400', borderColor: 'border-teal-200 dark:border-teal-800',
-                ringColor: 'ring-teal-400', tabBg: 'bg-teal-600', tabText: 'text-white',
+                gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
+                textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
+                ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
                 items: [
-                    'חשיפת בית החזה והתרשמות מסימני חבלה',
-                    'וידוא הפשטה מלאה - איתור כלל הפציעות, עצירת דימום במידה וזוהה והפיכה',
+                    'בהיעדר נשימה ← הנשמה באמצעות אמבו ומסיכה',
+                    'בחשד לפגיעה ← שמירה על עמש״צ',
+                    'חשיפת בית החזה והתרשמות מסימני חבלה'
+                ]
+            },
+            {
+                id: 'E', letter: 'E', fullName: 'Exposure & Evacuation', hebrewName: 'חשיפה ופינוי', time: '60 שניות',
+                survey: 'primary',
+                icon: 'scan-search',
+                gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
+                textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
+                ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
+                items: [
+                    'וידוא הפשטה מלאה והפיכה - איתור כלל הפציעות, עצירת דימום במידה וזוהה',
                     'ראש - התרשמות מסימני חבלה',
                     'עמש״צ - בחשד לפגיעה ← הנחת צווארון',
                     'אגן - הערכה וביצוע כריכת אגן',
-                    'כיסוי, חימום והעמסת לאלונקה'
-                ]
-            },
-            {
-                id: 'E', letter: 'E', fullName: 'Evacuation', hebrewName: 'פינוי',
-                icon: 'truck',
-                gradient: 'from-purple-600 to-indigo-500', lightBg: 'bg-purple-50 dark:bg-purple-900/20',
-                textColor: 'text-purple-600 dark:text-purple-400', borderColor: 'border-purple-200 dark:border-purple-800',
-                ringColor: 'ring-purple-400', tabBg: 'bg-purple-600', tabText: 'text-white',
-                items: [
+                    'כיסוי, חימום והעמסת לאלונקה',
                     'חיתוך מצב - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות',
-                    'וידוא העברת דיווח רפואי והשלמת תיעוד ב-101 דיגיטלי או ידני',
-                    'תחילת פינוי בהתאם למצב המבצעי ויכולת הטיפול בפינוי',
-                    'יש לבצע חיתוך מצב בצוות ולהעביר דיווח רפואי טרם הפינוי',
-                    'השלמת השלבים הבאים במהלך הפינוי'
+                    'העברת דיווח רפואי והשלמת תיעוד ב-101 דיגיטלי או ידני'
                 ]
             },
             {
-                id: 'EE', letter: 'EE', fullName: 'Everything Else', hebrewName: 'הכל אחר',
+                id: 'SC', letter: 'C', fullName: 'Secondary Circulation', hebrewName: 'מחזור דם - סקר שניוני',
+                survey: 'secondary',
+                icon: 'heart-pulse',
+                gradient: 'from-gray-600 to-gray-500', lightBg: 'bg-gray-50 dark:bg-gray-900/20',
+                textColor: 'text-gray-600 dark:text-gray-400', borderColor: 'border-gray-200 dark:border-gray-800',
+                ringColor: 'ring-gray-400', tabBg: 'bg-gray-600', tabText: 'text-white',
+                items: [
+                    'הערכת הלם חוזרת והמשך החזר נפח לפצועים בהלם עמוק',
+                    'השגת גישה למחזור הדם וקיבוע',
+                    'מתן TXA',
+                    'הערכה חוזרת והמרת חסמי עורקים',
+                    'קיבוע ומתיחה של שבר בירך באמצעות סד תומאס',
+                    'השלמת עירוי פריפרי שני בפצוע שנזקק להחזר נפח'
+                ]
+            },
+            {
+                id: 'SAR', letter: 'A+R', fullName: 'Secondary Airway & Respiration', hebrewName: 'נתיב אוויר ונשימה - סקר שניוני',
+                survey: 'secondary',
+                icon: 'wind',
+                gradient: 'from-gray-600 to-gray-500', lightBg: 'bg-gray-50 dark:bg-gray-900/20',
+                textColor: 'text-gray-600 dark:text-gray-400', borderColor: 'border-gray-200 dark:border-gray-800',
+                ringColor: 'ring-gray-400', tabBg: 'bg-gray-600', tabText: 'text-white',
+                items: [
+                    'הערכה חוזרת של נתיב אוויר וניהול שמרני או ע״י התערבות',
+                    'העשרה בחמצן',
+                    'בפצוע מונשם חיבור למנשם והכנת תרופות הרדמה להמשך',
+                    'החדרת נקז חזה לפצוע חזה מונשם במידת הצורך בלבד'
+                ]
+            },
+            {
+                id: 'SE', letter: 'E', fullName: 'Everything Else', hebrewName: 'הכל אחר - סקר שניוני',
+                survey: 'secondary',
                 icon: 'clipboard-list',
-                gradient: 'from-amber-600 to-yellow-500', lightBg: 'bg-amber-50 dark:bg-amber-900/20',
-                textColor: 'text-amber-600 dark:text-amber-400', borderColor: 'border-amber-200 dark:border-amber-800',
-                ringColor: 'ring-amber-400', tabBg: 'bg-amber-600', tabText: 'text-white',
+                gradient: 'from-gray-600 to-gray-500', lightBg: 'bg-gray-50 dark:bg-gray-900/20',
+                textColor: 'text-gray-600 dark:text-gray-400', borderColor: 'border-gray-200 dark:border-gray-800',
+                ringColor: 'ring-gray-400', tabBg: 'bg-gray-600', tabText: 'text-white',
                 items: [
                     'הערכת כאב וטיפול',
                     'מניעת זיהומים - שטיפת פצעים, חבישה, טיפול אנטיביוטי',
@@ -495,29 +571,18 @@
                     'וידוא כלל הקיבועים',
                     'השלמת תיעוד ב-101 דיגיטלי או ידני',
                     'הערכה לקיומה של תגובת דחק/קרב וביצוע התערבות יהלו״ם',
-                    'העברת דיווח רפואי חוזר',
-                    'ניטור ותיעוד הסימנים החיוניים באופן תדיר ומחזורי'
+                    'העברת דיווח רפואי חוזר'
                 ]
             },
             {
-                id: 'PFC', letter: 'PFC', fullName: 'Prolonged Field Care', hebrewName: 'טיפול ממושך',
+                id: 'PFC', letter: 'PFC', fullName: 'Prolonged Field Care', hebrewName: 'טיפול מתמשך',
+                survey: 'pfc',
                 icon: 'timer',
-                gradient: 'from-slate-600 to-gray-500', lightBg: 'bg-slate-100 dark:bg-slate-900/40',
-                textColor: 'text-slate-600 dark:text-slate-400', borderColor: 'border-slate-300 dark:border-slate-700',
-                ringColor: 'ring-slate-400', tabBg: 'bg-slate-600', tabText: 'text-white',
-                note: 'יבוצע בנוכחות מט״ב בלבד',
+                gradient: 'from-[#7a8a4a] to-[#b5c289]', lightBg: 'bg-[#e0e7cd] dark:bg-slate-900/40',
+                textColor: 'text-[#4a5428] dark:text-slate-400', borderColor: 'border-[#a3af79] dark:border-slate-700',
+                ringColor: 'ring-[#b5c289]', tabBg: 'bg-[#7a8a4a]', tabText: 'text-white',
                 items: [
-                    'הערכת הלם חוזרת והמשך החזר נפח לפצועים בהלם עמוק',
-                    'השגת גישה למחזור הדם וקיבוע',
-                    'מתן TXA',
-                    'הערכה חוזרת והמרת חסמי עורקים',
-                    'קיבוע ומתיחה של שבר בירך באמצעות סד תומאס',
-                    'השלמת עירוי פריפרי שני בפצוע שנזקק להחזר נפח',
-                    'הערכה חוזרת של נתיב אוויר וניהול שמרני או ע״י התערבות',
-                    'ניטור מדדים רציף',
-                    'העשרה בחמצן',
-                    'בפצוע מונשם חיבור למנשם והכנת תרופות הרדמה להמשך',
-                    'החדרת נקז חזה לפצוע חזה מונשם במידת הצורך בלבד',
+                    'ניטור ותיעוד הסימנים החיוניים באופן תדיר ומחזורי',
                     'החדרת נקז חזה לפצוע חזה נושם עצמונית עם הדרדרות נשימתית',
                     'מתן חוזר של טיפול תרופתי תוך ורידי',
                     'הכנסת צנתר שתן ובפצוע מונשם הכנסת זונדה לניקוז הקיבה',
@@ -565,29 +630,51 @@
         function buildQuizQuestionBank() {
             const stepLabels = schemaSteps.map(step => getStepLabel(step));
             const allItems = schemaSteps.flatMap(step => step.items);
+            const primarySteps = schemaSteps.filter(s => s.survey === 'primary');
+            const secondarySteps = schemaSteps.filter(s => s.survey === 'secondary');
             const questionBank = [
                 buildReviewQuestion(
                     'מהו השלב הראשון בסכמת X-CARE?',
                     getStepLabel(schemaSteps[0]),
                     stepLabels.filter(label => label !== getStepLabel(schemaSteps[0])).slice(0, 3),
-                    'שלב X פותח את הסכמה, ורק לאחריו ממשיכים לשלבים הבאים.'
+                    'שלב X פותח את הסכמה — טיפול תחת אש.'
                 ),
                 buildReviewQuestion(
-                    'מהו הסדר הנכון של שלבי הסכמה?',
-                    schemaSteps.map(step => step.letter).join(' → '),
+                    'מהו הסדר הנכון של שלבי הסכמה בסקר הראשוני?',
+                    'X → Extract → C → A → R → E',
                     [
-                        'X → A → C → R → E → EE → PFC',
-                        'C → X → A → R → E → EE → PFC',
-                        'X → C → R → A → E → EE → PFC'
+                        'X → C → A → R → E → Extract',
+                        'Extract → X → C → A → R → E',
+                        'X → A → C → R → E → Extract'
                     ],
-                    'סדר השלבים לפי הסכמה הוא X, אחריו C, אחריו A, אחריו R, אחריו E, ואז EE ולבסוף PFC.'
+                    'סדר השלבים בסקר הראשוני הוא X (טיפול תחת אש), אחריו Extract, אחריו C, אחריו A, אחריו R, ולבסוף E.'
+                ),
+                buildReviewQuestion(
+                    'מה כולל הסקר השניוני (Secondary Survey)?',
+                    'C, A+R, E (Everything Else)',
+                    [
+                        'X, C, A, R, E',
+                        'C, A, R בלבד',
+                        'E (Everything Else) בלבד'
+                    ],
+                    'הסקר השניוני כולל שלוש קבוצות: C (מחזור דם), A+R (נתיב אוויר ונשימה), ו-E (Everything Else).'
+                ),
+                buildReviewQuestion(
+                    'מהו PFC?',
+                    'Prolonged Field Care - טיפול מתמשך',
+                    [
+                        'Primary Field Care - טיפול ראשוני',
+                        'Patient First Check - בדיקת פצוע ראשונית',
+                        'Post Field Circulation - מחזור דם לאחר טיפול'
+                    ],
+                    'PFC הוא Prolonged Field Care — טיפול מתמשך בשטח.'
                 )
             ];
 
             schemaSteps.forEach((step, idx) => {
                 if (step.time) {
                     questionBank.push(buildReviewQuestion(
-                        `כמה זמן מוערך לביצוע שלב ${step.letter}?`,
+                        `כמה זמן מוערך לביצוע שלב ${step.letter}${step.survey === 'secondary' ? ' (סקר שניוני)' : ''}?`,
                         step.time,
                         sampleItems(['30 שניות', '60 שניות', '90 שניות', '120 שניות'], 3, [step.time]),
                         `בשלב ${step.letter} (${step.hebrewName}) הזמן המוערך הוא ${step.time}.`
@@ -602,18 +689,18 @@
                         3,
                         [`${step.items.length} נקודות`]
                     ),
-                    `בשלב ${step.letter} יש ${step.items.length} נקודות שונות שצריך לזכור.`
+                    `בשלב ${step.letter} (${step.hebrewName}) יש ${step.items.length} נקודות שונות שצריך לזכור.`
                 ));
 
                 questionBank.push(buildReviewQuestion(
-                    `מהי המשמעות של שלב ${step.letter} בסכמה?`,
+                    `מהי המשמעות של ${step.letter === 'Extract' || step.letter === 'PFC' || step.letter === 'A+R' ? '' : 'שלב '}${step.letter} בסכמה?`,
                     `${step.fullName} - ${step.hebrewName}`,
                     sampleItems(
                         schemaSteps.map(otherStep => `${otherStep.fullName} - ${otherStep.hebrewName}`),
                         3,
                         [`${step.fullName} - ${step.hebrewName}`]
                     ),
-                    `האות ${step.letter} מייצגת את ${step.fullName} — ${step.hebrewName}.`
+                    `${step.letter} מייצג את ${step.fullName} — ${step.hebrewName}.`
                 ));
 
                 if (step.note) {
@@ -929,33 +1016,291 @@
         // ====== FULL SCHEMA REFERENCE ======
         function initFullSchema() {
             const container = document.getElementById('full-schema-content');
-            if (container.dataset.rendered) return; // already rendered
-            container.dataset.rendered = '1';
-            container.innerHTML = schemaSteps.map(step => `
-                <div class="rounded-2xl border-2 overflow-hidden shadow-sm" style="border-color: var(--step-color, #e2e8f0)">
-                    <div class="bg-gradient-to-l ${step.gradient} px-4 py-3 flex items-center gap-3">
-                        <div class="shrink-0 w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center">
-                            <i data-lucide="${step.icon}" class="w-5 h-5 text-white"></i>
-                        </div>
-                        <div class="flex-1 text-right">
-                            <div class="text-lg font-black text-white leading-tight">${step.letter} — ${step.hebrewName}</div>
-                            <div class="text-xs font-semibold text-white/75">${step.fullName}${step.time ? ' · ' + step.time : ''}</div>
-                        </div>
-                    </div>
-                    ${step.note ? `<div class="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800 px-4 py-2 text-xs font-bold text-amber-700 dark:text-amber-300 text-right flex items-center gap-1.5"><span>⚠️</span> ${step.note}</div>` : ''}
-                    <div class="bg-white dark:bg-slate-800 px-4 py-3">
-                        <ol class="space-y-1.5">
-                            ${step.items.map((item, i) => `
-                                <li class="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-300 text-right">
-                                    <span class="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-xs font-black text-slate-500 dark:text-slate-400">${i + 1}</span>
-                                    <span class="leading-relaxed">${item}</span>
-                                </li>
-                            `).join('')}
-                        </ol>
-                    </div>
+            container.innerHTML = `
+    <div class="bg-white dark:bg-slate-800 shadow-xl rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700">
+        
+        <!-- Header -->
+        <div class="bg-gray-100 dark:bg-slate-900 text-center py-4 border-b-4 border-red-700">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">הסכמה האחודה לטיפול בפצוע בודד</h1>
+            <h2 class="text-xl md:text-2xl font-bold text-red-700 dark:text-red-400 tracking-widest mt-1">X - C A R E</h2>
+        </div>
+
+        <!-- Section 1: Care Under Fire (X) -->
+        <div class="flex border-b-2 border-white dark:border-slate-700 bg-red-100 dark:bg-red-900/30">
+            <div class="w-12 md:w-16 bg-red-700 text-white flex items-center justify-center p-2">
+                <span class="vertical-text font-bold text-sm md:text-base">טיפול תחת אש</span>
+            </div>
+            <div class="w-16 md:w-24 flex flex-col items-center py-4 border-l border-red-200 dark:border-red-800">
+                <div class="circle-badge">X</div>
+            </div>
+            <div class="flex-1 p-4">
+                <div class="font-bold text-red-800 dark:text-red-300 mb-2">ביצוע תרגולת 'חלץ-טפל' או טכניקה קרבית "פצוע בכוח": <span class="bg-red-600 text-white px-1 rounded text-xs">2</span></div>
+                <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
+                    <li>הכרזה בשטח ובקשר על פצוע בכוח</li>
+                    <li>השגת עליונות באש</li>
+                    <li>הגעה למחסה ראשוני ע"י חילוץ עצמי או על ידי כוח שהוגדר לכך</li>
+                    <li><strong>עצירת דימום פורץ</strong> עצמאית או ע"י לוחם/מטפל סמוך</li>
+                </ul>
+            </div>
+            <div class="w-12 md:w-16 bg-red-50 dark:bg-red-900/20 flex items-center justify-center border-r border-red-200 dark:border-red-800">
+                <span class="vertical-text text-red-800 dark:text-red-300 font-bold text-sm">30 שניות</span>
+            </div>
+        </div>
+
+        <!-- Section 2: Extract -->
+        <div class="flex border-b-2 border-white dark:border-slate-700 bg-green-50 dark:bg-green-900/20">
+            <div class="w-12 md:w-16 bg-green-700 text-white flex items-center justify-center p-2">
+                <span class="vertical-text font-bold text-sm md:text-base">סקר ראשוני</span>
+            </div>
+            <div class="w-16 md:w-24 flex flex-col items-center justify-center py-4 border-l border-green-200 dark:border-green-800">
+                <div class="font-bold text-sm md:text-base dark:text-white">Extract</div>
+            </div>
+            <div class="flex-1 p-4">
+                <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
+                    <li><strong>הגעה לסביבה מאובטחת/בטוחה</strong></li>
+                    <li><strong>התרשמות ראשונית מהירה</strong> - מנגנון הפציעה, בחינה ויזואלית ופניה לפצוע, דחיפות</li>
+                    <li><strong>דיווח אגמי</strong> - פניה, הזדהות, תיאור האירוע, מיקום, מספר פצועים ודחיפות פינוי</li>
+                </ul>
+            </div>
+            <div class="w-12 md:w-16 flex items-center justify-center border-r border-green-200 dark:border-green-800 bg-green-100/50 dark:bg-green-900/10">
+            </div>
+        </div>
+
+        <!-- Section 3: Circulation (C) -->
+        <div class="flex border-b-2 border-white dark:border-slate-700 bg-green-50 dark:bg-green-900/20">
+            <div class="w-12 md:w-16 bg-green-700 text-white"></div>
+            <div class="w-16 md:w-24 flex flex-col items-center py-4 border-l border-green-200 dark:border-green-800 relative">
+                <div class="circle-badge">C</div>
+                <span class="text-xs font-bold mt-1 dark:text-white">Circulation</span>
+            </div>
+            <div class="flex-1 p-4">
+                <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
+                    <li><strong>עצירת דימום פורץ.</strong> במידה ובוצע בדרג קודם &larr; וידוא שהדימום נעצר</li>
+                    <li><strong>חיפוש אחר פציעות ומקורות דימום</strong> בגו, בגפיים ובאזורים נסתרים תוך ביצוע הפיכה והפשטה - ראש, חזה, עורף, בתי שחי, גב, גפיים, עכוז ומפשעות - עצירת דימום שזוהה</li>
+                    <li><strong>הערכה קלינית:</strong>
+                        <ul class="schema-sub-list pr-5 mt-1 space-y-1 text-sm">
+                            <li>בדיקת הכרה לפי AVPU</li>
+                            <li>בהיעדר נשימה או בהיעדר תגובה לכאב &larr; ביצוע JT והחדרת AW</li>
+                            <li>בטראומה ישירה לנתיב האוויר &larr; סילוק הפרשות והושבה</li>
+                            <li>מדידת לחץ דם</li>
+                            <li>מדידת דופק איכותית וכמותית</li>
+                            <li>מדידת ריווי חמצן (סטורציה)</li>
+                        </ul>
+                    </li>
+                    <li class="bg-yellow-100/50 dark:bg-yellow-900/20 p-2 rounded mt-2"><strong>בהלם עמוק על פי הקריטריונים &larr; הנחיית הצוות להשגת גישה למחזור הדם והכנת מוצרי דם</strong><br>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">המשך ביצוע הסכמה על ידי מט"ב. הפעולות עצמן יבוצעו על ידי חובשים בלבד בשלב זה</span></li>
+                </ul>
+            </div>
+            <div class="w-12 md:w-16 flex flex-col border-r border-green-200 dark:border-green-800 relative">
+                 <div class="flex-1 flex items-center justify-center bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 border-b border-green-200 dark:border-green-800">
+                    <span class="vertical-text font-bold text-sm">60 שניות</span>
                 </div>
-            `).join('');
-            lucide.createIcons();
+            </div>
+        </div>
+
+        <!-- Section 4: Airway (A) -->
+        <div class="flex border-b-2 border-white dark:border-slate-700 bg-green-50 dark:bg-green-900/20">
+            <div class="w-12 md:w-16 bg-green-700"></div>
+            <div class="w-16 md:w-24 flex flex-col items-center py-4 border-l border-green-200 dark:border-green-800">
+                <div class="circle-badge">A</div>
+                <span class="text-xs font-bold mt-1 dark:text-white">Airway</span>
+            </div>
+            <div class="flex-1 p-4">
+                <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
+                    <li>הערכת נתיב האוויר ומצוקה נשימתית תוך פניה לפצוע והסתכלות.</li>
+                    <li>שימוש באמצעים בסיסיים לניהול נתיב האוויר: <span class="bg-red-600 text-white px-1 rounded text-xs">4</span>
+                        <ul class="schema-sub-list pr-5 mt-1 space-y-1 text-sm">
+                            <li>פתיחת פה וסילוק הפרשות</li>
+                            <li>הושבה</li>
+                            <li>העשרה בחמצן <span class="bg-red-600 text-white px-1 rounded text-xs">5</span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="w-12 md:w-16 bg-yellow-400 dark:bg-yellow-600 text-yellow-900 dark:text-yellow-100 border-r border-green-200 dark:border-green-800 flex flex-col items-center justify-center relative">
+                <span class="vertical-text font-bold text-sm mb-4">30 שניות</span>
+                <span class="vertical-text font-bold text-lg border-t border-yellow-500 dark:border-yellow-400 pt-4 w-full text-center">⬇ פינוי ⬇</span>
+            </div>
+        </div>
+
+        <!-- Section 5: Respiration (R) -->
+        <div class="flex border-b-2 border-white dark:border-slate-700 bg-green-50 dark:bg-green-900/20">
+            <div class="w-12 md:w-16 bg-green-700"></div>
+            <div class="w-16 md:w-24 flex flex-col items-center py-4 border-l border-green-200 dark:border-green-800">
+                <div class="circle-badge">R</div>
+                <span class="text-xs font-bold mt-1 dark:text-white">Respiration</span>
+            </div>
+            <div class="flex-1 p-4">
+                <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
+                    <li>בהיעדר נשימה &larr; הנשמה באמצעות אמבו ומסיכה</li>
+                    <li>בחשד לפגיעה &larr; שמירה על עמש"צ</li>
+                    <li>חשיפת בית החזה והתרשמות מסימני חבלה</li>
+                </ul>
+            </div>
+            <div class="w-12 md:w-16 bg-yellow-400 dark:bg-yellow-600 flex items-center justify-center border-r border-green-200 dark:border-green-800 p-1">
+                 <span class="text-[10px] leading-tight text-center text-yellow-900 dark:text-yellow-100 font-semibold">טרם הפינוי יש לבצע חיתוך מצב בצוות ולהעביר דיווח רפואי</span>
+            </div>
+        </div>
+
+        <!-- Section 6: Exposure & Evacuation (E) -->
+        <div class="flex border-b-4 border-gray-300 dark:border-slate-600 bg-green-50 dark:bg-green-900/20">
+            <div class="w-12 md:w-16 bg-green-700"></div>
+            <div class="w-16 md:w-24 flex flex-col items-center justify-center py-4 border-l border-green-200 dark:border-green-800 text-center">
+                <div class="circle-badge mb-1">E</div>
+                <span class="text-[10px] leading-tight font-bold dark:text-white">& Exposure<br>Evacuation</span>
+            </div>
+            <div class="flex-1 p-4">
+                <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
+                    <li><strong>וידוא הפשטה מלאה והפיכה</strong> - איתור כלל הפציעות, עצירת דימום במידה וזוהה</li>
+                    <li>ראש - התרשמות מסימני חבלה <span class="text-red-600 dark:text-red-400 text-xs font-bold">[!]</span></li>
+                    <li>עמש"צ - בחשד לפגיעה &larr; הנחת צווארון <span class="bg-red-600 text-white px-1 rounded text-xs">2</span></li>
+                    <li>אגן - הערכה וביצוע כריכת אגן <span class="bg-red-600 text-white px-1 rounded text-xs">2</span></li>
+                    <li>כיסוי, חימום והעמסת לאלונקה</li>
+                    <li><strong>חיתוך מצב</strong> - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות</li>
+                    <li><strong>העברת דיווח רפואי והשלמת תיעוד ב-101 דיגיטלי או ידני</strong></li>
+                </ul>
+            </div>
+            <div class="w-12 md:w-16 bg-yellow-400 dark:bg-yellow-600 flex flex-col items-center justify-center border-r border-green-200 dark:border-green-800 relative">
+                <span class="text-[10px] leading-tight text-center text-yellow-900 dark:text-yellow-100 font-semibold p-1">תחילת פינוי בהתאם למצב המבצעי...</span>
+                <span class="vertical-text font-bold text-sm text-yellow-900 dark:text-yellow-100 mt-4">60 שניות</span>
+            </div>
+        </div>
+
+        <!-- SECONDARY SURVEY SECTION -->
+        <div class="bg-gray-200 dark:bg-slate-700 text-center py-2 border-b border-gray-300 dark:border-slate-600">
+            <h2 class="text-lg font-bold text-gray-800 dark:text-white">סקר שניוני (Secondary Survey)</h2>
+        </div>
+
+        <!-- Secondary C -->
+        <div class="flex border-b border-white dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+            <div class="w-12 md:w-16 bg-gray-400 dark:bg-gray-600 text-white flex items-center justify-center p-2">
+                 <span class="vertical-text font-bold text-sm">ניטור מדדים רציף</span>
+            </div>
+            <div class="w-16 md:w-24 flex flex-col items-center py-4 border-l border-gray-200 dark:border-gray-700">
+                <div class="circle-badge bg-gray-800">C</div>
+            </div>
+            <div class="flex-1 p-4">
+                <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
+                    <li>הערכת הלם חוזרת והמשך החזר נפח לפצועים בהלם עמוק <span class="bg-red-600 text-white px-1 rounded text-xs">2</span></li>
+                    <li>השגת גישה למחזור הדם וקיבוע <span class="bg-red-600 text-white px-1 rounded text-xs">10</span></li>
+                    <li>מתן TXA <span class="bg-red-600 text-white px-1 rounded text-xs">3</span></li>
+                    <li><strong>הערכה חוזרת והמרת חסמי עורקים</strong></li>
+                    <li>קיבוע ומתיחה של שבר בירך באמצעות סד תומאס <span class="bg-red-600 text-white px-1 rounded text-xs">12</span></li>
+                    <li>השלמת עירוי פריפרי שני בפצוע שנזקק להחזר נפח</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Secondary A & R -->
+        <div class="flex border-b border-white dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+            <div class="w-12 md:w-16 bg-gray-400 dark:bg-gray-600"></div>
+            <div class="w-16 md:w-24 flex flex-col items-center justify-center py-4 border-l border-gray-200 dark:border-gray-700 space-y-4">
+                <div class="circle-badge bg-gray-800">A</div>
+                <div class="circle-badge bg-gray-800">R</div>
+            </div>
+            <div class="flex-1 p-4 flex flex-col justify-center space-y-4">
+                <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1 border-b border-gray-200 dark:border-gray-700 pb-2">
+                    <li>הערכה חוזרת של נתיב אוויר וניהול שמרני <span class="bg-red-600 text-white px-1 rounded text-xs">4</span> או ע"י התערבות</li>
+                </ul>
+                <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
+                    <li>העשרה בחמצן <span class="bg-red-600 text-white px-1 rounded text-xs">5</span></li>
+                    <li>בפצוע מונשם חיבור למנשם והכנת תרופות הרדמה להמשך</li>
+                    <li>החדרת נקז חזה לפצוע חזה מונשם במידת הצורך בלבד <span class="bg-red-600 text-white px-1 rounded text-xs">5</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Secondary E -->
+        <div class="flex border-b-4 border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-800/50">
+            <div class="w-12 md:w-16 bg-gray-400 dark:bg-gray-600"></div>
+            <div class="w-16 md:w-24 flex flex-col items-center justify-center py-4 border-l border-gray-200 dark:border-gray-700">
+                <div class="circle-badge bg-gray-800 mb-2">E</div>
+                <span class="text-[10px] leading-tight font-bold text-center dark:text-white">Everything<br>Else</span>
+            </div>
+            <div class="flex-1 p-4">
+                <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
+                    <li><strong>הערכת כאב וטיפול</strong> <span class="bg-red-600 text-white px-1 rounded text-xs">15</span></li>
+                    <li>מניעת זיהומים - שטיפת פצעים, חבישה, טיפול אנטיביוטי <span class="bg-red-600 text-white px-1 rounded text-xs">16</span></li>
+                    <li>הערכת GCS, התרשמות מתנועות ידיים ורגליים ובדיקת אישונים</li>
+                    <li>סריקה גופנית מלאה מהקודקוד ועד לבהונות הרגליים - טיפול בכל פציעה המזוהה בדרך</li>
+                    <li>קיבוע שברים</li>
+                    <li>וידוא כלל הקיבועים</li>
+                    <li>השלמת תיעוד ב-101 דיגיטלי או ידני</li>
+                    <li>הערכה לקיומה של תגובת דחק/קרב וביצוע התערבות יהלו"ם</li>
+                    <li>העברת דיווח רפואי חוזר</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PFC Section -->
+        <div class="flex border-b border-gray-300 dark:border-slate-600 bg-[#e0e7cd] dark:bg-[#3a4228]">
+            <div class="w-28 md:w-40 flex flex-col justify-center items-center bg-[#b5c289] dark:bg-[#5a6a39] text-[#4a5428] dark:text-[#d4e0b0] font-bold p-4 text-center border-l border-[#a3af79] dark:border-[#6a7a49]">
+                <span class="text-lg mb-1">טיפול מתמשך</span>
+                <span class="text-sm">PFC<br>Prolonged<br>Field Care</span>
+            </div>
+            <div class="flex-1 p-4">
+                <ul class="schema-content-list text-[#4a5428] dark:text-[#d4e0b0] space-y-2 font-medium">
+                    <li>ניטור ותיעוד הסימנים החיוניים באופן תדיר ומחזורי</li>
+                    <li>החדרת נקז חזה לפצוע חזה נושם עצמונית עם הדרדרות נשימתית <span class="bg-red-600 text-white px-1 rounded text-xs">5</span></li>
+                    <li>מתן חוזר של טיפול תרופתי תוך ורידי <span class="bg-red-600 text-white px-1 rounded text-xs">3</span></li>
+                    <li>הכנסת צנתר שתן ובפצוע מונשם הכנסת זונדה לניקוז הקיבה</li>
+                    <li>מניעת פצעי לחץ</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Legend / Notes -->
+        <div class="bg-gray-100 dark:bg-slate-900 p-2 text-xs flex justify-center space-x-4 space-x-reverse text-gray-600 dark:text-gray-400 border-b-4 border-gray-300 dark:border-slate-600">
+            <span><span class="text-red-600 font-bold mr-1">■</span> יבוצע בנוכחות מט"ב בלבד</span>
+            <span><span class="text-red-600 font-bold mr-1 bg-red-600 text-white px-1 rounded text-[10px]">#</span> יבוצע בנוכחות התוויה בלבד, ראה פרק מתאים</span>
+        </div>
+
+        <!-- TEAMWORK EXAMPLE -->
+        <div class="p-4 md:p-6 bg-white dark:bg-slate-800">
+            <h3 class="text-xl font-bold text-center text-gray-800 dark:text-white mb-2">דוגמא לביצוע של הסכמה בעבודת צוות</h3>
+            <p class="text-center text-sm text-gray-500 dark:text-gray-400 mb-6">בעבודה בצוות יש חשיבות רבה לביצוע שלבי הסכמה במקביל, בדגש על הערכה המודינמית ומתן של מוצרי דם</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Column 1: מט"ב -->
+                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 p-4 shadow-sm relative">
+                    <div class="absolute -top-3 right-4 bg-[#b5c289] text-[#4a5428] px-3 py-1 font-bold rounded shadow">מט"ב</div>
+                    <ul class="mt-4 space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">X</span> <div>התרשמות ראשונית מהירה<br>עצירת דימום פורץ<br>חיפוש מקורות דימום כולל הפיכה</div></li>
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">C</span> <div>הערכה קלינית של הפצוע (AVPU, קיום נשימה, טראומה לנתיב אוויר, דופק וסטורציה, ל"ד)<br>הערכת הלם עמוק והחלטה על מתן מוצרי דם</div></li>
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">A</span> <div>הערכת AW ומצב נשימתי<br>בחשד לפגיעה - ניהול AW בסיסי</div></li>
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">R</span> <div>בהיעדר נשימה - הנשמה באמבו ומסיכה<br>שמירה על עמש"צ<br>חשיפת בית חזה, התרשמות</div></li>
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">E</span> <div>הפשטה מלאה כולל איזור מעבר<br>ראש - התרשמות מחבלות<br>עמש"צ - הנחת צווארון בחשד לפציעה<br>הערכת אגן והחלטה על כריכה<br>כיסוי ואלונקה<br><strong class="text-black dark:text-white">סיכום הממצאים - הגדרת דחיפות ותכנית טיפול</strong></div></li>
+                    </ul>
+                </div>
+
+                <!-- Column 2: חובש 1 -->
+                <div class="bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 p-4 shadow-sm relative mt-4 md:mt-0">
+                    <div class="absolute -top-3 right-4 bg-red-400 text-white px-3 py-1 font-bold rounded shadow">חובש 1</div>
+                    <ul class="mt-4 space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">X</span> <div>דיווח אגמי ודחיפות פינוי</div></li>
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">C</span> <div>מדידת ל"ד<br>פאלס על האצבע - דופק וסטורציה<br>בהיעדר נשימה - הנשמה באמבו ומסיכה<br>בהלם עמוק - השגת גישה למחזור הדם ומתן מוצרי דם</div></li>
+                        <li class="flex items-start"><span class="font-bold text-gray-400 dark:text-gray-500 border border-gray-300 dark:border-gray-600 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">-</span> <div>דיווח רפואי (טרם התחלת פינוי)</div></li>
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">R</span> <div>חמצן במידת הצורך</div></li>
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">E</span> <div>העברת דיווח רפואי עדכני</div></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: חובש 2 -->
+                <div class="bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 p-4 shadow-sm relative mt-4 md:mt-0">
+                    <div class="absolute -top-3 right-4 bg-red-400 text-white px-3 py-1 font-bold rounded shadow">חובש 2</div>
+                    <ul class="mt-4 space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">X</span> <div>הגעה לסביבה מאובטחת</div></li>
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">C</span> <div>עצירת דימום פורץ<br>חיפוש מקורות דימום כולל הפיכה<br>הפשטה מלאה כולל איזורי מעבר</div></li>
+                        <li class="flex items-start"><span class="font-bold text-black dark:text-white bg-gray-200 dark:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-2 shrink-0">E</span> <div>ביצוע כריכת אגן במידת הצורך<br>כיסוי, חימום והעמסה וקיבוע על אלונקה<br>השלמת תיעוד ב-101</div></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+            `;
         }
 
         // ====== STEP TEST ======
