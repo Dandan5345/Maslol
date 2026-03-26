@@ -17,6 +17,18 @@ if (typeof __firebase_config !== 'undefined') {
     };
 }
 
+// כתובות המייל המורשות לגישה לשאלות הספציפיות למבחן בכל ציר.
+// בדיקת המייל נעשית לפי הכתובת הרשומה בחשבון Google בפיירבייס.
+export const AUTHORIZED_EMAILS = [
+    'doronenakache@gmail.com',
+    // הוסף כאן את כתובת המייל השנייה
+];
+
+// בודק האם המשתמש מורשה לגישה לשאלות הספציפיות למבחן
+export function isAuthorizedUser(user) {
+    return AUTHORIZED_EMAILS.includes((user?.email || '').toLowerCase());
+}
+
 export const AXES = [
     { id: 'resuscitation', label: 'ציר החייאה', href: 'resuscitation.html' },
     { id: 'resuscitation-schema', label: 'ציר סכמת טיפול בפצוע', href: 'resuscitation-schema.html' },
