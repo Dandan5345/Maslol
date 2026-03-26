@@ -123,7 +123,13 @@
 
         function showView(viewId) {
             views.forEach((view) => view.classList.remove('active-view'));
-            document.getElementById(viewId)?.classList.add('active-view');
+            const target = document.getElementById(viewId);
+            if (target) {
+                target.classList.add('active-view');
+                target.style.animation = 'none';
+                target.offsetHeight; // force reflow
+                target.style.animation = '';
+            }
             updateHeader(viewId);
             updateFloatingNav(viewId);
         }
