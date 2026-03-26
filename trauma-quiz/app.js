@@ -73,6 +73,16 @@ const toastEl = document.getElementById('toast');
 function showView(viewId) {
     views.forEach(view => view.classList.remove('active-view'));
     document.getElementById(viewId).classList.add('active-view');
+    
+    // Manage Global Top Bar Home Button visibility
+    const globalHomeBtn = document.getElementById('global-home-btn');
+    if (globalHomeBtn) {
+        if (viewId === 'login-screen' || viewId === 'dashboard-screen') {
+            globalHomeBtn.classList.add('hidden');
+        } else {
+            globalHomeBtn.classList.remove('hidden');
+        }
+    }
 }
 window.showView = showView;
 
@@ -89,9 +99,42 @@ document.getElementById('axis-trauma').addEventListener('click', () => {
     showView('subcategory-screen');
 });
 
-btnBackDashboard.addEventListener('click', () => {
-    showView('dashboard-screen');
-});
+// Remove old back Dashboard logic since it's handled inline
+if (btnBackDashboard) {
+    btnBackDashboard.addEventListener('click', () => {
+        showView('dashboard-screen');
+    });
+}
+
+// Theme Toggle
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+const moonIcon = document.querySelector('.moon-icon');
+const sunIcon = document.querySelector('.sun-icon');
+
+const savedTheme = localStorage.getItem('theme') || 'dark';
+if (savedTheme === 'light') {
+    document.body.classList.add('light-theme');
+    if (moonIcon && sunIcon) {
+        moonIcon.classList.add('hidden');
+        sunIcon.classList.remove('hidden');
+    }
+}
+
+if(themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        
+        if (isLight) {
+            moonIcon.classList.add('hidden');
+            sunIcon.classList.remove('hidden');
+        } else {
+            moonIcon.classList.remove('hidden');
+            sunIcon.classList.add('hidden');
+        }
+    });
+}
 
 // Activity Control
 window.startQuiz = function(type) {
