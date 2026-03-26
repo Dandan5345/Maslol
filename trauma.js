@@ -80,6 +80,15 @@
 
         const trauma39Data = quiz100Data.slice(0, 39);
         const homeHref = document.body?.dataset?.homeHref || 'axes.html';
+        const homeTitle = document.body?.dataset?.homeTitle || 'ציר טראומה';
+        const homeSubtitle = document.body?.dataset?.homeSubtitle || 'בחרו מצב תרגול';
+        const quizTitle = document.body?.dataset?.quizTitle || 'מבחן טראומה';
+        const quizSubtitle39 = document.body?.dataset?.quizSubtitle39 || 'מבחן מסכם קצר וממוקד.';
+        const quizSubtitle100 = document.body?.dataset?.quizSubtitle100 || 'מבחן ענק עם מאה שאלות.';
+        const flashcardsTitle = document.body?.dataset?.flashcardsTitle || 'כרטיסיות טראומה';
+        const flashcardsSubtitle = document.body?.dataset?.flashcardsSubtitle || 'מעבר מהיר בין מושגים, פרוטוקולים ו-TCCC.';
+        const resultTitle = document.body?.dataset?.resultTitle || 'סיכום תרגול';
+        const resultSubtitle = document.body?.dataset?.resultSubtitle || 'אפשר להפעיל מבחן נוסף או לחזור למסך הראשי של טראומה.';
 
         function updateFloatingNav(viewId = 'subcategory-screen') {
             if (typeof window.setFloatingNavState === 'function') {
@@ -101,10 +110,10 @@
 
         function updateHeader(viewId) {
             const titles = {
-                'subcategory-screen': ['ציר טראומה', 'בחרו מצב תרגול'],
-                'quiz-screen': ['מבחן טראומה', currentMode === '39' ? 'מבחן מסכם קצר וממוקד.' : 'מבחן ענק עם מאה שאלות.'],
-                'flashcards-screen': ['כרטיסיות טראומה', 'מעבר מהיר בין מושגים, פרוטוקולים ו-TCCC.'],
-                'result-screen': ['סיכום תרגול', 'אפשר להפעיל מבחן נוסף או לחזור למסך הראשי של טראומה.']
+                'subcategory-screen': [homeTitle, homeSubtitle],
+                'quiz-screen': [quizTitle, currentMode === '39' ? quizSubtitle39 : quizSubtitle100],
+                'flashcards-screen': [flashcardsTitle, flashcardsSubtitle],
+                'result-screen': [resultTitle, resultSubtitle]
             };
 
             const [title, subtitle] = titles[viewId] || titles['subcategory-screen'];
