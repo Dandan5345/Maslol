@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <link rel="manifest" href="manifest.json">
@@ -10,7 +11,7 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>שאלות חובשים - ציר החייאה</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -30,23 +31,73 @@
 
     <style>
         /* Custom Styles & Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #475569; }
-        
-        .preserve-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-        .rotate-y-180 { transform: rotateY(180deg); }
-        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+
+        .preserve-3d {
+            transform-style: preserve-3d;
+        }
+
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
         /* Hide screens by default */
-        .screen { display: none; opacity: 0; transition: opacity 0.3s ease; }
-        .screen.active { display: flex; opacity: 1; }
+        .screen {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
 
         /* Loader */
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
-        .dark .loader { border: 4px solid #334155; border-top: 4px solid #60a5fa; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        .dark .loader {
+            border: 4px solid #334155;
+            border-top: 4px solid #60a5fa;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
         body {
             background:
@@ -54,6 +105,7 @@
                 radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.16), transparent 24%),
                 linear-gradient(135deg, #f8fbff 0%, #eff6ff 46%, #f8fafc 100%);
         }
+
         .dark body {
             background:
                 radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 26%),
@@ -62,6 +114,7 @@
         }
     </style>
 </head>
+
 <body class="text-slate-800 dark:text-slate-100 h-dvh flex flex-col transition-colors duration-300 overflow-hidden">
 
     <div class="fixed inset-0 pointer-events-none overflow-hidden">
@@ -71,41 +124,53 @@
     </div>
 
     <!-- Global Fullscreen Loader -->
-    <div id="global-loader" class="fixed inset-0 bg-white dark:bg-slate-900 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+    <div id="global-loader"
+        class="fixed inset-0 bg-white dark:bg-slate-900 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="loader mb-4"></div>
         <p class="text-slate-500 dark:text-slate-400 font-bold animate-pulse">טוען נתונים...</p>
     </div>
 
     <!-- Header -->
-    <header id="app-header" class="hidden bg-white/85 dark:bg-slate-800/90 shadow-sm border-b border-slate-200 dark:border-slate-700 z-40 sticky top-0 backdrop-blur">
+    <header id="app-header"
+        class="hidden bg-white/85 dark:bg-slate-800/90 shadow-sm border-b border-slate-200 dark:border-slate-700 z-40 sticky top-0 backdrop-blur">
         <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('home')">
                 <div class="bg-blue-600 dark:bg-blue-500 p-2 rounded-xl text-white shadow-md">
                     <i data-lucide="activity" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg font-black text-slate-800 dark:text-white tracking-tight leading-tight">
-                        קורס חובשים <span class="bg-clip-text text-transparent bg-gradient-to-l from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">ציר החייאה</span>
+                    <h1
+                        class="text-base sm:text-lg font-black text-slate-800 dark:text-white tracking-tight leading-tight">
+                        קורס חובשים <span
+                            class="bg-clip-text text-transparent bg-gradient-to-l from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">ציר
+                            החייאה</span>
                     </h1>
                 </div>
             </div>
-            
-            <div class="flex items-center gap-2 sm:gap-4 mr-auto sm:mr-0">
-                <div id="user-greeting" class="hidden sm:block text-sm font-bold text-slate-600 dark:text-slate-300"></div>
 
-                <button onclick="window.location.href='axes.html'" class="hidden sm:flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors">
+            <div class="flex items-center gap-2 sm:gap-4 mr-auto sm:mr-0">
+                <div id="user-greeting" class="hidden sm:block text-sm font-bold text-slate-600 dark:text-slate-300">
+                </div>
+
+                <button onclick="window.location.href='axes.html'"
+                    class="hidden sm:flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors">
                     <i data-lucide="layout-grid" class="w-4 h-4"></i> <span>בחירת ציר</span>
                 </button>
-                
-                <button onclick="toggleDarkMode()" class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-400 rounded-full transition-colors" title="מצב כהה/בהיר">
+
+                <button onclick="toggleDarkMode()"
+                    class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-400 rounded-full transition-colors"
+                    title="מצב כהה/בהיר">
                     <i data-lucide="moon" id="dark-icon" class="w-5 h-5"></i>
                 </button>
-                
-                <button id="btn-back-menu" onclick="navigate('home')" class="hidden sm:flex items-center gap-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors">
+
+                <button id="btn-back-menu" onclick="navigate('home')"
+                    class="hidden sm:flex items-center gap-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors">
                     <i data-lucide="home" class="w-4 h-4"></i> <span class="hidden sm:inline">תפריט ראשי</span>
                 </button>
 
-                <button onclick="handleLogout()" class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 rounded-full transition-colors" title="התנתק">
+                <button onclick="handleLogout()"
+                    class="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 rounded-full transition-colors"
+                    title="התנתק">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -115,14 +180,18 @@
     <main class="flex-1 flex flex-col relative overflow-hidden">
 
         <!-- SCREEN: HOME -->
-        <div id="screen-home" class="screen flex-col max-w-4xl mx-auto w-full p-4 py-6 sm:p-6 sm:py-10 flex-1 overflow-y-auto custom-scrollbar">
+        <div id="screen-home"
+            class="screen flex-col max-w-4xl mx-auto w-full p-4 py-6 sm:p-6 sm:py-10 flex-1 overflow-y-auto custom-scrollbar">
             <div class="text-center mb-10 sm:mb-12">
-                <h2 id="home-greeting" class="text-3xl sm:text-5xl font-black text-slate-800 dark:text-white mb-4 tracking-tight"></h2>
-                <p class="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-xl mx-auto">בחר את שיטת הלמידה שמתאימה לך כעת. המערכת שומרת את ההתקדמות שלך בענן ומערבבת את אפשרויות התשובה בכל פעם מחדש.</p>
+                <h2 id="home-greeting"
+                    class="text-3xl sm:text-5xl font-black text-slate-800 dark:text-white mb-4 tracking-tight"></h2>
+                <p class="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-xl mx-auto">בחר את שיטת הלמידה
+                    שמתאימה לך כעת. המערכת שומרת את ההתקדמות שלך בענן ומערבבת את אפשרויות התשובה בכל פעם מחדש.</p>
             </div>
 
             <div class="mb-6 flex justify-center">
-                <button onclick="window.location.href='axes.html'" class="inline-flex items-center gap-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 px-5 py-3 text-sm font-bold text-blue-700 dark:text-blue-300 shadow-sm border border-blue-100 dark:border-slate-700">
+                <button onclick="window.location.href='axes.html'"
+                    class="inline-flex items-center gap-2 rounded-2xl bg-white/90 dark:bg-slate-800/90 px-5 py-3 text-sm font-bold text-blue-700 dark:text-blue-300 shadow-sm border border-blue-100 dark:border-slate-700">
                     <i data-lucide="layout-grid" class="w-4 h-4"></i>
                     מעבר לבחירת ציר
                 </button>
@@ -130,43 +199,56 @@
 
             <div class="grid md:grid-cols-3 gap-6">
                 <!-- Flashcards Card -->
-                <button onclick="navigate('flashcards')" class="group text-right bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 p-5 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start relative overflow-hidden">
-                    <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <button onclick="navigate('flashcards')"
+                    class="group text-right bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 p-5 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start relative overflow-hidden">
+                    <div
+                        class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <i data-lucide="book-open" class="w-8 h-8"></i>
                     </div>
                     <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">כרטיסיות למידה</h3>
-                    <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">למידה והיכרות מעמיקה עם המושגים. כולל אפשרות לסינון ולמידה חכמה.</p>
-                    
+                    <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">למידה והיכרות מעמיקה עם המושגים. כולל
+                        אפשרות לסינון ולמידה חכמה.</p>
+
                     <div class="mt-auto w-full">
                         <div class="flex justify-between text-xs font-bold text-slate-400 dark:text-slate-500 mb-2">
                             <span>התקדמות כללית</span> <span id="home-progress-text">0%</span>
                         </div>
                         <div class="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden w-full">
-                            <div id="home-progress-bar" class="h-full bg-blue-500 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                            <div id="home-progress-bar"
+                                class="h-full bg-blue-500 rounded-full transition-all duration-1000" style="width: 0%">
+                            </div>
                         </div>
                     </div>
                 </button>
 
                 <!-- Practice Card -->
-                <button onclick="navigate('practice')" class="group text-right bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-orange-400 dark:hover:border-orange-500 p-5 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start">
-                    <div class="w-12 h-12 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <button onclick="navigate('practice')"
+                    class="group text-right bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-orange-400 dark:hover:border-orange-500 p-5 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col items-start">
+                    <div
+                        class="w-12 h-12 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <i data-lucide="list" class="w-8 h-8"></i>
                     </div>
                     <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">שאלות אמריקאיות</h3>
-                    <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">מצב תרגול אינסופי עם תשובות מבלבלות והסברים רפואיים מפורטים לכל שאלה.</p>
-                    <span class="mt-auto inline-flex items-center gap-1.5 text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-900/30 px-4 py-2 rounded-xl transition-colors">
+                    <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">מצב תרגול אינסופי עם תשובות מבלבלות
+                        והסברים רפואיים מפורטים לכל שאלה.</p>
+                    <span
+                        class="mt-auto inline-flex items-center gap-1.5 text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-900/30 px-4 py-2 rounded-xl transition-colors">
                         התחל לתרגל <i data-lucide="chevron-left" class="w-4 h-4"></i>
                     </span>
                 </button>
 
                 <!-- Test Card -->
-                <button onclick="navigate('test')" class="group text-right bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-800 hover:border-indigo-400 p-5 rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-start text-white">
-                    <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <button onclick="navigate('test')"
+                    class="group text-right bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-800 hover:border-indigo-400 p-5 rounded-[2rem] shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-start text-white">
+                    <div
+                        class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <i data-lucide="target" class="w-8 h-8 text-indigo-300"></i>
                     </div>
                     <h3 class="text-xl font-black mb-2">מבחן מסכם</h3>
-                    <p class="text-slate-400 font-medium mb-8">בוחן פתע! 25 שאלות רנדומליות על זמן וציון סופי בסיום. בחן את השליטה שלך.</p>
-                    <span class="mt-auto inline-flex items-center gap-1.5 text-slate-900 font-black bg-indigo-400 px-4 py-2 rounded-xl group-hover:bg-white transition-colors">
+                    <p class="text-slate-400 font-medium mb-8">בוחן פתע! 25 שאלות רנדומליות על זמן וציון סופי בסיום. בחן
+                        את השליטה שלך.</p>
+                    <span
+                        class="mt-auto inline-flex items-center gap-1.5 text-slate-900 font-black bg-indigo-400 px-4 py-2 rounded-xl group-hover:bg-white transition-colors">
                         התחל מבחן <i data-lucide="chevron-left" class="w-4 h-4"></i>
                     </span>
                 </button>
@@ -174,53 +256,74 @@
         </div>
 
         <!-- SCREEN: FLASHCARDS -->
-        <div id="screen-flashcards" class="screen flex-col w-full items-center p-4 transition-colors duration-300 flex-1 overflow-hidden">
-            
+        <div id="screen-flashcards"
+            class="screen flex-col w-full items-center p-4 transition-colors duration-300 flex-1 overflow-hidden">
+
             <div class="w-full max-w-lg flex justify-between items-center mb-6 z-10">
-                <button onclick="toggleSettings()" class="bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 font-bold text-sm flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                <button onclick="toggleSettings()"
+                    class="bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 font-bold text-sm flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                     <i data-lucide="settings" class="w-4 h-4"></i> הגדרות
                 </button>
-                <div id="fc-counter" class="bg-white dark:bg-slate-800 font-bold text-slate-500 dark:text-slate-400 text-sm px-4 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                <div id="fc-counter"
+                    class="bg-white dark:bg-slate-800 font-bold text-slate-500 dark:text-slate-400 text-sm px-4 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
                     כרטיס 1 / 49
                 </div>
             </div>
 
             <!-- Empty State -->
-            <div id="fc-empty" class="hidden bg-white dark:bg-slate-800 rounded-[2rem] p-10 text-center shadow-xl border border-slate-100 dark:border-slate-700 max-w-lg w-full flex-col items-center mt-12 z-10">
-                <div class="w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6 text-green-600 dark:text-green-400">
+            <div id="fc-empty"
+                class="hidden bg-white dark:bg-slate-800 rounded-[2rem] p-10 text-center shadow-xl border border-slate-100 dark:border-slate-700 max-w-lg w-full flex-col items-center mt-12 z-10">
+                <div
+                    class="w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6 text-green-600 dark:text-green-400">
                     <i data-lucide="check" class="w-12 h-12"></i>
                 </div>
                 <h2 class="text-2xl font-black text-slate-800 dark:text-white mb-2">אין כרטיסיות להצגה!</h2>
-                <p class="text-slate-500 dark:text-slate-400 mb-8 font-medium">כל הכרטיסיות בסינון הנוכחי טופלו, או שסיננת הכל החוצה.</p>
-                <button onclick="resetFilters()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold w-full shadow-lg transition-colors">נקה סינונים והצג הכל</button>
+                <p class="text-slate-500 dark:text-slate-400 mb-8 font-medium">כל הכרטיסיות בסינון הנוכחי טופלו, או
+                    שסיננת הכל החוצה.</p>
+                <button onclick="resetFilters()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold w-full shadow-lg transition-colors">נקה
+                    סינונים והצג הכל</button>
             </div>
 
             <!-- Card Area -->
             <div id="fc-container" class="max-w-lg w-full flex-1 flex flex-col items-center">
-                <div id="fc-card-wrapper" class="z-10 w-full h-[400px] sm:h-[450px] cursor-grab active:cursor-grabbing select-none flex-shrink-0 relative preserve-3d transition-transform duration-500 ease-out" onclick="flipCard()">
-                    
+                <div id="fc-card-wrapper"
+                    class="z-10 w-full h-[400px] sm:h-[450px] cursor-grab active:cursor-grabbing select-none flex-shrink-0 relative preserve-3d transition-transform duration-500 ease-out"
+                    onclick="flipCard()">
+
                     <!-- Front -->
-                    <div id="fc-front" class="absolute inset-0 bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col p-8 text-center justify-center items-center backface-hidden">
-                        <span id="fc-status-badge" class="absolute top-6 text-xs font-bold px-3 py-1 rounded-full hidden"></span>
-                        <h2 id="fc-question" class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white mt-4 leading-tight">שאלה</h2>
-                        <div class="absolute bottom-6 text-slate-400 dark:text-slate-500 text-sm flex items-center gap-2 animate-pulse">
+                    <div id="fc-front"
+                        class="absolute inset-0 bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col p-8 text-center justify-center items-center backface-hidden">
+                        <span id="fc-status-badge"
+                            class="absolute top-6 text-xs font-bold px-3 py-1 rounded-full hidden"></span>
+                        <h2 id="fc-question"
+                            class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white mt-4 leading-tight">
+                            שאלה</h2>
+                        <div
+                            class="absolute bottom-6 text-slate-400 dark:text-slate-500 text-sm flex items-center gap-2 animate-pulse">
                             <i data-lucide="rotate-cw" class="w-4 h-4"></i> לחץ כדי להפוך
                         </div>
                     </div>
 
                     <!-- Back -->
-                    <div id="fc-back" class="absolute inset-0 bg-gradient-to-b from-blue-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-[2rem] shadow-xl border border-blue-200 dark:border-slate-700 flex flex-col p-6 overflow-hidden backface-hidden rotate-y-180">
+                    <div id="fc-back"
+                        class="absolute inset-0 bg-gradient-to-b from-blue-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-[2rem] shadow-xl border border-blue-200 dark:border-slate-700 flex flex-col p-6 overflow-hidden backface-hidden rotate-y-180">
                         <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col justify-center text-right">
                             <h3 class="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2 flex items-center gap-2">
                                 <i data-lucide="check" class="w-4 h-4"></i> תשובה:
                             </h3>
-                            <p id="fc-answer" class="text-xl font-bold text-slate-800 dark:text-white leading-snug mb-4">תשובה</p>
+                            <p id="fc-answer"
+                                class="text-xl font-bold text-slate-800 dark:text-white leading-snug mb-4">תשובה</p>
                             <hr class="border-blue-100 dark:border-slate-700 my-4" />
-                            <div class="bg-blue-100/60 dark:bg-slate-700/50 rounded-2xl p-4 border border-blue-200 dark:border-slate-600">
-                                <h3 class="text-xs font-black text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-1.5 uppercase">
+                            <div
+                                class="bg-blue-100/60 dark:bg-slate-700/50 rounded-2xl p-4 border border-blue-200 dark:border-slate-600">
+                                <h3
+                                    class="text-xs font-black text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-1.5 uppercase">
                                     <i data-lucide="info" class="w-3.5 h-3.5"></i> הסבר:
                                 </h3>
-                                <p id="fc-explanation" class="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">הסבר</p>
+                                <p id="fc-explanation"
+                                    class="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">הסבר
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -228,10 +331,12 @@
 
                 <!-- Actions -->
                 <div class="flex w-full gap-4 mt-8 z-10 pb-8 select-none">
-                    <button onclick="markCard('learning')" class="flex-1 bg-white dark:bg-slate-800 border-2 border-orange-100 dark:border-orange-900/50 text-orange-600 dark:text-orange-500 font-bold py-4 rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 hover:bg-orange-50 dark:hover:bg-slate-700 transition-colors">
+                    <button onclick="markCard('learning')"
+                        class="flex-1 bg-white dark:bg-slate-800 border-2 border-orange-100 dark:border-orange-900/50 text-orange-600 dark:text-orange-500 font-bold py-4 rounded-2xl shadow-sm flex flex-col items-center justify-center gap-1 hover:bg-orange-50 dark:hover:bg-slate-700 transition-colors">
                         <i data-lucide="x" class="w-6 h-6"></i> <span class="text-sm">צריך חזרה</span>
                     </button>
-                    <button onclick="markCard('known')" class="flex-1 bg-green-500 dark:bg-green-600 border-2 border-transparent text-white font-bold py-4 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-1 hover:bg-green-600 dark:hover:bg-green-700 transition-colors">
+                    <button onclick="markCard('known')"
+                        class="flex-1 bg-green-500 dark:bg-green-600 border-2 border-transparent text-white font-bold py-4 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-1 hover:bg-green-600 dark:hover:bg-green-700 transition-colors">
                         <i data-lucide="check" class="w-6 h-6"></i> <span class="text-sm">יודע היטב</span>
                     </button>
                 </div>
@@ -239,14 +344,18 @@
         </div>
 
         <!-- SCREEN: PRACTICE -->
-        <div id="screen-practice" class="screen flex-col flex-1 w-full max-w-2xl mx-auto p-4 py-8 overflow-y-auto custom-scrollbar">
-            <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden w-full">
+        <div id="screen-practice"
+            class="screen flex-col flex-1 w-full max-w-2xl mx-auto p-4 py-8 overflow-y-auto custom-scrollbar">
+            <div
+                class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden w-full">
                 <div class="p-6 sm:p-8 bg-slate-800 dark:bg-slate-900 text-white">
                     <div class="flex justify-between items-center mb-4">
-                        <span class="bg-white/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+                        <span
+                            class="bg-white/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
                             <i data-lucide="list" class="w-3.5 h-3.5"></i> מצב תרגול
                         </span>
-                        <span id="prac-type-badge" class="hidden bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full items-center gap-1.5 animate-pulse">
+                        <span id="prac-type-badge"
+                            class="hidden bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full items-center gap-1.5 animate-pulse">
                             <i data-lucide="check-square" class="w-3.5 h-3.5"></i> שאלת רב-ברירה
                         </span>
                     </div>
@@ -258,22 +367,27 @@
                 </div>
 
                 <!-- Feedback Area -->
-                <div id="prac-feedback" class="hidden p-6 sm:p-8 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                <div id="prac-feedback"
+                    class="hidden p-6 sm:p-8 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
                     <div id="prac-feedback-box" class="flex items-start gap-4 p-4 rounded-2xl mb-6 border">
                         <i id="prac-feedback-icon" class="w-8 h-8 shrink-0 mt-1"></i>
                         <div>
                             <h3 id="prac-feedback-title" class="text-xl font-black mb-1"></h3>
-                            <p class="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed"><span class="font-bold">הסבר: </span><span id="prac-feedback-text"></span></p>
+                            <p class="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed"><span
+                                    class="font-bold">הסבר: </span><span id="prac-feedback-text"></span></p>
                         </div>
                     </div>
-                    <button onclick="nextPractice()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xl py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-colors">
+                    <button onclick="nextPractice()"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xl py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-colors">
                         השאלה הבאה <i data-lucide="chevron-left" class="w-6 h-6"></i>
                     </button>
                 </div>
 
                 <!-- Submit Area -->
-                <div id="prac-submit-area" class="p-6 sm:p-8 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-                    <button id="prac-submit-btn" onclick="checkPractice()" class="w-full font-black text-xl py-4 rounded-2xl shadow-lg transition-all bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed">
+                <div id="prac-submit-area"
+                    class="p-6 sm:p-8 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                    <button id="prac-submit-btn" onclick="checkPractice()"
+                        class="w-full font-black text-xl py-4 rounded-2xl shadow-lg transition-all bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed">
                         בדוק תשובה
                     </button>
                 </div>
@@ -282,55 +396,78 @@
 
         <!-- SCREEN: TEST -->
         <div id="screen-test" class="screen flex-col flex-1 w-full max-w-2xl mx-auto p-4 py-6 overflow-hidden">
-            
+
             <div id="test-active-view" class="flex flex-col h-full w-full hidden">
                 <div class="mb-6 flex items-center justify-between">
                     <div id="test-counter" class="font-bold text-slate-500 dark:text-slate-400">שאלה 1 מתוך 25</div>
                     <div class="w-1/2 bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
-                        <div id="test-progress-bar" class="bg-indigo-600 dark:bg-indigo-500 h-full transition-all" style="width: 4%"></div>
+                        <div id="test-progress-bar" class="bg-indigo-600 dark:bg-indigo-500 h-full transition-all"
+                            style="width: 4%"></div>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-800 flex-1 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden relative">
-                    <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-700 flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900">
-                        <span id="test-type-badge" class="hidden inline-flex bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 text-xs font-bold px-3 py-1 rounded-full items-center gap-1.5 mb-4">
+                <div
+                    class="bg-white dark:bg-slate-800 flex-1 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden relative">
+                    <div
+                        class="p-6 sm:p-8 border-b border-slate-100 dark:border-slate-700 flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900">
+                        <span id="test-type-badge"
+                            class="hidden inline-flex bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 text-xs font-bold px-3 py-1 rounded-full items-center gap-1.5 mb-4">
                             <i data-lucide="check-square" class="w-3.5 h-3.5"></i> שאלת בחירה מרובה
                         </span>
-                        <h2 id="test-question" class="text-2xl sm:text-3xl font-black leading-tight text-slate-800 dark:text-white mb-8">שאלה</h2>
+                        <h2 id="test-question"
+                            class="text-2xl sm:text-3xl font-black leading-tight text-slate-800 dark:text-white mb-8">
+                            שאלה</h2>
                         <div id="test-options" class="space-y-3">
                             <!-- Options -->
                         </div>
                     </div>
-                    <div class="p-4 sm:p-6 bg-white dark:bg-slate-800 shrink-0 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                        <button id="test-prev-btn" onclick="prevTest()" class="font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-300 dark:text-slate-600 cursor-not-allowed">
+                    <div
+                        class="p-4 sm:p-6 bg-white dark:bg-slate-800 shrink-0 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                        <button id="test-prev-btn" onclick="prevTest()"
+                            class="font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-300 dark:text-slate-600 cursor-not-allowed">
                             חזור <span class="hidden sm:inline">לשאלה קודמת</span>
                         </button>
-                        <button id="test-next-btn" onclick="nextTest()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-6 sm:px-8 py-3.5 rounded-xl shadow-lg flex items-center gap-2 transition-colors">
-                            <span id="test-next-text">השאלה הבאה</span> <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                        <button id="test-next-btn" onclick="nextTest()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-6 sm:px-8 py-3.5 rounded-xl shadow-lg flex items-center gap-2 transition-colors">
+                            <span id="test-next-text">השאלה הבאה</span> <i data-lucide="chevron-left"
+                                class="w-5 h-5"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
             <!-- Test Results -->
-            <div id="test-results-view" class="flex-col h-full w-full items-center overflow-y-auto custom-scrollbar hidden py-4">
-                <div class="bg-white dark:bg-slate-800 max-w-lg w-full rounded-[2rem] shadow-2xl p-10 text-center border border-slate-200 dark:border-slate-700 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-white dark:from-indigo-900/20 dark:to-slate-800"></div>
+            <div id="test-results-view"
+                class="flex-col h-full w-full items-center overflow-y-auto custom-scrollbar hidden py-4">
+                <div
+                    class="bg-white dark:bg-slate-800 max-w-lg w-full rounded-[2rem] shadow-2xl p-10 text-center border border-slate-200 dark:border-slate-700 relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 w-full h-32 bg-gradient-to-b from-indigo-50 to-white dark:from-indigo-900/20 dark:to-slate-800">
+                    </div>
                     <div class="relative z-10">
                         <i data-lucide="target" id="test-res-icon" class="mx-auto mb-6 w-16 h-16 text-green-600"></i>
                         <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-2">סיום המבחן!</h2>
-                        <p id="test-res-msg" class="text-slate-500 dark:text-slate-400 font-medium mb-8 text-lg">כל הכבוד!</p>
-                        
-                        <div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-[2rem] p-8 mb-8">
+                        <p id="test-res-msg" class="text-slate-500 dark:text-slate-400 font-medium mb-8 text-lg">כל
+                            הכבוד!</p>
+
+                        <div
+                            class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-[2rem] p-8 mb-8">
                             <div class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">הציון שלך</div>
                             <div id="test-res-score" class="text-6xl font-black text-green-600 mb-2">100</div>
-                            <div id="test-res-text" class="text-slate-600 dark:text-slate-400 font-bold">25 תשובות נכונות מתוך 25</div>
+                            <div id="test-res-text" class="text-slate-600 dark:text-slate-400 font-bold">25 תשובות
+                                נכונות מתוך 25</div>
                         </div>
 
                         <div class="flex flex-col gap-3">
-                            <button id="test-review-btn" onclick="showTestReview()" class="w-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-bold text-lg py-4 rounded-xl border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition hidden">בדוק טעויות (<span id="test-wrong-count">0</span>)</button>
-                            <button onclick="navigate('home')" class="w-full bg-slate-900 dark:bg-indigo-600 text-white font-black text-lg py-4 rounded-xl hover:bg-slate-800 dark:hover:bg-indigo-700 transition shadow-lg">חזרה לתפריט הראשי</button>
-                            <button onclick="startTest()" class="w-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-lg py-4 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition">מבחן חדש</button>
+                            <button id="test-review-btn" onclick="showTestReview()"
+                                class="w-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-bold text-lg py-4 rounded-xl border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition hidden">בדוק
+                                טעויות (<span id="test-wrong-count">0</span>)</button>
+                            <button onclick="navigate('home')"
+                                class="w-full bg-slate-900 dark:bg-indigo-600 text-white font-black text-lg py-4 rounded-xl hover:bg-slate-800 dark:hover:bg-indigo-700 transition shadow-lg">חזרה
+                                לתפריט הראשי</button>
+                            <button onclick="startTest()"
+                                class="w-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-lg py-4 rounded-xl border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition">מבחן
+                                חדש</button>
                         </div>
                     </div>
                 </div>
@@ -340,7 +477,8 @@
             <div id="test-review-view" class="flex-col h-full w-full hidden">
                 <div class="flex items-center justify-between mb-5 shrink-0">
                     <h2 class="text-2xl font-black text-slate-800 dark:text-white">סקירת טעויות</h2>
-                    <button onclick="showTestResults()" class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition text-sm flex items-center gap-1.5">
+                    <button onclick="showTestResults()"
+                        class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition text-sm flex items-center gap-1.5">
                         <i data-lucide="chevron-right" class="w-4 h-4"></i> חזרה לתוצאות
                     </button>
                 </div>
@@ -356,27 +494,36 @@
     <!-- Settings Modal -->
     <div id="modal-settings" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleSettings()"></div>
-        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-[2rem] shadow-2xl p-6 relative flex flex-col max-h-[90vh] z-10 border border-slate-100 dark:border-slate-700">
+        <div
+            class="bg-white dark:bg-slate-800 w-full max-w-md rounded-[2rem] shadow-2xl p-6 relative flex flex-col max-h-[90vh] z-10 border border-slate-100 dark:border-slate-700">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-black dark:text-white">הגדרות וסינון</h3>
-                <button onclick="toggleSettings()" class="bg-slate-100 dark:bg-slate-700 p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="toggleSettings()"
+                    class="bg-slate-100 dark:bg-slate-700 p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"><i
+                        data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            
+
             <div class="flex-1 overflow-y-auto custom-scrollbar space-y-6 pr-2">
-                <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                <div
+                    class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
                     <div>
                         <h4 class="font-bold text-slate-800 dark:text-slate-200">הסתר כרטיסיות ידועות</h4>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">הצג רק מושגים שדורשים חזרה.</p>
                     </div>
-                    <button id="toggle-hide-known" onclick="toggleHideKnown()" class="w-14 h-8 flex items-center rounded-full p-1 transition-colors bg-slate-300 dark:bg-slate-600">
-                        <div id="toggle-hide-known-dot" class="bg-white w-6 h-6 rounded-full shadow-md transform transition-transform -translate-x-6"></div>
+                    <button id="toggle-hide-known" onclick="toggleHideKnown()"
+                        class="w-14 h-8 flex items-center rounded-full p-1 transition-colors bg-slate-300 dark:bg-slate-600">
+                        <div id="toggle-hide-known-dot"
+                            class="bg-white w-6 h-6 rounded-full shadow-md transform transition-transform -translate-x-6">
+                        </div>
                     </button>
                 </div>
 
-                <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-900/30 flex flex-col">
+                <div
+                    class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-100 dark:border-red-900/30 flex flex-col">
                     <h4 class="font-bold text-red-800 dark:text-red-400 mb-1">איפוס נתונים</h4>
                     <p class="text-xs text-red-600/70 dark:text-red-400/70 mb-3">יאפס את כל ההתקדמות שלך בענן!</p>
-                    <button onclick="resetAllData()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-xl text-sm self-start px-4 flex items-center gap-2 transition-colors">
+                    <button onclick="resetAllData()"
+                        class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-xl text-sm self-start px-4 flex items-center gap-2 transition-colors">
                         <i data-lucide="rotate-ccw" class="w-4 h-4"></i> איפוס מלא
                     </button>
                 </div>
@@ -459,11 +606,11 @@
                 document.getElementById('user-greeting').innerText = `שלום, ${user.displayName || 'משתמש'}`;
                 document.getElementById('home-greeting').innerHTML = `שלום <span class="text-blue-600 dark:text-blue-400">${user.displayName || 'לוחם'}</span>,<br>מוכן לתרגל <span class="bg-clip-text text-transparent bg-gradient-to-l from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">רפואת חירום</span>?`;
                 document.getElementById('app-header').classList.remove('hidden');
-                
+
                 window.appState.cards = await loadProgress(user.uid, window.appState.cards);
                 await setLastAxis(user.uid, currentAxis);
                 updateHomeProgress();
-                
+
                 document.getElementById('global-loader').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('global-loader').style.display = 'none';
@@ -477,7 +624,7 @@
         });
 
         window.handleLogout = async () => {
-            if(confirm("האם אתה בטוח שברצונך להתנתק?")) {
+            if (confirm("האם אתה בטוח שברצונך להתנתק?")) {
                 await signOutUser();
                 window.location.replace('login.html');
             }
@@ -490,8 +637,8 @@
         };
 
         window.resetAllData = async () => {
-            if(confirm("האם אתה בטוח שברצונך לאפס את הכל? הפעולה לא ניתנת לביטול.")) {
-                window.appState.cards = window.appState.cards.map(c => ({...c, status: 'unseen'}));
+            if (confirm("האם אתה בטוח שברצונך לאפס את הכל? הפעולה לא ניתנת לביטול.")) {
+                window.appState.cards = window.appState.cards.map(c => ({ ...c, status: 'unseen' }));
                 window.appState.hideKnown = false;
                 await persistProgress();
                 toggleSettings();
@@ -506,7 +653,7 @@
                 window.location.replace('login.html');
                 return;
             }
-            
+
             document.querySelectorAll('.screen').forEach(el => {
                 el.classList.remove('active');
             });
@@ -514,8 +661,14 @@
             currentScreen = screen;
 
             const backBtn = document.getElementById('btn-back-menu');
-            if(screen === 'home') backBtn.classList.add('hidden');
+            if (screen === 'home') backBtn.classList.add('hidden');
             else backBtn.classList.remove('hidden');
+
+            if (typeof window.setFloatingNavState === 'function') {
+                window.setFloatingNavState({
+                    homeAction: () => window.navigate('home')
+                });
+            }
 
             if (screen === 'flashcards') initFlashcards();
             if (screen === 'practice') initPractice();
@@ -634,7 +787,7 @@
         function renderFlashcard() {
             const container = document.getElementById('fc-container');
             const emptyState = document.getElementById('fc-empty');
-            
+
             document.getElementById('toggle-hide-known-dot').classList.toggle('translate-x-0', window.appState.hideKnown);
             document.getElementById('toggle-hide-known').classList.toggle('bg-green-500', window.appState.hideKnown);
 
@@ -645,11 +798,11 @@
                 document.getElementById('fc-counter').innerText = `0 / 0`;
                 return;
             }
-            
+
             container.classList.remove('hidden');
             emptyState.classList.add('hidden');
             emptyState.classList.remove('flex');
-            
+
             const card = fcList[fcIndex];
             document.getElementById('fc-counter').innerText = `כרטיס ${fcIndex + 1} / ${fcList.length}`;
             document.getElementById('fc-question').innerText = card.question;
@@ -672,7 +825,7 @@
         }
 
         window.flipCard = () => {
-            if(window.isDraggingCard) return; // Prevent flip on swipe
+            if (window.isDraggingCard) return; // Prevent flip on swipe
             fcFlipped = !fcFlipped;
             document.getElementById('fc-card-wrapper').style.transform = `rotateY(${fcFlipped ? 180 : 0}deg)`;
         };
@@ -680,21 +833,21 @@
         window.markCard = async (status) => {
             if (fcList.length === 0) return;
             const currentId = fcList[fcIndex].id;
-            
+
             // Update local state
             window.appState.cards = window.appState.cards.map(c => c.id === currentId ? { ...c, status } : c);
-            
+
             // Background save
-            persistProgress(); 
+            persistProgress();
 
             fcFlipped = false;
             document.getElementById('fc-card-wrapper').style.transform = `rotateY(0deg)`;
-            
+
             setTimeout(() => {
                 if (fcIndex + 1 >= fcList.length) {
                     // Rebuild list if needed
                     const newList = window.appState.cards.filter(c => !window.appState.hideKnown || c.status !== 'known');
-                    if(newList.length === 0 && !window.appState.hideKnown && window.appState.cards.some(c=>c.status==='learning')) {
+                    if (newList.length === 0 && !window.appState.hideKnown && window.appState.cards.some(c => c.status === 'learning')) {
                         alert('סיימת סבב! עוברים רק לכרטיסיות שצריכות חזרה.');
                         window.appState.hideKnown = true;
                         initFlashcards();
@@ -730,19 +883,19 @@
             startX = e.touches[0].clientX;
             window.isDraggingCard = true;
             cardEl.style.transition = 'none';
-        }, {passive: true});
+        }, { passive: true });
 
         cardEl.addEventListener('touchmove', (e) => {
             if (!window.isDraggingCard) return;
             currentX = e.touches[0].clientX - startX;
             cardEl.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg) rotateY(${fcFlipped ? 180 : 0}deg)`;
-        }, {passive: true});
+        }, { passive: true });
 
         cardEl.addEventListener('touchend', (e) => {
             if (!window.isDraggingCard) return;
             window.isDraggingCard = false;
             cardEl.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)';
-            
+
             if (currentX > 100) {
                 markCard('known');
             } else if (currentX < -100) {
@@ -778,10 +931,10 @@
             pracSelected = [];
             pracChecked = false;
             const q = pracList[pracIndex];
-            
+
             document.getElementById('prac-question').innerText = q.question;
             const badge = document.getElementById('prac-type-badge');
-            if(q.type === 'multiple') { badge.classList.remove('hidden'); badge.classList.add('inline-flex'); }
+            if (q.type === 'multiple') { badge.classList.remove('hidden'); badge.classList.add('inline-flex'); }
             else { badge.classList.add('hidden'); badge.classList.remove('inline-flex'); }
 
             document.getElementById('prac-feedback').classList.add('hidden');
@@ -800,14 +953,14 @@
             q.options.forEach(opt => {
                 const isSelected = pracSelected.includes(opt);
                 const isCorrect = q.correctAnswers.includes(opt);
-                
+
                 let style = "bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-blue-300 dark:hover:border-blue-500 cursor-pointer";
-                let iconHtml = `<div class="w-5 h-5 rounded shrink-0 border-2 ${q.type==='single'?'rounded-full':''} ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 dark:border-slate-600'}"></div>`;
+                let iconHtml = `<div class="w-5 h-5 rounded shrink-0 border-2 ${q.type === 'single' ? 'rounded-full' : ''} ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 dark:border-slate-600'}"></div>`;
 
                 if (pracChecked) {
                     style = "bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 opacity-60 cursor-default";
                     iconHtml = `<div class="w-5 h-5 shrink-0"></div>`;
-                    
+
                     if (isCorrect) {
                         style = "bg-green-50 dark:bg-green-900/20 border-2 border-green-500 text-green-900 dark:text-green-300 shadow-sm cursor-default opacity-100";
                         iconHtml = `<i data-lucide="check" class="text-green-600 dark:text-green-400 w-6 h-6 shrink-0"></i>`;
@@ -831,16 +984,16 @@
         window.handlePracticeOption = (opt) => {
             if (pracChecked) return;
             const q = pracList[pracIndex];
-            
+
             if (q.type === 'multiple') {
                 if (pracSelected.includes(opt)) pracSelected = pracSelected.filter(o => o !== opt);
                 else pracSelected.push(opt);
             } else {
                 pracSelected = [opt];
             }
-            
+
             renderPracticeOptions();
-            
+
             const btn = document.getElementById('prac-submit-btn');
             if (pracSelected.length > 0) {
                 btn.className = "w-full font-black text-xl py-4 rounded-2xl shadow-lg transition-all bg-slate-900 dark:bg-blue-600 text-white hover:bg-slate-800 dark:hover:bg-blue-700 hover:-translate-y-1";
@@ -856,15 +1009,15 @@
 
             const q = pracList[pracIndex];
             const isFullyCorrect = pracSelected.length === q.correctAnswers.length && pracSelected.every(opt => q.correctAnswers.includes(opt));
-            
+
             document.getElementById('prac-submit-btn').parentNode.classList.add('hidden');
-            
+
             const feedbackArea = document.getElementById('prac-feedback');
             const feedbackBox = document.getElementById('prac-feedback-box');
             const title = document.getElementById('prac-feedback-title');
-            
+
             feedbackArea.classList.remove('hidden');
-            
+
             if (isFullyCorrect) {
                 feedbackBox.className = "flex items-start gap-4 p-4 rounded-2xl mb-6 border bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800";
                 document.getElementById('prac-feedback-icon').setAttribute('data-lucide', 'check-circle');
@@ -909,13 +1062,13 @@
         function renderTest() {
             const q = testList[testIdx];
             const selected = testAnswers[q.quizId] || [];
-            
+
             document.getElementById('test-counter').innerText = `שאלה ${testIdx + 1} מתוך 25`;
             document.getElementById('test-progress-bar').style.width = `${((testIdx + 1) / 25) * 100}%`;
             document.getElementById('test-question').innerText = q.question;
 
             const badge = document.getElementById('test-type-badge');
-            if(q.type === 'multiple') { badge.classList.remove('hidden'); badge.classList.add('inline-flex'); }
+            if (q.type === 'multiple') { badge.classList.remove('hidden'); badge.classList.add('inline-flex'); }
             else { badge.classList.add('hidden'); badge.classList.remove('inline-flex'); }
 
             const container = document.getElementById('test-options');
@@ -924,7 +1077,7 @@
             q.options.forEach(opt => {
                 const isSelected = selected.includes(opt);
                 const style = isSelected ? "bg-indigo-50 dark:bg-indigo-900/40 border-indigo-500 text-indigo-900 dark:text-indigo-300 shadow-sm" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-500";
-                const iconHtml = `<div class="w-5 h-5 rounded shrink-0 border-2 ${q.type==='single'?'rounded-full':''} ${isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 dark:border-slate-600'}"></div>`;
+                const iconHtml = `<div class="w-5 h-5 rounded shrink-0 border-2 ${q.type === 'single' ? 'rounded-full' : ''} ${isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 dark:border-slate-600'}"></div>`;
 
                 const div = document.createElement('div');
                 div.className = `p-4 rounded-2xl border-2 flex items-center gap-4 transition-all cursor-pointer ${style}`;
@@ -942,7 +1095,7 @@
             });
 
             const prevBtn = document.getElementById('test-prev-btn');
-            if(testIdx === 0) prevBtn.className = "font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-300 dark:text-slate-600 cursor-not-allowed";
+            if (testIdx === 0) prevBtn.className = "font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-300 dark:text-slate-600 cursor-not-allowed";
             else prevBtn.className = "font-bold px-4 sm:px-6 py-3 rounded-xl transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700";
 
             document.getElementById('test-next-text').innerText = testIdx === testList.length - 1 ? 'סיים מבחן' : 'השאלה הבאה';
@@ -955,9 +1108,9 @@
         window.nextTest = () => {
             const q = testList[testIdx];
             const selected = testAnswers[q.quizId] || [];
-            
+
             if (selected.length === 0 && !confirm('לא בחרת תשובה, להמשיך הלאה? תשובה ריקה תיחשב כשגיאה.')) return;
-            
+
             if (testIdx < testList.length - 1) {
                 testIdx++;
                 renderTest();
@@ -974,7 +1127,7 @@
             let correctCount = 0;
             testList.forEach(card => {
                 const userAns = testAnswers[card.quizId] || [];
-                if(isQuestionCorrect(card, userAns)) correctCount++;
+                if (isQuestionCorrect(card, userAns)) correctCount++;
             });
             const percent = Math.round((correctCount / testList.length) * 100);
             const wrongCount = testList.length - correctCount;
@@ -997,7 +1150,7 @@
             let msg = "כל הכבוד!";
             let color = "text-green-600 dark:text-green-400";
             let icon = "target";
-            
+
             if (percent < 70) { msg = "יש צורך בחזרה נוספת."; color = "text-orange-500"; icon = "alert-triangle"; }
             if (percent < 50) { msg = "מומלץ לעבור על הכרטיסיות מחדש."; color = "text-red-500"; icon = "alert-circle"; }
 
@@ -1072,12 +1225,14 @@
         };
 
     </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
-    });
-  }
-</script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => { });
+            });
+        }
+    </script>
+    <script src="shared-navigation.js" defer></script>
 </body>
+
 </html>

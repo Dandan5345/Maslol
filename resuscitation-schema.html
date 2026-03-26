@@ -678,6 +678,12 @@
             if (screen === 'home') backBtn.classList.add('hidden');
             else backBtn.classList.remove('hidden');
 
+            if (typeof window.setFloatingNavState === 'function') {
+                window.setFloatingNavState({
+                    homeAction: () => window.navigate('home')
+                });
+            }
+
             if (screen === 'schema') initSchema();
             if (screen === 'full-test') initFullTest();
             if (screen === 'step-test') initStepTest();
@@ -1215,6 +1221,7 @@
             });
         }
     </script>
+    <script src="shared-navigation.js" defer></script>
 </body>
 
 </html>

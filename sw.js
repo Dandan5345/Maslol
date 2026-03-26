@@ -1,14 +1,19 @@
-const CACHE_NAME = 'chavshanim-v1';
+const CACHE_NAME = 'chavshanim-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/login.html',
   '/axes.html',
   '/resuscitation.html',
+  '/resuscitation-schema.html',
   '/trauma.html',
   '/routine.html',
   '/anamnesis.html',
   '/mental-health.html',
   '/firebase-common.js',
+  '/shared-navigation.js',
+  '/trauma.js',
+  '/trauma-quiz/data.js',
+  '/trauma-quiz/style.css',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png'
