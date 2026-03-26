@@ -36,16 +36,11 @@ function ensure100QuizData() {
 
 // Ensure 100 items exist on load
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
     ensure100QuizData();
 });
 
 // DOM Elements
 const views = document.querySelectorAll('.view');
-const btnLogin = document.getElementById('login-btn');
-const inputEmail = document.getElementById('email-input');
-const btnLogout = document.getElementById('logout-btn');
-const userEmailDisplay = document.getElementById('user-email-display');
 const btnBackDashboard = document.getElementById('back-to-dashboard');
 
 const quizProgress = document.getElementById('quiz-progress');
@@ -79,6 +74,7 @@ function showView(viewId) {
     views.forEach(view => view.classList.remove('active-view'));
     document.getElementById(viewId).classList.add('active-view');
 }
+window.showView = showView;
 
 function showToast(message) {
     toastEl.textContent = message;
@@ -87,43 +83,6 @@ function showToast(message) {
         toastEl.classList.add('hidden');
     }, 3000);
 }
-
-// Authentication
-function checkAuth() {
-    const savedEmail = localStorage.getItem('trauma_auth_email');
-    if (savedEmail && authorizedEmails.includes(savedEmail)) {
-        userEmailDisplay.textContent = savedEmail;
-        showView('dashboard-screen');
-    } else {
-        showView('login-screen');
-    }
-}
-
-btnLogin.addEventListener('click', () => {
-    const email = inputEmail.value.trim().toLowerCase();
-    if (!email) {
-        showToast('נא להזין כתובת דוא"ל');
-        return;
-    }
-    
-    if (authorizedEmails.includes(email)) {
-        localStorage.setItem('trauma_auth_email', email);
-        userEmailDisplay.textContent = email;
-        showView('dashboard-screen');
-    } else {
-        showToast('אין לך הרשאה לגשת למערכת זו.');
-    }
-});
-
-inputEmail.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') btnLogin.click();
-});
-
-btnLogout.addEventListener('click', () => {
-    localStorage.removeItem('trauma_auth_email');
-    inputEmail.value = '';
-    showView('login-screen');
-});
 
 // Category Navigation
 document.getElementById('axis-trauma').addEventListener('click', () => {
