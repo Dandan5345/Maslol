@@ -51,12 +51,19 @@
         .screen.active {
             display: flex;
             opacity: 1;
-            animation: screenFadeIn 0.35s cubic-bezier(0.22,1,0.36,1) both;
+            animation: screenFadeIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         @keyframes screenFadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .loader {
@@ -110,6 +117,7 @@
             text-orientation: mixed;
             transform: rotate(180deg);
         }
+
         .circle-badge {
             width: 40px;
             height: 40px;
@@ -123,11 +131,13 @@
             font-size: 1.25rem;
             flex-shrink: 0;
         }
+
         .schema-content-list li {
             position: relative;
             padding-right: 1.25rem;
             margin-bottom: 0.25rem;
         }
+
         .schema-content-list li::before {
             content: '○';
             position: absolute;
@@ -136,10 +146,12 @@
             color: #6b7280;
             font-weight: bold;
         }
+
         .schema-sub-list li::before {
             content: '-';
             color: #9ca3af;
         }
+
         .test-input {
             transition: border-color 0.2s, box-shadow 0.2s;
         }
@@ -297,7 +309,8 @@
                         <i data-lucide="target" class="w-8 h-8 text-indigo-300"></i>
                     </div>
                     <h3 class="text-xl font-black mb-2">שאלות חזרה</h3>
-                    <p class="text-slate-400 font-medium mb-8">שאלות רב-ברירה מתוך הסכמה, בסדר רנדומלי ועם תשובה מיידית אחרי כל בחירה.</p>
+                    <p class="text-slate-400 font-medium mb-8">שאלות רב-ברירה מתוך הסכמה, בסדר רנדומלי ועם תשובה מיידית
+                        אחרי כל בחירה.</p>
                     <span
                         class="mt-auto inline-flex items-center gap-1.5 text-slate-900 font-black bg-indigo-400 px-4 py-2 rounded-xl group-hover:bg-white transition-colors">
                         התחל חזרה <i data-lucide="chevron-left" class="w-4 h-4"></i>
@@ -337,7 +350,8 @@
         <div id="screen-quiz" class="screen flex-col flex-1 w-full max-w-2xl mx-auto p-4 py-6 overflow-hidden">
             <div id="quiz-active-view" class="flex flex-col h-full w-full">
                 <div class="mb-6 flex items-center justify-between">
-                    <div id="quiz-counter" class="font-bold text-slate-500 dark:text-slate-400">שאלת חזרה 1 מתוך 25</div>
+                    <div id="quiz-counter" class="font-bold text-slate-500 dark:text-slate-400">שאלת חזרה 1 מתוך 25
+                    </div>
                     <div class="w-1/2 bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
                         <div id="quiz-progress-bar" class="bg-indigo-600 dark:bg-indigo-500 h-full transition-all"
                             style="width: 5%"></div>
@@ -355,7 +369,8 @@
                     </div>
                     <div
                         class="p-4 sm:p-6 bg-white dark:bg-slate-800 shrink-0 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center gap-3">
-                        <div id="quiz-status-hint" class="text-sm font-bold text-slate-500 dark:text-slate-400">בחר תשובה כדי לקבל משוב מיידי</div>
+                        <div id="quiz-status-hint" class="text-sm font-bold text-slate-500 dark:text-slate-400">בחר
+                            תשובה כדי לקבל משוב מיידי</div>
                         <button id="quiz-next-btn" onclick="nextQuiz()"
                             class="bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-500 font-black px-6 sm:px-8 py-3.5 rounded-xl shadow-lg flex items-center gap-2 transition-colors cursor-not-allowed">
                             <span id="quiz-next-text">ענה כדי להמשיך</span> <i data-lucide="chevron-left"
@@ -380,7 +395,8 @@
                             הכבוד!</p>
                         <div
                             class="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-[2rem] p-8 mb-8">
-                            <div class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">כמה ענית נכון</div>
+                            <div class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">כמה ענית נכון
+                            </div>
                             <div id="quiz-res-score" class="text-6xl font-black text-green-600 mb-2">100</div>
                             <div id="quiz-res-text" class="text-slate-600 dark:text-slate-400 font-bold">25 מתוך 25
                             </div>
@@ -419,10 +435,13 @@
                 <div class="max-w-3xl mx-auto">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h2 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white">הסכמה האחודה לטיפול בפצוע בודד</h2>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">X-CARE — כל שלבי הסכמה במבט אחד</p>
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white">הסכמה האחודה
+                                לטיפול בפצוע בודד</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">X-CARE — כל שלבי הסכמה במבט אחד
+                            </p>
                         </div>
-                        <button onclick="navigate('home')" class="shrink-0 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">
+                        <button onclick="navigate('home')"
+                            class="shrink-0 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">
                             <i data-lucide="chevron-right" class="w-4 h-4"></i> חזרה
                         </button>
                     </div>
@@ -501,7 +520,8 @@
                     'שימוש באמצעים בסיסיים לניהול נתיב האוויר',
                     'פתיחת פה וסילוק הפרשות',
                     'הושבה',
-                    'העשרה בחמצן'
+                    'העשרה בחמצן',
+                    'בהיעדר נשימה ← הנשמה באמצעות אמבו ומסיכה'
                 ]
             },
             {
@@ -512,7 +532,6 @@
                 textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
                 ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
                 items: [
-                    'בהיעדר נשימה ← הנשמה באמצעות אמבו ומסיכה',
                     'בחשד לפגיעה ← שמירה על עמש״צ',
                     'חשיפת בית החזה והתרשמות מסימני חבלה'
                 ]
@@ -746,19 +765,9 @@
         }
 
         function getAcceptedFeedback(expected, comparison) {
-            if (comparison.isExact) {
-                return {
-                    className: 'mt-1 text-sm font-bold px-2 text-green-600 dark:text-green-400',
-                    html: '✓ נכון!'
-                };
-            }
-
             return {
-                className: 'mt-1 text-sm font-bold px-2 text-amber-600 dark:text-amber-400',
-                html: `
-                    <div>✓ נכון, אבל יש שגיאת כתיב: ${formatCorrectionPairs(comparison.typoCorrections)}</div>
-                    <div class="mt-1 text-slate-700 dark:text-slate-300">השורה התקינה: ${escapeHtml(expected)}</div>
-                `
+                className: 'mt-1 text-sm font-bold px-2 text-green-600 dark:text-green-400',
+                html: '✓ נכון!'
             };
         }
 
@@ -1095,7 +1104,7 @@
             let html = `
                 <div class="text-center mb-8">
                     <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2">מבחן סכמה מלא</h2>
-                    <p class="text-slate-500 dark:text-slate-400 font-medium">לא חייב מילה במילה — רווחים, פסיקים וסימני פיסוק אחרים לא נבדקים, ושגיאות כתיב קטנות מתקבלות עם תיקון.</p>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">לא חייב מילה במילה — רווחים, פסיקים וסימני פיסוק אחרים לא נבדקים, ושגיאות כתיב קטנות מתקבלות.</p>
                 </div>
             `;
 
@@ -1314,6 +1323,7 @@
                             <li>פתיחת פה וסילוק הפרשות</li>
                             <li>הושבה</li>
                             <li>העשרה בחמצן <span class="bg-red-600 text-white px-1 rounded text-xs">5</span></li>
+                            <li>בהיעדר נשימה &larr; הנשמה באמצעות אמבו ומסיכה</li>
                         </ul>
                     </li>
                 </ul>
@@ -1332,7 +1342,6 @@
             </div>
             <div class="flex-1 p-4">
                 <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
-                    <li>בהיעדר נשימה &larr; הנשמה באמצעות אמבו ומסיכה</li>
                     <li>בחשד לפגיעה &larr; שמירה על עמש"צ</li>
                     <li>חשיפת בית החזה והתרשמות מסימני חבלה</li>
                 </ul>
@@ -1539,7 +1548,7 @@
             let html = `
                 <div class="text-center mb-8">
                     <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2">מבחן לפי שלבים</h2>
-                    <p class="text-slate-500 dark:text-slate-400 font-medium">בחר שלב ספציפי ורשום את כל הנקודות שלו. רווחים וסימני פיסוק לא נבדקים, ושגיאות כתיב קטנות מתקבלות עם תיקון.</p>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">בחר שלב ספציפי ורשום את כל הנקודות שלו. רווחים וסימני פיסוק לא נבדקים, ושגיאות כתיב קטנות מתקבלות.</p>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
             `;
