@@ -497,7 +497,7 @@
                 gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
                 textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
                 ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
-                note: 'שלבי A ו-R נלמדים יחד. בהיעדר נשימה יש לבצע הנשמה באמצעות אמבו ומסיכה כחלק מניהול נתיב האוויר.',
+                note: 'שלבי A ו-R נלמדים יחד.',
                 items: [
                     'הערכת נתיב האוויר ומצוקה נשימתית תוך פניה לפצוע והסתכלות',
                     'בהיעדר נשימה ← הנשמה באמצעות אמבו ומסיכה',
@@ -615,6 +615,12 @@
             const expNorm = normalizeForCompare(expected);
             const actNorm = normalizeForCompare(actual);
             return expNorm === actNorm;
+        }
+
+        function getStepNoteTitle(step) {
+            if (step.id === 'E') return 'לפני הפינוי';
+            if (step.id === 'A' || step.id === 'R') return 'A + R';
+            return 'דגש';
         }
 
         function shuffleArray(arr) {
@@ -864,7 +870,7 @@
 
             let noteHtml = '';
             if (step.note) {
-                const noteTitle = step.id === 'E' ? 'לפני הפינוי' : (step.id === 'A' || step.id === 'R' ? 'A + R' : 'דגש');
+                const noteTitle = getStepNoteTitle(step);
                 noteHtml = `<div class="mb-4 px-4 py-4 rounded-2xl ${step.lightBg} ${step.borderColor} border shadow-sm">
                     <div class="flex items-start gap-3">
                         <i data-lucide="info" class="w-5 h-5 ${step.textColor} shrink-0 mt-0.5"></i>
@@ -943,7 +949,7 @@
 
                 let noteHtml = '';
                 if (step.note) {
-                    const noteTitle = step.id === 'E' ? 'לפני הפינוי' : (step.id === 'A' || step.id === 'R' ? 'A + R' : 'דגש');
+                    const noteTitle = getStepNoteTitle(step);
                     noteHtml = `<div class="mb-3 px-4 py-3 rounded-2xl ${step.lightBg} ${step.borderColor} border">
                         <div class="flex items-start gap-2">
                             <i data-lucide="info" class="w-4 h-4 ${step.textColor} shrink-0 mt-0.5"></i>
@@ -1140,7 +1146,7 @@
             <div class="flex-1 p-4">
                 <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
                     <li>הערכת נתיב האוויר ומצוקה נשימתית תוך פניה לפצוע והסתכלות.</li>
-                    <li role="note" aria-label="שלבי A ו-R נלמדים יחד" class="bg-blue-50 dark:bg-slate-800/80 border border-blue-100 dark:border-slate-700 p-2 rounded-lg text-sm"><strong>שלבי A ו-R נלמדים יחד</strong></li>
+                    <li class="bg-blue-50 dark:bg-slate-800/80 border border-blue-100 dark:border-slate-700 p-2 rounded-lg text-sm"><strong>שלבי A ו-R נלמדים יחד</strong></li>
                     <li>שימוש באמצעים בסיסיים לניהול נתיב האוויר: <span class="bg-red-600 text-white px-1 rounded text-xs">4</span>
                         <ul class="schema-sub-list pr-5 mt-1 space-y-1 text-sm">
                             <li>בהיעדר נשימה &larr; הנשמה באמצעות אמבו ומסיכה</li>
@@ -1172,7 +1178,7 @@
                 </ul>
             </div>
             <div class="w-12 md:w-16 bg-yellow-400 dark:bg-yellow-600 flex items-center justify-center border-r border-green-200 dark:border-green-800 p-1">
-                 <span aria-label="לפני פינוי: חיתוך מצב ודיווח רפואי" class="text-xs leading-snug text-center text-yellow-900 dark:text-yellow-100 font-bold">
+                 <span class="text-xs leading-snug text-center text-yellow-900 dark:text-yellow-100 font-bold">
                     <span class="block">לפני פינוי:</span>
                     <span class="block">חיתוך מצב</span>
                     <span class="block">ודיווח רפואי</span>
@@ -1402,7 +1408,7 @@
 
             let noteHtml = '';
             if (step.note) {
-                const noteTitle = step.id === 'E' ? 'לפני הפינוי' : (step.id === 'A' || step.id === 'R' ? 'A + R' : 'דגש');
+                const noteTitle = getStepNoteTitle(step);
                 noteHtml = `<div class="mb-3 px-4 py-3 rounded-2xl ${step.lightBg} ${step.borderColor} border">
                     <div class="flex items-start gap-2">
                         <i data-lucide="info" class="w-4 h-4 ${step.textColor} shrink-0 mt-0.5"></i>
