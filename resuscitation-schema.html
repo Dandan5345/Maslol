@@ -449,7 +449,6 @@
                 textColor: 'text-red-600 dark:text-red-400', borderColor: 'border-red-200 dark:border-red-800',
                 ringColor: 'ring-red-400', tabBg: 'bg-red-600', tabText: 'text-white',
                 items: [
-                    'ביצוע תרגולת חלץ-טפל או טכניקה קרבית פצוע בכוח',
                     'הכרזה בשטח ובקשר על פצוע בכוח',
                     'השגת עליונות באש',
                     'הגעה למחסה ראשוני ע״י חילוץ עצמי או על ידי כוח שהוגדר לכך',
@@ -497,14 +496,12 @@
                 gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
                 textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
                 ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
-                note: 'שלבי A ו-R נלמדים יחד.',
                 items: [
                     'הערכת נתיב האוויר ומצוקה נשימתית תוך פניה לפצוע והסתכלות',
                     'שימוש באמצעים בסיסיים לניהול נתיב האוויר',
                     'פתיחת פה וסילוק הפרשות',
                     'הושבה',
-                    'העשרה בחמצן',
-                    'בהיעדר נשימה ← הנשמה באמצעות אמבו ומסיכה'
+                    'העשרה בחמצן'
                 ]
             },
             {
@@ -514,8 +511,8 @@
                 gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
                 textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
                 ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
-                note: 'שלב R נלמד יחד עם A ומתמקד בהערכת הנשימה, עמש״צ וחשיפת בית החזה.',
                 items: [
+                    'בהיעדר נשימה ← הנשמה באמצעות אמבו ומסיכה',
                     'בחשד לפגיעה ← שמירה על עמש״צ',
                     'חשיפת בית החזה והתרשמות מסימני חבלה'
                 ]
@@ -534,7 +531,8 @@
                     'עמש״צ - בחשד לפגיעה ← הנחת צווארון',
                     'אגן - הערכה וביצוע כריכת אגן',
                     'כיסוי, חימום והעמסת לאלונקה',
-                    'טרם הפינוי יש לבצע חיתוך מצב בצוות - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות, להעביר דיווח רפואי ולהשלים תיעוד ב-101 דיגיטלי או ידני'
+                    'חיתוך מצב - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות',
+                    'העברת דיווח רפואי והשלמת תיעוד ב-101 דיגיטלי או ידני'
                 ]
             },
             {
@@ -1311,10 +1309,8 @@
             <div class="flex-1 p-4">
                 <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
                     <li>הערכת נתיב האוויר ומצוקה נשימתית תוך פניה לפצוע והסתכלות.</li>
-                    <li class="bg-blue-50 dark:bg-slate-800/80 border border-blue-100 dark:border-slate-700 p-2 rounded-lg text-sm"><strong>שלבי A ו-R נלמדים יחד</strong></li>
                     <li>שימוש באמצעים בסיסיים לניהול נתיב האוויר: <span class="bg-red-600 text-white px-1 rounded text-xs">4</span>
                         <ul class="schema-sub-list pr-5 mt-1 space-y-1 text-sm">
-                            <li>בהיעדר נשימה &larr; הנשמה באמצעות אמבו ומסיכה</li>
                             <li>פתיחת פה וסילוק הפרשות</li>
                             <li>הושבה</li>
                             <li>העשרה בחמצן <span class="bg-red-600 text-white px-1 rounded text-xs">5</span></li>
@@ -1322,9 +1318,8 @@
                     </li>
                 </ul>
             </div>
-            <div class="w-12 md:w-16 bg-yellow-400 dark:bg-yellow-600 text-yellow-900 dark:text-yellow-100 border-r border-green-200 dark:border-green-800 flex flex-col items-center justify-center relative">
-                <span class="vertical-text font-bold text-sm mb-4">30 שניות</span>
-                <span class="vertical-text font-bold text-lg border-t border-yellow-500 dark:border-yellow-400 pt-4 w-full text-center">⬇ פינוי ⬇</span>
+            <div class="w-12 md:w-16 bg-green-100/50 dark:bg-green-900/10 border-r border-green-200 dark:border-green-800 flex items-center justify-center">
+                <span class="vertical-text font-bold text-sm text-green-900 dark:text-green-300">30 שניות</span>
             </div>
         </div>
 
@@ -1337,19 +1332,12 @@
             </div>
             <div class="flex-1 p-4">
                 <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
-                    <li class="text-sm text-blue-700 dark:text-blue-300 font-semibold">R נלמד כהמשך ישיר ל-A</li>
+                    <li>בהיעדר נשימה &larr; הנשמה באמצעות אמבו ומסיכה</li>
                     <li>בחשד לפגיעה &larr; שמירה על עמש"צ</li>
                     <li>חשיפת בית החזה והתרשמות מסימני חבלה</li>
                 </ul>
             </div>
-            <div class="w-12 md:w-16 bg-yellow-400 dark:bg-yellow-600 flex items-center justify-center border-r border-green-200 dark:border-green-800 p-1">
-                 <span class="text-xs leading-snug text-center text-yellow-900 dark:text-yellow-100 font-bold">
-                    <span class="block">טרם הפינוי:</span>
-                    <span class="block">חיתוך מצב</span>
-                    <span class="block">בצוות</span>
-                    <span class="block">ודיווח רפואי</span>
-                 </span>
-            </div>
+            <div class="w-12 md:w-16 bg-green-100/50 dark:bg-green-900/10 border-r border-green-200 dark:border-green-800"></div>
         </div>
 
         <!-- Section 6: Exposure & Evacuation (E) -->
@@ -1366,15 +1354,37 @@
                     <li>עמש"צ - בחשד לפגיעה &larr; הנחת צווארון <span class="bg-red-600 text-white px-1 rounded text-xs">2</span></li>
                     <li>אגן - הערכה וביצוע כריכת אגן <span class="bg-red-600 text-white px-1 rounded text-xs">2</span></li>
                     <li>כיסוי, חימום והעמסת לאלונקה</li>
-                    <li class="bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-3 mt-2">
-                        <strong>טרם הפינוי</strong> יש לבצע <strong>חיתוך מצב בצוות</strong> - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות, <strong>להעביר דיווח רפואי</strong> ולהשלים תיעוד ב-101 דיגיטלי או ידני
+                    <li><strong>חיתוך מצב</strong> - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות</li>
+                    <li><strong>העברת דיווח רפואי והשלמת תיעוד ב-101 דיגיטלי או ידני</strong></li>
+                </ul>
+            </div>
+            <div class="w-12 md:w-16 bg-green-100/50 dark:bg-green-900/10 flex flex-col items-center justify-center border-r border-green-200 dark:border-green-800 relative">
+                <span class="vertical-text font-bold text-sm text-green-900 dark:text-green-300 mt-4">60 שניות</span>
+            </div>
+        </div>
+
+        <!-- NEW EVACUATION SECTION -->
+        <div class="flex border-b-4 border-gray-300 dark:border-slate-600 bg-yellow-100 dark:bg-yellow-900/20 relative">
+            <div class="w-12 md:w-16 bg-yellow-500 dark:bg-yellow-600 text-yellow-900 dark:text-yellow-100 flex items-center justify-center p-2">
+                 <span class="vertical-text font-bold text-sm md:text-base">פינוי</span>
+            </div>
+            <div class="w-16 md:w-24 flex flex-col items-center justify-center py-4 border-l border-yellow-300 dark:border-yellow-700 text-center">
+                <span class="text-3xl font-bold text-yellow-800 dark:text-yellow-200">⬇</span>
+            </div>
+            <div class="flex-1 p-5">
+                <h3 class="font-bold text-lg md:text-xl text-gray-900 dark:text-white mb-3">תחילת פינוי בהתאם למצב המבצעי ויכולת הטיפול בפינוי:</h3>
+                <ul class="text-gray-800 dark:text-gray-200 space-y-2 pr-2 text-base md:text-lg">
+                    <li class="flex items-start">
+                        <span class="ml-2 font-bold text-yellow-600 dark:text-yellow-400 text-xl leading-none">•</span>
+                        <span>טרם הפינוי יש לבצע חיתוך מצב בצוות ולהעביר דיווח רפואי</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="ml-2 font-bold text-yellow-600 dark:text-yellow-400 text-xl leading-none">•</span>
+                        <span>השלמת השלבים הבאים במהלך הפינוי</span>
                     </li>
                 </ul>
             </div>
-            <div class="w-12 md:w-16 bg-yellow-400 dark:bg-yellow-600 flex flex-col items-center justify-center border-r border-green-200 dark:border-green-800 relative">
-                <span class="text-[10px] leading-tight text-center text-yellow-900 dark:text-yellow-100 font-semibold p-1">תחילת פינוי בהתאם למצב המבצעי...</span>
-                <span class="vertical-text font-bold text-sm text-yellow-900 dark:text-yellow-100 mt-4">60 שניות</span>
-            </div>
+            <div class="w-12 md:w-16 border-r border-yellow-300 dark:border-yellow-700 bg-yellow-200/50 dark:bg-yellow-900/30"></div>
         </div>
 
         <!-- SECONDARY SURVEY SECTION -->
