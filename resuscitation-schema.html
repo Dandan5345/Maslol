@@ -497,8 +497,10 @@
                 gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
                 textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
                 ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
+                note: 'שלבי A ו-R נלמדים יחד.',
                 items: [
                     'הערכת נתיב האוויר ומצוקה נשימתית תוך פניה לפצוע והסתכלות',
+                    'בהיעדר נשימה ← הנשמה באמצעות אמבו ומסיכה',
                     'שימוש באמצעים בסיסיים לניהול נתיב האוויר',
                     'פתיחת פה וסילוק הפרשות',
                     'הושבה',
@@ -512,8 +514,8 @@
                 gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
                 textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
                 ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
+                note: 'שלב R נלמד יחד עם A ומתמקד בהערכת הנשימה, עמש״צ וחשיפת בית החזה.',
                 items: [
-                    'בהיעדר נשימה ← הנשמה באמצעות אמבו ומסיכה',
                     'בחשד לפגיעה ← שמירה על עמש״צ',
                     'חשיפת בית החזה והתרשמות מסימני חבלה'
                 ]
@@ -525,14 +527,14 @@
                 gradient: 'from-green-600 to-emerald-500', lightBg: 'bg-green-50 dark:bg-green-900/20',
                 textColor: 'text-green-600 dark:text-green-400', borderColor: 'border-green-200 dark:border-green-800',
                 ringColor: 'ring-green-400', tabBg: 'bg-green-700', tabText: 'text-white',
+                note: 'טרם הפינוי יש לבצע חיתוך מצב בצוות ולהעביר דיווח רפואי.',
                 items: [
                     'וידוא הפשטה מלאה והפיכה - איתור כלל הפציעות, עצירת דימום במידה וזוהה',
                     'ראש - התרשמות מסימני חבלה',
                     'עמש״צ - בחשד לפגיעה ← הנחת צווארון',
                     'אגן - הערכה וביצוע כריכת אגן',
                     'כיסוי, חימום והעמסת לאלונקה',
-                    'חיתוך מצב - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות',
-                    'העברת דיווח רפואי והשלמת תיעוד ב-101 דיגיטלי או ידני'
+                    'טרם הפינוי יש לבצע חיתוך מצב בצוות - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות, להעביר דיווח רפואי ולהשלים תיעוד ב-101 דיגיטלי או ידני'
                 ]
             },
             {
@@ -603,16 +605,22 @@
 
         // ====== UTILITY FUNCTIONS ======
         function normalizeForCompare(text) {
-            return text
-                .replace(/[,.\-–:;!?'"״׳()\[\]{}<>←→«»\/\\]/g, '')
-                .replace(/\s+/g, ' ')
-                .trim();
+            return (text || '')
+                .normalize('NFKC')
+                .toLowerCase()
+                .replace(/[^0-9a-zA-Z\u0590-\u05ff]+/g, '');
         }
 
         function compareTexts(expected, actual) {
             const expNorm = normalizeForCompare(expected);
             const actNorm = normalizeForCompare(actual);
             return expNorm === actNorm;
+        }
+
+        function getStepNoteTitle(step) {
+            if (step.id === 'E') return 'לפני הפינוי';
+            if (step.id === 'A' || step.id === 'R') return 'A + R';
+            return 'דגש';
         }
 
         function shuffleArray(arr) {
@@ -862,9 +870,15 @@
 
             let noteHtml = '';
             if (step.note) {
-                noteHtml = `<div class="mb-4 px-4 py-3 rounded-2xl ${step.lightBg} ${step.borderColor} border flex items-center gap-3">
-                    <i data-lucide="info" class="w-5 h-5 ${step.textColor} shrink-0"></i>
-                    <span class="font-bold text-sm ${step.textColor}">${step.note}</span>
+                const noteTitle = getStepNoteTitle(step);
+                noteHtml = `<div class="mb-4 px-4 py-4 rounded-2xl ${step.lightBg} ${step.borderColor} border shadow-sm">
+                    <div class="flex items-start gap-3">
+                        <i data-lucide="info" class="w-5 h-5 ${step.textColor} shrink-0 mt-0.5"></i>
+                        <div>
+                            <div class="font-black text-xs uppercase tracking-[0.2em] ${step.textColor} mb-1">${noteTitle}</div>
+                            <p class="font-bold text-sm leading-6 ${step.textColor}">${step.note}</p>
+                        </div>
+                    </div>
                 </div>`;
             }
 
@@ -918,7 +932,7 @@
             let html = `
                 <div class="text-center mb-8">
                     <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2">מבחן סכמה מלא</h2>
-                    <p class="text-slate-500 dark:text-slate-400 font-medium">רשום את התוכן של כל שלב מילה במילה. פסיקים ונקודות לא נבדקים.</p>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">לא חייב מילה במילה — רווחים, פסיקים וסימני פיסוק אחרים לא נבדקים.</p>
                 </div>
             `;
 
@@ -933,7 +947,19 @@
                     </div>
                 `).join('');
 
-                let noteHtml = step.note ? `<div class="text-sm font-bold ${step.textColor} mb-2"><i data-lucide="info" class="w-4 h-4 inline"></i> ${step.note}</div>` : '';
+                let noteHtml = '';
+                if (step.note) {
+                    const noteTitle = getStepNoteTitle(step);
+                    noteHtml = `<div class="mb-3 px-4 py-3 rounded-2xl ${step.lightBg} ${step.borderColor} border">
+                        <div class="flex items-start gap-2">
+                            <i data-lucide="info" class="w-4 h-4 ${step.textColor} shrink-0 mt-0.5"></i>
+                            <div>
+                                <div class="font-black text-[11px] uppercase tracking-[0.18em] ${step.textColor} mb-1">${noteTitle}</div>
+                                <div class="text-sm font-bold leading-6 ${step.textColor}">${step.note}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                }
 
                 html += `
                     <div class="mb-6 rounded-[2rem] overflow-hidden shadow-lg border ${step.borderColor}">
@@ -1120,8 +1146,10 @@
             <div class="flex-1 p-4">
                 <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
                     <li>הערכת נתיב האוויר ומצוקה נשימתית תוך פניה לפצוע והסתכלות.</li>
+                    <li class="bg-blue-50 dark:bg-slate-800/80 border border-blue-100 dark:border-slate-700 p-2 rounded-lg text-sm"><strong>שלבי A ו-R נלמדים יחד</strong></li>
                     <li>שימוש באמצעים בסיסיים לניהול נתיב האוויר: <span class="bg-red-600 text-white px-1 rounded text-xs">4</span>
                         <ul class="schema-sub-list pr-5 mt-1 space-y-1 text-sm">
+                            <li>בהיעדר נשימה &larr; הנשמה באמצעות אמבו ומסיכה</li>
                             <li>פתיחת פה וסילוק הפרשות</li>
                             <li>הושבה</li>
                             <li>העשרה בחמצן <span class="bg-red-600 text-white px-1 rounded text-xs">5</span></li>
@@ -1144,13 +1172,17 @@
             </div>
             <div class="flex-1 p-4">
                 <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
-                    <li>בהיעדר נשימה &larr; הנשמה באמצעות אמבו ומסיכה</li>
+                    <li class="text-sm text-blue-700 dark:text-blue-300 font-semibold">R נלמד כהמשך ישיר ל-A</li>
                     <li>בחשד לפגיעה &larr; שמירה על עמש"צ</li>
                     <li>חשיפת בית החזה והתרשמות מסימני חבלה</li>
                 </ul>
             </div>
             <div class="w-12 md:w-16 bg-yellow-400 dark:bg-yellow-600 flex items-center justify-center border-r border-green-200 dark:border-green-800 p-1">
-                 <span class="text-[10px] leading-tight text-center text-yellow-900 dark:text-yellow-100 font-semibold">טרם הפינוי יש לבצע חיתוך מצב בצוות ולהעביר דיווח רפואי</span>
+                 <span class="text-xs leading-snug text-center text-yellow-900 dark:text-yellow-100 font-bold">
+                    <span class="block">לפני פינוי:</span>
+                    <span class="block">חיתוך מצב</span>
+                    <span class="block">ודיווח רפואי</span>
+                 </span>
             </div>
         </div>
 
@@ -1168,8 +1200,9 @@
                     <li>עמש"צ - בחשד לפגיעה &larr; הנחת צווארון <span class="bg-red-600 text-white px-1 rounded text-xs">2</span></li>
                     <li>אגן - הערכה וביצוע כריכת אגן <span class="bg-red-600 text-white px-1 rounded text-xs">2</span></li>
                     <li>כיסוי, חימום והעמסת לאלונקה</li>
-                    <li><strong>חיתוך מצב</strong> - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות</li>
-                    <li><strong>העברת דיווח רפואי והשלמת תיעוד ב-101 דיגיטלי או ידני</strong></li>
+                    <li class="bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-3 mt-2">
+                        <strong>טרם הפינוי</strong> יש לבצע <strong>חיתוך מצב בצוות</strong> - סיכום הממצאים, הגדרת דחיפות הפינוי ומתן הנחיות לצוות, <strong>להעביר דיווח רפואי</strong> ולהשלים תיעוד ב-101 דיגיטלי או ידני
+                    </li>
                 </ul>
             </div>
             <div class="w-12 md:w-16 bg-yellow-400 dark:bg-yellow-600 flex flex-col items-center justify-center border-r border-green-200 dark:border-green-800 relative">
@@ -1330,7 +1363,7 @@
             let html = `
                 <div class="text-center mb-8">
                     <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2">מבחן לפי שלבים</h2>
-                    <p class="text-slate-500 dark:text-slate-400 font-medium">בחר שלב ספציפי ורשום את כל הנקודות שלו מילה במילה.</p>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">בחר שלב ספציפי ורשום את כל הנקודות שלו. רווחים וסימני פיסוק לא נבדקים.</p>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
             `;
@@ -1373,7 +1406,19 @@
                 </div>
             `).join('');
 
-            let noteHtml = step.note ? `<div class="text-sm font-bold ${step.textColor} mb-3"><i data-lucide="info" class="w-4 h-4 inline"></i> ${step.note}</div>` : '';
+            let noteHtml = '';
+            if (step.note) {
+                const noteTitle = getStepNoteTitle(step);
+                noteHtml = `<div class="mb-3 px-4 py-3 rounded-2xl ${step.lightBg} ${step.borderColor} border">
+                    <div class="flex items-start gap-2">
+                        <i data-lucide="info" class="w-4 h-4 ${step.textColor} shrink-0 mt-0.5"></i>
+                        <div>
+                            <div class="font-black text-[11px] uppercase tracking-[0.18em] ${step.textColor} mb-1">${noteTitle}</div>
+                            <div class="text-sm font-bold leading-6 ${step.textColor}">${step.note}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }
 
             container.innerHTML = `
                 <button onclick="initStepTest()" class="mb-4 flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm hover:text-slate-700 dark:hover:text-slate-200 transition">
