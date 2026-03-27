@@ -611,10 +611,159 @@
                 .replace(/[^0-9a-zA-Z\u0590-\u05ff]+/g, '');
         }
 
-        function compareTexts(expected, actual) {
+        function tokenizeForCompare(text) {
+            return ((text || '')
+                .normalize('NFKC')
+                .toLowerCase()
+                .replace(/[^0-9a-zA-Z\u0590-\u05ff\s]+/g, '')
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean));
+        }
+
+        function getAllowedTypos(word) {
+            return word.length > 5 ? 2 : 1;
+        }
+
+        function levenshteinDistance(a, b) {
+            const rows = a.length + 1;
+            const cols = b.length + 1;
+            const dp = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+            for (let i = 0; i < rows; i++) dp[i][0] = i;
+            for (let j = 0; j < cols; j++) dp[0][j] = j;
+
+            for (let i = 1; i < rows; i++) {
+                for (let j = 1; j < cols; j++) {
+                    const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                    dp[i][j] = Math.min(
+                        dp[i - 1][j] + 1,
+                        dp[i][j - 1] + 1,
+                        dp[i - 1][j - 1] + cost
+                    );
+                }
+            }
+
+            return dp[a.length][b.length];
+        }
+
+        function analyzeTextComparison(expected, actual) {
             const expNorm = normalizeForCompare(expected);
             const actNorm = normalizeForCompare(actual);
-            return expNorm === actNorm;
+
+            if (expNorm === actNorm) {
+                return {
+                    isAccepted: true,
+                    isExact: true,
+                    typoCorrections: []
+                };
+            }
+
+            const expectedWords = tokenizeForCompare(expected);
+            const actualWords = tokenizeForCompare(actual);
+
+            if (!actualWords.length) {
+                return {
+                    isAccepted: false,
+                    isExact: false,
+                    typoCorrections: [],
+                    incorrectWords: []
+                };
+            }
+
+            if (expectedWords.length !== actualWords.length) {
+                return {
+                    isAccepted: false,
+                    isExact: false,
+                    typoCorrections: [],
+                    incorrectWords: actualWords.map((word, idx) => ({
+                        actualWord: word,
+                        expectedWord: expectedWords[idx] || ''
+                    }))
+                };
+            }
+
+            const typoCorrections = [];
+            const incorrectWords = [];
+
+            expectedWords.forEach((expectedWord, idx) => {
+                const actualWord = actualWords[idx];
+                if (expectedWord === actualWord) return;
+
+                const distance = levenshteinDistance(expectedWord, actualWord);
+                if (distance <= getAllowedTypos(expectedWord)) {
+                    typoCorrections.push({ actualWord, expectedWord });
+                    return;
+                }
+
+                incorrectWords.push({ actualWord, expectedWord });
+            });
+
+            return {
+                isAccepted: incorrectWords.length === 0,
+                isExact: false,
+                typoCorrections,
+                incorrectWords
+            };
+        }
+
+        function compareTexts(expected, actual) {
+            return analyzeTextComparison(expected, actual).isAccepted;
+        }
+
+        function escapeHtml(text) {
+            return (text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatCorrectionPairs(pairs) {
+            return pairs
+                .filter(pair => pair.expectedWord || pair.actualWord)
+                .map(pair => {
+                    const actualWord = pair.actualWord || '—';
+                    const expectedWord = pair.expectedWord || '—';
+                    return `<span class="font-black text-slate-700 dark:text-slate-200">"${escapeHtml(actualWord)}"</span> → <span class="font-black text-slate-700 dark:text-slate-200">"${escapeHtml(expectedWord)}"</span>`;
+                })
+                .join(', ');
+        }
+
+        function getAcceptedFeedback(expected, comparison) {
+            if (comparison.isExact) {
+                return {
+                    className: 'mt-1 text-sm font-bold px-2 text-green-600 dark:text-green-400',
+                    html: '✓ נכון!'
+                };
+            }
+
+            return {
+                className: 'mt-1 text-sm font-bold px-2 text-amber-600 dark:text-amber-400',
+                html: `
+                    <div>✓ נכון, אבל יש שגיאת כתיב: ${formatCorrectionPairs(comparison.typoCorrections)}</div>
+                    <div class="mt-1 text-slate-700 dark:text-slate-300">השורה התקינה: ${escapeHtml(expected)}</div>
+                `
+            };
+        }
+
+        function getRejectedFeedback(expected, actual, comparison) {
+            const actualWords = formatCorrectionPairs(comparison.incorrectWords);
+            if (!actual.trim()) {
+                return {
+                    className: 'mt-1 text-sm font-bold px-2 text-red-500 dark:text-red-400',
+                    html: `<div class="text-slate-700 dark:text-slate-300">השורה התקינה: ${escapeHtml(expected)}</div>`
+                };
+            }
+
+            return {
+                className: 'mt-1 text-sm font-bold px-2 text-red-500 dark:text-red-400',
+                html: `
+                    <div>✗ טעית ב: ${actualWords || `<span class="font-black text-slate-700 dark:text-slate-200">"${escapeHtml(actual)}"</span>`}</div>
+                    <div class="mt-1 text-slate-700 dark:text-slate-300">השורה התקינה: ${escapeHtml(expected)}</div>
+                `
+            };
         }
 
         function getStepNoteTitle(step) {
@@ -932,7 +1081,7 @@
             let html = `
                 <div class="text-center mb-8">
                     <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2">מבחן סכמה מלא</h2>
-                    <p class="text-slate-500 dark:text-slate-400 font-medium">לא חייב מילה במילה — רווחים, פסיקים וסימני פיסוק אחרים לא נבדקים.</p>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">לא חייב מילה במילה — רווחים, פסיקים וסימני פיסוק אחרים לא נבדקים, ושגיאות כתיב קטנות מתקבלות עם תיקון.</p>
                 </div>
             `;
 
@@ -1002,28 +1151,28 @@
 
             let totalItems = 0;
             let correctItems = 0;
-            let wrongDetails = [];
-
             schemaSteps.forEach(step => {
                 step.items.forEach((expected, idx) => {
                     totalItems++;
                     const input = document.getElementById(`ft-${step.id}-${idx}`);
                     const feedback = document.getElementById(`ft-fb-${step.id}-${idx}`);
                     const userText = input.value.trim();
+                    const comparison = analyzeTextComparison(expected, userText);
 
-                    if (compareTexts(expected, userText)) {
+                    if (comparison.isAccepted) {
                         correctItems++;
                         input.classList.add('correct');
                         feedback.classList.remove('hidden');
-                        feedback.className = 'mt-1 text-sm font-bold px-2 text-green-600 dark:text-green-400';
-                        feedback.innerHTML = '✓ נכון!';
+                        const acceptedFeedback = getAcceptedFeedback(expected, comparison);
+                        feedback.className = acceptedFeedback.className;
+                        feedback.innerHTML = acceptedFeedback.html;
                     } else {
                         input.classList.add('wrong');
                         input.readOnly = true;
                         feedback.classList.remove('hidden');
-                        feedback.className = 'mt-1 text-sm font-bold px-2 text-red-500 dark:text-red-400';
-                        feedback.innerHTML = `✗ צריך להיות: <span class="text-slate-700 dark:text-slate-300">${expected}</span>`;
-                        wrongDetails.push({ step: step.letter, idx: idx + 1, expected, got: userText });
+                        const rejectedFeedback = getRejectedFeedback(expected, userText, comparison);
+                        feedback.className = rejectedFeedback.className;
+                        feedback.innerHTML = rejectedFeedback.html;
                     }
                 });
             });
@@ -1363,7 +1512,7 @@
             let html = `
                 <div class="text-center mb-8">
                     <h2 class="text-3xl font-black text-slate-800 dark:text-white mb-2">מבחן לפי שלבים</h2>
-                    <p class="text-slate-500 dark:text-slate-400 font-medium">בחר שלב ספציפי ורשום את כל הנקודות שלו. רווחים וסימני פיסוק לא נבדקים.</p>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">בחר שלב ספציפי ורשום את כל הנקודות שלו. רווחים וסימני פיסוק לא נבדקים, ושגיאות כתיב קטנות מתקבלות עם תיקון.</p>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
             `;
@@ -1461,19 +1610,22 @@
                 const input = document.getElementById(`st-${step.id}-${idx}`);
                 const feedback = document.getElementById(`st-fb-${step.id}-${idx}`);
                 const userText = input.value.trim();
+                const comparison = analyzeTextComparison(expected, userText);
 
-                if (compareTexts(expected, userText)) {
+                if (comparison.isAccepted) {
                     correctItems++;
                     input.classList.add('correct');
                     feedback.classList.remove('hidden');
-                    feedback.className = 'mt-1 text-sm font-bold px-2 text-green-600 dark:text-green-400';
-                    feedback.innerHTML = '✓ נכון!';
+                    const acceptedFeedback = getAcceptedFeedback(expected, comparison);
+                    feedback.className = acceptedFeedback.className;
+                    feedback.innerHTML = acceptedFeedback.html;
                 } else {
                     input.classList.add('wrong');
                     input.readOnly = true;
                     feedback.classList.remove('hidden');
-                    feedback.className = 'mt-1 text-sm font-bold px-2 text-red-500 dark:text-red-400';
-                    feedback.innerHTML = `✗ צריך להיות: <span class="text-slate-700 dark:text-slate-300">${expected}</span>`;
+                    const rejectedFeedback = getRejectedFeedback(expected, userText, comparison);
+                    feedback.className = rejectedFeedback.className;
+                    feedback.innerHTML = rejectedFeedback.html;
                 }
             });
 
