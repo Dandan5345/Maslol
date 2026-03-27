@@ -608,7 +608,7 @@
             return (text || '')
                 .normalize('NFKC')
                 .toLowerCase()
-                .replace(/[^0-9a-z\u0590-\u05ff]+/g, '');
+                .replace(/[^0-9a-zA-Z\u0590-\u05ff]+/g, '');
         }
 
         function compareTexts(expected, actual) {
@@ -1140,7 +1140,7 @@
             <div class="flex-1 p-4">
                 <ul class="schema-content-list text-gray-800 dark:text-gray-200 space-y-1">
                     <li>הערכת נתיב האוויר ומצוקה נשימתית תוך פניה לפצוע והסתכלות.</li>
-                    <li class="bg-blue-50 dark:bg-slate-800/80 border border-blue-100 dark:border-slate-700 p-2 rounded-lg text-sm"><strong>שלבי A ו-R נלמדים יחד</strong></li>
+                    <li role="note" aria-label="שלבי A ו-R נלמדים יחד" class="bg-blue-50 dark:bg-slate-800/80 border border-blue-100 dark:border-slate-700 p-2 rounded-lg text-sm"><strong>שלבי A ו-R נלמדים יחד</strong></li>
                     <li>שימוש באמצעים בסיסיים לניהול נתיב האוויר: <span class="bg-red-600 text-white px-1 rounded text-xs">4</span>
                         <ul class="schema-sub-list pr-5 mt-1 space-y-1 text-sm">
                             <li>בהיעדר נשימה &larr; הנשמה באמצעות אמבו ומסיכה</li>
