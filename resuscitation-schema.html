@@ -604,25 +604,32 @@
         ];
 
         // ====== UTILITY FUNCTIONS ======
-        function normalizeForCompare(text) {
+        function getComparableText(text, keepSpaces = false) {
             return (text || '')
                 .normalize('NFKC')
                 .toLowerCase()
-                .replace(/[^0-9a-zA-Z\u0590-\u05ff]+/g, '');
+                .replace(keepSpaces ? /[^0-9a-zA-Z\u0590-\u05ff\s]+/g : /[^0-9a-zA-Z\u0590-\u05ff]+/g, '');
+        }
+
+        function normalizeForCompare(text) {
+            return getComparableText(text);
         }
 
         function tokenizeForCompare(text) {
-            return ((text || '')
-                .normalize('NFKC')
-                .toLowerCase()
-                .replace(/[^0-9a-zA-Z\u0590-\u05ff\s]+/g, '')
+            return getComparableText(text, true)
                 .trim()
                 .split(/\s+/)
-                .filter(Boolean));
+                .filter(Boolean);
         }
 
+        const SHORT_WORD_MAX_LENGTH = 5;
+        const SHORT_WORD_TYPO_ALLOWANCE = 1;
+        const LONG_WORD_TYPO_ALLOWANCE = 2;
+        const MISSING_ACTUAL_WORD_DISPLAY_TEXT = 'לא נכתב';
+        const EXTRA_ACTUAL_WORD_DISPLAY_TEXT = 'מיותר';
+
         function getAllowedTypos(word) {
-            return word.length > 5 ? 2 : 1;
+            return word.length > SHORT_WORD_MAX_LENGTH ? LONG_WORD_TYPO_ALLOWANCE : SHORT_WORD_TYPO_ALLOWANCE;
         }
 
         function levenshteinDistance(a, b) {
@@ -676,10 +683,7 @@
                     isAccepted: false,
                     isExact: false,
                     typoCorrections: [],
-                    incorrectWords: actualWords.map((word, idx) => ({
-                        actualWord: word,
-                        expectedWord: expectedWords[idx] || ''
-                    }))
+                    incorrectWords: buildWordPairs(expectedWords, actualWords)
                 };
             }
 
@@ -724,11 +728,23 @@
             return pairs
                 .filter(pair => pair.expectedWord || pair.actualWord)
                 .map(pair => {
-                    const actualWord = pair.actualWord || '—';
-                    const expectedWord = pair.expectedWord || '—';
+                    const actualWord = pair.actualWord || MISSING_ACTUAL_WORD_DISPLAY_TEXT;
+                    const expectedWord = pair.expectedWord || EXTRA_ACTUAL_WORD_DISPLAY_TEXT;
                     return `<span class="font-black text-slate-700 dark:text-slate-200">"${escapeHtml(actualWord)}"</span> → <span class="font-black text-slate-700 dark:text-slate-200">"${escapeHtml(expectedWord)}"</span>`;
                 })
                 .join(', ');
+        }
+
+        function buildWordPairs(expectedWords, actualWords) {
+            const totalWords = Math.max(expectedWords.length, actualWords.length);
+            return Array.from({ length: totalWords }, (_, idx) => ({
+                actualWord: actualWords[idx] || '',
+                expectedWord: expectedWords[idx] || ''
+            })).filter(isMeaningfulWordPair);
+        }
+
+        function isMeaningfulWordPair(pair) {
+            return (pair.actualWord || pair.expectedWord) && pair.actualWord !== pair.expectedWord;
         }
 
         function getAcceptedFeedback(expected, comparison) {
@@ -750,7 +766,7 @@
 
         function getRejectedFeedback(expected, actual, comparison) {
             const actualWords = formatCorrectionPairs(comparison.incorrectWords);
-            if (!actual.trim()) {
+            if (!actual) {
                 return {
                     className: 'mt-1 text-sm font-bold px-2 text-red-500 dark:text-red-400',
                     html: `<div class="text-slate-700 dark:text-slate-300">השורה התקינה: ${escapeHtml(expected)}</div>`
@@ -760,7 +776,7 @@
             return {
                 className: 'mt-1 text-sm font-bold px-2 text-red-500 dark:text-red-400',
                 html: `
-                    <div>✗ טעית ב: ${actualWords || `<span class="font-black text-slate-700 dark:text-slate-200">"${escapeHtml(actual)}"</span>`}</div>
+                    <div>✗ טעית ב: ${actualWords}</div>
                     <div class="mt-1 text-slate-700 dark:text-slate-300">השורה התקינה: ${escapeHtml(expected)}</div>
                 `
             };
