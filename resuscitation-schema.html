@@ -457,6 +457,7 @@
 
         let currentUser = null;
         const currentAxis = 'resuscitation-schema';
+        const axisHomeHref = document.body?.dataset?.homeHref || 'axes.html';
 
         // ====== SCHEMA DATA ======
         const schemaSteps = [
@@ -988,7 +989,20 @@
 
             if (typeof window.setFloatingNavState === 'function') {
                 window.setFloatingNavState({
-                    homeAction: () => window.navigate('home')
+                    backAction: () => {
+                        if (currentScreen === 'home') {
+                            window.location.href = axisHomeHref;
+                            return;
+                        }
+                        if (currentScreen === 'step-test' && stepTestStep) {
+                            initStepTest();
+                            return;
+                        }
+                        window.navigate('home');
+                    },
+                    homeAction: () => {
+                        window.location.href = axisHomeHref;
+                    }
                 });
             }
 
@@ -1119,20 +1133,6 @@
                     </div>
                 `).join('');
 
-                let noteHtml = '';
-                if (step.note) {
-                    const noteTitle = getStepNoteTitle(step);
-                    noteHtml = `<div class="mb-3 px-4 py-3 rounded-2xl ${step.lightBg} ${step.borderColor} border">
-                        <div class="flex items-start gap-2">
-                            <i data-lucide="info" class="w-4 h-4 ${step.textColor} shrink-0 mt-0.5"></i>
-                            <div>
-                                <div class="font-black text-[11px] uppercase tracking-[0.18em] ${step.textColor} mb-1">${noteTitle}</div>
-                                <div class="text-sm font-bold leading-6 ${step.textColor}">${step.note}</div>
-                            </div>
-                        </div>
-                    </div>`;
-                }
-
                 html += `
                     <div class="mb-6 rounded-[2rem] overflow-hidden shadow-lg border ${step.borderColor}">
                         <div class="bg-gradient-to-br ${step.gradient} text-white p-4 sm:p-5 flex items-center gap-4">
@@ -1144,10 +1144,7 @@
                                 <div class="text-white/80 text-sm font-bold">${step.hebrewName} ${step.time ? '(' + step.time + ')' : ''} • ${step.items.length} נקודות</div>
                             </div>
                         </div>
-                        <div class="p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/50 space-y-3">
-                            ${noteHtml}
-                            ${inputsHtml}
-                        </div>
+                        <div class="p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/50 space-y-3">${inputsHtml}</div>
                     </div>
                 `;
             });
@@ -1591,20 +1588,6 @@
                 </div>
             `).join('');
 
-            let noteHtml = '';
-            if (step.note) {
-                const noteTitle = getStepNoteTitle(step);
-                noteHtml = `<div class="mb-3 px-4 py-3 rounded-2xl ${step.lightBg} ${step.borderColor} border">
-                    <div class="flex items-start gap-2">
-                        <i data-lucide="info" class="w-4 h-4 ${step.textColor} shrink-0 mt-0.5"></i>
-                        <div>
-                            <div class="font-black text-[11px] uppercase tracking-[0.18em] ${step.textColor} mb-1">${noteTitle}</div>
-                            <div class="text-sm font-bold leading-6 ${step.textColor}">${step.note}</div>
-                        </div>
-                    </div>
-                </div>`;
-            }
-
             container.innerHTML = `
                 <button onclick="initStepTest()" class="mb-4 flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm hover:text-slate-700 dark:hover:text-slate-200 transition">
                     <i data-lucide="chevron-right" class="w-4 h-4"></i> חזרה לבחירת שלב
@@ -1617,10 +1600,7 @@
                             <div class="text-white/80 font-bold">${step.hebrewName} • ${step.items.length} נקודות</div>
                         </div>
                     </div>
-                    <div class="p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/50 space-y-3">
-                        ${noteHtml}
-                        ${inputsHtml}
-                    </div>
+                    <div class="p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/50 space-y-3">${inputsHtml}</div>
                 </div>
                 <div id="st-result" class="hidden mb-6 p-6 rounded-[2rem] shadow-xl border text-center"></div>
                 <div class="flex gap-3 mb-10">

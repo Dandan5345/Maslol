@@ -77,7 +77,8 @@
             @media (max-width: 640px) {
                 .global-floating-nav {
                     left: 0.75rem;
-                    top: max(0.75rem, env(safe-area-inset-top));
+                    top: auto;
+                    bottom: max(0.75rem, env(safe-area-inset-bottom));
                 }
 
                 .global-floating-nav__btn {
