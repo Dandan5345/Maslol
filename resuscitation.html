@@ -543,6 +543,7 @@
 
         let currentUser = null;
         const currentAxis = 'resuscitation';
+        const axisHomeHref = document.body?.dataset?.homeHref || 'axes.html';
 
         // Data State
         window.appState = {
@@ -680,7 +681,16 @@
 
             if (typeof window.setFloatingNavState === 'function') {
                 window.setFloatingNavState({
-                    homeAction: () => window.navigate('home')
+                    backAction: () => {
+                        if (currentScreen === 'home') {
+                            window.location.href = axisHomeHref;
+                            return;
+                        }
+                        window.navigate('home');
+                    },
+                    homeAction: () => {
+                        window.location.href = axisHomeHref;
+                    }
                 });
             }
 
