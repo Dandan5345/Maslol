@@ -256,6 +256,15 @@
         const specificExamCard = document.getElementById('start-exam-specific');
         const accessDeniedMessage = document.getElementById('access-denied-message');
 
+        function redirectToLogin() {
+            try {
+                sessionStorage.setItem('post-login-route', 'sodi');
+            } catch (error) {
+                console.error('Unable to store post-login route', error);
+            }
+            window.location.replace('login.html');
+        }
+
         function hideLoader() {
             const loader = document.getElementById('page-loader');
             loader.style.opacity = '0';
@@ -273,7 +282,7 @@
 
         onUserChanged(async (user) => {
             if (!user) {
-                window.location.replace('login.html');
+                redirectToLogin();
                 return;
             }
 
