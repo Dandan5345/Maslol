@@ -21,7 +21,7 @@ if (typeof __firebase_config !== 'undefined') {
 // בדיקת המייל נעשית לפי הכתובת הרשומה בחשבון Google בפיירבייס.
 export const AUTHORIZED_EMAILS = [
     'doronenakache@gmail.com',
-    // הוסף כאן את כתובת המייל השנייה
+    'gili.axelevy1@gmail.com',
 ];
 
 // בודק האם המשתמש מורשה לגישה לשאלות הספציפיות למבחן
