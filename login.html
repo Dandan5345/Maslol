@@ -168,18 +168,13 @@
         const errorBox = document.getElementById('login-error');
         const loginButton = document.getElementById('google-login-button');
         const DEFAULT_POST_LOGIN_URL = 'axes.html';
+        const POST_LOGIN_ROUTES = {
+            sodi: 'sodi.html',
+        };
 
         function getPostLoginUrl() {
-            const requestedUrl = new URLSearchParams(window.location.search).get('next') || '';
-            if (!requestedUrl) return DEFAULT_POST_LOGIN_URL;
-
-            const normalizedUrl = requestedUrl.trim().replace(/^\/+/, '');
-            if (!normalizedUrl) return DEFAULT_POST_LOGIN_URL;
-            if (/^(?:[a-z]+:)?\/\//i.test(normalizedUrl) || normalizedUrl.toLowerCase().startsWith('javascript:')) {
-                return DEFAULT_POST_LOGIN_URL;
-            }
-
-            return normalizedUrl;
+            const requestedRoute = new URLSearchParams(window.location.search).get('next') || '';
+            return POST_LOGIN_ROUTES[requestedRoute] || DEFAULT_POST_LOGIN_URL;
         }
 
         function applyDarkMode() {

@@ -257,8 +257,7 @@
         const accessDeniedMessage = document.getElementById('access-denied-message');
 
         function redirectToLogin() {
-            const currentPage = `${window.location.pathname.split('/').pop() || 'sodi.html'}${window.location.search}${window.location.hash}`;
-            window.location.replace(`login.html?next=${encodeURIComponent(currentPage)}`);
+            window.location.replace('login.html?next=sodi');
         }
 
         function hideLoader() {
