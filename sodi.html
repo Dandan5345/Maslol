@@ -251,7 +251,7 @@
     <script src="trauma-quiz/data.js"></script>
     <script src="trauma.js"></script>
     <script type="module">
-        import { ensureInitialAuth, onUserChanged, signOutUser, isAuthorizedUser } from './firebase-common.js';
+        import { ensureInitialAuth, onUserChanged, signOutUser, isSodiAuthorizedUser } from './firebase-common.js';
 
         const specificExamCard = document.getElementById('start-exam-specific');
         const accessDeniedMessage = document.getElementById('access-denied-message');
@@ -277,14 +277,14 @@
                 return;
             }
 
-            const isAllowed = isAuthorizedUser(user);
+            const isAllowed = isSodiAuthorizedUser(user);
 
             document.getElementById('trauma-user-display').textContent = user.displayName || user.email || 'משתמש';
             specificExamCard.classList.toggle('hidden', !isAllowed);
             accessDeniedMessage.classList.toggle('hidden', isAllowed);
 
             if (!isAllowed) {
-                document.getElementById('trauma-view-subtitle').textContent = 'המייל שלך אינו מורשה לגשת למבחן הזה.';
+                document.getElementById('trauma-view-subtitle').textContent = 'החשבון שלך אינו מורשה לגשת למבחן הזה.';
             }
 
             window.lucide?.createIcons();

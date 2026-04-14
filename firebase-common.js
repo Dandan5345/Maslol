@@ -24,9 +24,33 @@ export const AUTHORIZED_EMAILS = [
     // הוסף כאן את כתובת המייל השנייה
 ];
 
+const SODI_AUTHORIZED_EMAILS = [
+    'gili.axelevy1@gmail.com'
+];
+
+const SODI_AUTHORIZED_NAME_PARTS = ['גילי', 'לוי'];
+
+function normalizeAuthText(value) {
+    return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
 // בודק האם המשתמש מורשה לגישה לשאלות הספציפיות למבחן
 export function isAuthorizedUser(user) {
     return AUTHORIZED_EMAILS.includes((user?.email || '').toLowerCase());
+}
+
+export function isSodiAuthorizedUser(user) {
+    if (isAuthorizedUser(user)) {
+        return true;
+    }
+
+    const email = normalizeAuthText(user?.email);
+    if (SODI_AUTHORIZED_EMAILS.includes(email)) {
+        return true;
+    }
+
+    const displayName = normalizeAuthText(user?.displayName);
+    return SODI_AUTHORIZED_NAME_PARTS.every((part) => displayName.includes(part));
 }
 
 export const AXES = [
