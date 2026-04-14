@@ -167,12 +167,17 @@
         const loader = document.getElementById('page-loader');
         const errorBox = document.getElementById('login-error');
         const loginButton = document.getElementById('google-login-button');
-        const DEFAULT_POST_LOGIN_URL = 'axes.html';
+        const defaultPostLoginUrl = 'axes.html';
 
         function getPostLoginUrl() {
-            const requestedRoute = new URLSearchParams(window.location.search).get('next') || '';
-            if (requestedRoute === 'sodi') return 'sodi.html';
-            return DEFAULT_POST_LOGIN_URL;
+            try {
+                const requestedRoute = sessionStorage.getItem('post-login-route') || '';
+                sessionStorage.removeItem('post-login-route');
+                if (requestedRoute === 'sodi') return 'sodi.html';
+            } catch (error) {
+                console.error('Unable to restore post-login route', error);
+            }
+            return defaultPostLoginUrl;
         }
 
         function applyDarkMode() {

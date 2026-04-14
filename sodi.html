@@ -257,7 +257,12 @@
         const accessDeniedMessage = document.getElementById('access-denied-message');
 
         function redirectToLogin() {
-            window.location.replace('login.html?next=sodi');
+            try {
+                sessionStorage.setItem('post-login-route', 'sodi');
+            } catch (error) {
+                console.error('Unable to store post-login route', error);
+            }
+            window.location.replace('login.html');
         }
 
         function hideLoader() {
