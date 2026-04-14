@@ -168,13 +168,11 @@
         const errorBox = document.getElementById('login-error');
         const loginButton = document.getElementById('google-login-button');
         const DEFAULT_POST_LOGIN_URL = 'axes.html';
-        const POST_LOGIN_ROUTES = {
-            sodi: 'sodi.html',
-        };
 
         function getPostLoginUrl() {
             const requestedRoute = new URLSearchParams(window.location.search).get('next') || '';
-            return POST_LOGIN_ROUTES[requestedRoute] || DEFAULT_POST_LOGIN_URL;
+            if (requestedRoute === 'sodi') return 'sodi.html';
+            return DEFAULT_POST_LOGIN_URL;
         }
 
         function applyDarkMode() {
